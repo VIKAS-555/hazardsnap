@@ -359,7 +359,7 @@ function renderClubOverview() {
           </div>
           <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Branch</p>
         </div>
-        <div class="mt-2 text-[10px] text-slate-400 font-mono">Batch 2026–2030</div>
+        <div class="mt-2 text-[10px] text-slate-400 font-mono">Cohort 2026</div>
       </div>
 
       <!-- Stat 4: Live Technical Sessions & RSVP (Updates on Hackathon/Event CRUD & RSVP) -->
@@ -1869,7 +1869,7 @@ async function callGeminiApi(prompt, apiKey, model = 'gemini-1.5-flash') {
   const systemContext = `
 You are the official Technical Advisor and Club AI for BST Tech Club at Bosscoder School of Technology.
 Department: Department of Computer Science & Engineering (AI & ML).
-Target Batch: 2026–2030 (Class of 2030).
+Target Cohort: 2026.
 Eligibility Rule: ONLY students with USNs strictly in the range 2392608001 through 2392608302 are eligible to register. If asked about a USN, check if it is within 2392608001-2392608302 and state the verdict clearly.
 The club has 4 core technical verticals:
 1. Competative Programming (C++, Python, DSA, contest strategy, Codeforces, LeetCode, CodeChef, ICPC preparation).
@@ -1930,11 +1930,11 @@ function generateBuiltinAiAnswer(query) {
       const usnNum = parseInt(usnMatch[0], 10);
       if (usnNum >= 2392608001 && usnNum <= 2392608302) {
         return `✅ **USN Verification Successful: \`${usnMatch[0]}\` is ELIGIBLE!**\n\n` +
-          `• **Department**: CSE (AI & ML) Batch 2026–2030 (Class of 2030)\n` +
+          `• **Department**: CSE (AI & ML) Cohort 2026\n` +
           `• **Status**: Permitted within active registry range (\`2392608001\` – \`2392608302\`)\n\n` +
           `You can create your account and access all domain tracks immediately at the **[BST Member Portal](login.html)**.`;
       } else {
-        return `❌ **USN Check: \`${usnMatch[0]}\` is Outside Batch Range**\n\n` +
+        return `❌ **USN Check: \`${usnMatch[0]}\` is Outside Cohort Range**\n\n` +
           `BST Tech Club membership is currently strictly reserved for the **Department of CSE (AI & ML)** undergraduates with USNs between **\`2392608001\`** and **\`2392608302\`**.\n\n` +
           `If this is an administrative or lateral entry error, please reach out to the faculty coordinator at \`contact@bsttechclub.edu\`.`;
       }
@@ -1943,7 +1943,7 @@ function generateBuiltinAiAnswer(query) {
     return `🎓 **BST Tech Club Eligibility Criteria**\n\n` +
       `• **Eligible Department**: Department of Computer Science & Engineering (AI & ML)\n` +
       `• **Permitted USN Range**: **\`2392608001\`** through **\`2392608302\`**\n` +
-      `• **Batch**: 2026–2030 (Graduation Class of 2030)\n` +
+      `• **Cohort**: Cohort 2026\n` +
       `• **Prerequisites**: No prior experience required! We cater to all levels from absolute beginners to advanced builders.\n\n` +
       `Ready to register? Visit the **[Member Sign-In / Join](login.html)** portal to claim your personal digital ID badge.`;
   }
@@ -2048,7 +2048,7 @@ function generateBuiltinAiAnswer(query) {
 
   // 7. General Fallback with intelligent suggestions
   return `💡 **BST Tech Club Advisor Response**\n\n` +
-    `BST Tech Club is the premier builder collective for the **Department of CSE (AI & ML)** at Bosscoder School of Technology (Batch 2026–2030).\n\n` +
+    `BST Tech Club is the premier builder collective for the **Department of CSE (AI & ML)** at Bosscoder School of Technology (Cohort 2026).\n\n` +
     `• **Eligible USNs**: \`2392608001\` to \`2392608302\`\n` +
     `• **4 Technical Verticals**: Competative Programming, Robotics, Open Source, and Hackathons\n` +
     `• **Cost**: 100% Free for all department undergraduates\n\n` +

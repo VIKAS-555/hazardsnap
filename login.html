@@ -10,7 +10,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://bst-club-portal.vercel.app/login.html">
   <meta property="og:title" content="BST Tech Club | Student Member Portal">
-  <meta property="og:description" content="Official technical society for Department of CSE (AI & ML), Batch 2026–2030 (Class of 2030). Register your Tech Club ID, RSVP for hackathons, and collaborate.">
+  <meta property="og:description" content="Official technical society for Department of CSE (AI & ML), Cohort 2026. Register your Tech Club ID, RSVP for hackathons, and collaborate.">
   <meta property="og:image" content="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80&w=1200">
   <meta name="theme-color" content="#2563eb">
 
@@ -422,8 +422,8 @@
 
             <div class="grid grid-cols-2 gap-3 text-xs">
               <div>
-                <span class="text-[10px] uppercase font-mono text-slate-400">ACADEMIC BATCH</span>
-                <div class="font-mono font-semibold text-blue-600 dark:text-blue-400">2026–2030 (Class of '30)</div>
+                <span class="text-[10px] uppercase font-mono text-slate-400">ACADEMIC COHORT</span>
+                <div class="font-mono font-semibold text-blue-600 dark:text-blue-400">Cohort 2026</div>
               </div>
               <div>
                 <span class="text-[10px] uppercase font-mono text-slate-400">STATUS</span>
@@ -920,7 +920,7 @@
       const session = window.AuthEngine.getActiveSession();
       if (!session) return;
       const refUrl = getLiveReferralUrl(session.techClubId);
-      const text = `Hey! Join the official BST Tech Club (Department of CSE - AI & ML, Batch 2026–2030).\n\nRegister using my peer invitation link to mint your official Tech Club ID and access all workshops, hackathons, and technical sessions:\n\n${refUrl}`;
+      const text = `Hey! Join the official BST Tech Club (Department of CSE - AI & ML, Cohort 2026).\n\nRegister using my peer invitation link to mint your official Tech Club ID and access all workshops, hackathons, and technical sessions:\n\n${refUrl}`;
       const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
       window.open(whatsappUrl, '_blank');
     }

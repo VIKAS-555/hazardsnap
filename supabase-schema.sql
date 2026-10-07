@@ -1,7 +1,7 @@
 -- ============================================================
 -- BST TECH CLUB - PRODUCTION SUPABASE DATABASE SCHEMA
 -- Department: Computer Science & Engineering (AI & ML)
--- Academic Batch: 2026–2030 (Class of 2030)
+-- Cohort: 2026
 -- USN Range Restriction: 2392608001 to 2392608302
 -- ============================================================
 
