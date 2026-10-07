@@ -15,7 +15,7 @@ const ATTEMPTS_STORAGE_KEY = 'devsphere_login_attempts_v1';
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 60 * 1000; // 60 seconds lockout
 
-// --- High-Tech Clan Hierarchy Configuration ---
+// --- Open-Source Community Roles & Contribution Tracks Configuration ---
 const CLUB_RANKS = {
   'Root Architect': {
     rankLevel: 4,
@@ -25,7 +25,7 @@ const CLUB_RANKS = {
     statusLabel: 'ROOT ARCHITECT [UID 0]',
     avatarIcon: 'terminal',
     badgeClass: 'bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700',
-    description: 'root / UID 0. Complete kernel sovereignty; master key holder.'
+    description: 'root / UID 0. System initialization, platform infrastructure, and core club direction.'
   },
   'Core Maintainer': {
     rankLevel: 3,
@@ -35,7 +35,7 @@ const CLUB_RANKS = {
     statusLabel: 'CORE MAINTAINER [MAIN BRANCH]',
     avatarIcon: 'git-branch',
     badgeClass: 'bg-purple-100 dark:bg-purple-950/80 text-purple-800 dark:text-purple-300 border-purple-300 dark:border-purple-700',
-    description: 'Has write/merge permissions to the main branch. Heads domain tracks (CP, Robotics, AI).'
+    description: 'Main branch merge authority. Directs domain tracks (CP, Robotics, AI & ML) and reviews code submissions.'
   },
   'Staff Contributor': {
     rankLevel: 2,
@@ -45,7 +45,7 @@ const CLUB_RANKS = {
     statusLabel: 'STAFF CONTRIBUTOR [VERIFIED REVIEWER]',
     avatarIcon: 'code-2',
     badgeClass: 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700',
-    description: 'Trusted senior builder; earned by inviting 5+ peers or shipping code. Can verify ticket hashes.'
+    description: 'Senior peer builder and mentor. Earned by introducing 5+ student developers or contributing to club projects.'
   },
   'Active Developer': {
     rankLevel: 1,
@@ -55,7 +55,7 @@ const CLUB_RANKS = {
     statusLabel: 'ACTIVE DEVELOPER [USERLAND]',
     avatarIcon: 'cpu',
     badgeClass: 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
-    description: 'Verified student member in the CSE (AI & ML) registry.'
+    description: 'Verified student member in the CSE (AI & ML) registry. Active participant in workshops, hackathons, and projects.'
   }
 };
 
@@ -482,18 +482,18 @@ function isUserAdmin(session) {
 }
 
 /**
- * Promote / Demote / Reassign member rank
+ * Assign / Reassign community role
  * Authorized for Root Architect only
  */
 async function updateMemberRank(targetClubId, newRank) {
   const activeSession = getActiveSession();
   if (!activeSession || !isRootArchitect(activeSession)) {
-    throw new Error('Kernel Sovereignty Violation: Only Root Architect [UID 0] can assign member ranks.');
+    throw new Error('Administrative Access Required: Only the Root Architect [UID 0] can assign community roles.');
   }
 
   const validRanks = ['Root Architect', 'Core Maintainer', 'Staff Contributor', 'Active Developer'];
   if (!validRanks.includes(newRank)) {
-    throw new Error(`Invalid rank: ${newRank}`);
+    throw new Error(`Invalid role: ${newRank}`);
   }
 
   const vault = getMembersVault();
@@ -502,9 +502,9 @@ async function updateMemberRank(targetClubId, newRank) {
     throw new Error(`Member with ID ${targetClubId} not found.`);
   }
 
-  // Permanent founder protection: Cannot demote Root Architect
+  // Permanent founder protection: Cannot modify Root Architect
   if (normalizeMemberRank(target.role) === 'Root Architect' && targetClubId !== activeSession.techClubId && newRank !== 'Root Architect') {
-    throw new Error('Root Architect [UID 0] possesses immutable kernel sovereignty and cannot be demoted.');
+    throw new Error('Root Architect [UID 0] is the permanent founding lead and cannot be reassigned.');
   }
 
   target.role = newRank;
