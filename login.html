@@ -3,8 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Member Portal & Secure Access | DevSphere Tech Club</title>
-  <meta name="description" content="Secure login and student onboarding for DevSphere Technical Society. Access your digital member ID card, register for hackathons, and invite peers.">
+  <title>Member Portal & Secure Access | BST Tech Club</title>
+  <meta name="description" content="Secure login and student onboarding for BST Tech Club, Department of CSE (AI & ML). Access your digital member ID card, register for hackathons, and invite peers.">
+
+  <!-- Open Graph / WhatsApp Rich Link Preview -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://bst-club-portal.vercel.app/login.html">
+  <meta property="og:title" content="BST Tech Club | Student Member Portal">
+  <meta property="og:description" content="Official technical society for Department of CSE (AI & ML), Cohort 2026. Register your Tech Club ID, RSVP for hackathons, and collaborate.">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80&w=1200">
+  <meta name="theme-color" content="#2563eb">
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -478,13 +486,12 @@
           </button>
         </div>
 
-        <!-- Helpful Mobile Camera Scanning Tip when testing on localhost -->
-        <div id="localhost-phone-tip" class="hidden mt-3 p-2.5 rounded-xl bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200/60 dark:border-blue-900/50 text-[11px] text-blue-700 dark:text-blue-300 flex items-center justify-between gap-3">
-          <div class="flex items-center gap-2">
-            <i data-lucide="smartphone" class="w-4 h-4 shrink-0 text-blue-600 dark:text-blue-400"></i>
-            <span><b>Mobile Phone Scanning:</b> Mobile cameras cannot open <code class="px-1 py-0.5 rounded bg-blue-100/60 dark:bg-blue-900/50">localhost</code>. Connect to the same Wi-Fi and set your computer's IP address.</span>
-          </div>
-          <button type="button" onclick="promptCustomNetworkHost()" class="underline font-bold whitespace-nowrap text-blue-800 dark:text-blue-200 hover:text-blue-600">Set Wi-Fi IP</button>
+        <!-- Live Domain Verification Badge -->
+        <div class="mt-3 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+          <span class="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-medium">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Live Link: https://bst-club-portal.vercel.app
+          </span>
+          <span class="text-[10px] text-slate-400 font-sans">Official HTTPS URL</span>
         </div>
       </div>
 
@@ -833,13 +840,8 @@
       
       const vault = window.AuthEngine.getMembersVault();
       const currentMemberRecord = vault[session.techClubId] || session;
-      // Check if running on localhost to display helpful mobile camera scanning tip
-      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      const phoneTip = document.getElementById('localhost-phone-tip');
-      if (phoneTip) {
-        if (isLocalhost) phoneTip.classList.remove('hidden');
-        else phoneTip.classList.add('hidden');
-      }
+      // Purge any legacy temporary Wi-Fi IP override so links are always authentic HTTPS
+      try { localStorage.removeItem('bst_custom_host'); } catch (e) {}
 
       // Construct unique referral URL (defaults to live Vercel URL so phone cameras scanning laptop screens open the real site!)
       const referralUrl = getLiveReferralUrl(session.techClubId);
@@ -854,17 +856,11 @@
     const VERCEL_PRODUCTION_URL = 'https://bst-club-portal.vercel.app';
 
     function getLiveReferralUrl(clubId) {
+      try { localStorage.removeItem('bst_custom_host'); } catch (e) {}
       const host = window.location.hostname;
       const isLocal = host === 'localhost' || host === '127.0.0.1' || window.location.protocol === 'file:';
-      
-      const customHost = localStorage.getItem('bst_custom_host');
-      if (customHost && isLocal) {
-        let origin = customHost.startsWith('http') ? customHost : `http://${customHost}`;
-        if (!origin.includes(':') && window.location.port) origin += `:${window.location.port}`;
-        return `${origin}/login.html?ref=${encodeURIComponent(clubId)}`;
-      }
 
-      // Automatically default to live Vercel URL so phone cameras scanning laptop screens open the real web app!
+      // Always produce the authentic, clean HTTPS Vercel production URL
       const baseOrigin = isLocal ? VERCEL_PRODUCTION_URL : window.location.origin;
       return `${baseOrigin}/login.html?ref=${encodeURIComponent(clubId)}`;
     }
@@ -911,7 +907,7 @@
       const session = window.AuthEngine.getActiveSession();
       if (!session) return;
       const refUrl = getLiveReferralUrl(session.techClubId);
-      const text = `Hey! Join the official BST Tech Club (Department of CSE - AI & ML, Cohort 2026).\n\nRegister using my peer invitation link to mint your official Tech Club ID and access all events, workshops, and hackathons:\n${refUrl}`;
+      const text = `Hey! Join the official BST Tech Club (Department of CSE - AI & ML, Cohort 2026).\n\nRegister using my peer invitation link to mint your official Tech Club ID and access all workshops, hackathons, and technical sessions:\n\n${refUrl}`;
       const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
       window.open(whatsappUrl, '_blank');
     }
@@ -934,22 +930,6 @@
         if (img && img.src) {
           window.open(img.src, '_blank');
         }
-      }
-    }
-
-    // Set custom Wi-Fi IP for mobile phone camera scanning
-    function promptCustomNetworkHost() {
-      const current = localStorage.getItem('bst_custom_host') || '';
-      const entered = prompt("Enter your laptop's Wi-Fi IP address (e.g. 192.168.1.15) so phone cameras on the same Wi-Fi can open it:", current);
-      if (entered !== null) {
-        if (entered.trim()) {
-          localStorage.setItem('bst_custom_host', entered.trim());
-        } else {
-          localStorage.removeItem('bst_custom_host');
-        }
-        const session = window.AuthEngine.getActiveSession();
-        if (session) renderMemberDashboard(session);
-        showToast('Updated Referral QR Code!', 'check-circle-2');
       }
     }
 
