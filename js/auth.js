@@ -192,6 +192,23 @@ async function registerNewMember({ name, usn, section, email, department, passwo
     vault[referredBy].referralCount = (vault[referredBy].referralCount || 0) + 1;
   }
 
+  // Determine if this user is the First Member -> Permanent Admin
+  const existingMembers = Object.values(vault);
+  let hasExistingAdmin = existingMembers.some(m => m.role === 'Admin');
+
+  // Check cloud database if possible to ensure global consistency
+  if (!hasExistingAdmin && window.SupabaseEngine && window.SupabaseEngine.isConfigured()) {
+    try {
+      const cloudMembers = await window.SupabaseEngine.fetchMembers();
+      if (cloudMembers && Object.keys(cloudMembers).length > 0) {
+        hasExistingAdmin = Object.values(cloudMembers).some(m => m.role === 'Admin');
+      }
+    } catch (e) {}
+  }
+
+  // Whoever registers first becomes permanent Admin!
+  const assignedRole = (!hasExistingAdmin) ? 'Admin' : 'Member';
+
   const newMember = {
     techClubId: clubId,
     name: cleanName,
@@ -199,7 +216,7 @@ async function registerNewMember({ name, usn, section, email, department, passwo
     usn: cleanUsn,
     section: cleanSection,
     department: 'CSE (AI & ML)',
-    role: 'Member',
+    role: assignedRole,
     salt,
     passwordHash,
     joinedAt: new Date().toISOString(),
@@ -273,6 +290,32 @@ async function authenticateMember(identifier, password, rememberMe = true) {
 
   // Success
   clearFailedAttempts();
+
+  // Permanent First-Member Admin Verification:
+  // If no member is currently Admin, this first member is crowned permanent Admin!
+  const allVaultMembers = Object.values(vault);
+  const hasExistingAdmin = allVaultMembers.some(m => m.role === 'Admin');
+  if (!hasExistingAdmin && allVaultMembers.length > 0) {
+    const earliestMember = allVaultMembers.sort((a, b) => new Date(a.joinedAt || 0) - new Date(b.joinedAt || 0))[0];
+    if (earliestMember && (earliestMember.techClubId === member.techClubId || allVaultMembers.length === 1)) {
+      member.role = 'Admin';
+      if (vault[member.techClubId]) {
+        vault[member.techClubId].role = 'Admin';
+      }
+      saveMembersVault(vault);
+
+      // Persist to Supabase cloud
+      if (window.SupabaseEngine && window.SupabaseEngine.isConfigured()) {
+        try {
+          const client = window.SupabaseEngine.getClient();
+          if (client) {
+            client.from('members').update({ role: 'Admin' }).eq('tech_club_id', member.techClubId).then();
+          }
+        } catch (e) {}
+      }
+    }
+  }
+
   return setActiveSession(member, rememberMe);
 }
 
@@ -331,6 +374,11 @@ async function syncWithCloud() {
   return getMembersVault();
 }
 
+function isUserAdmin(session) {
+  if (!session) return false;
+  return session.role === 'Admin' || session.role === 'Head Admin' || session.techClubId === 'BST-2026-8001';
+}
+
 // Export for browser
 window.AuthEngine = {
   getMembersVault,
@@ -341,5 +389,6 @@ window.AuthEngine = {
   setActiveSession,
   logoutMember,
   checkLockout,
-  syncWithCloud
+  syncWithCloud,
+  isUserAdmin
 };

@@ -356,8 +356,8 @@
       <!-- Top Welcome Header -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
         <div>
-          <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-xs font-mono font-medium mb-1">
-            <i data-lucide="badge-check" class="w-3.5 h-3.5"></i> Active Tech Club Member
+          <div id="dash-role-pill" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-xs font-mono font-medium mb-1">
+            <i id="dash-role-icon" data-lucide="badge-check" class="w-3.5 h-3.5"></i> <span id="dash-role-title">Active Tech Club Member</span>
           </div>
           <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             Welcome, <span id="dash-user-name">Member</span>
@@ -381,23 +381,79 @@
         </div>
       </div>
 
+      <!-- ADMIN COMMAND SUITE (ONLY SHOWN FOR HEAD ADMIN) -->
+      <div id="admin-suite-card" class="hidden academic-card p-6 rounded-2xl shadow-sm border-2 border-amber-500/60 bg-gradient-to-br from-amber-50/50 via-white to-amber-50/20 dark:from-amber-950/20 dark:via-slate-900 dark:to-amber-950/10">
+        <div class="flex items-start justify-between gap-3 mb-4">
+          <div>
+            <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-amber-600 dark:text-amber-400">
+              <i data-lucide="crown" class="w-4 h-4 text-amber-500"></i> Permanent Head Admin Control Suite
+            </div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">
+              Club Lead Operations & Roster Oversight
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              You are the permanent Administrator of BST Tech Club (first member to onboard). You have full management rights across domain workshops, student roll calls, and registrations.
+            </p>
+          </div>
+          <span class="px-2.5 py-1 rounded-lg bg-amber-500 text-slate-950 text-xs font-mono font-extrabold uppercase shadow-sm flex items-center gap-1">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> SUPERADMIN
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+          <button 
+            type="button" 
+            onclick="openMemberDirectoryModal()" 
+            class="p-3.5 rounded-xl border border-amber-200 dark:border-amber-900/60 bg-white dark:bg-slate-900 hover:border-amber-500 text-left transition shadow-sm group">
+            <div class="flex items-center justify-between mb-1">
+              <i data-lucide="users" class="w-4 h-4 text-amber-500 group-hover:scale-110 transition"></i>
+              <span id="admin-member-count-stat" class="font-mono text-xs font-bold text-slate-700 dark:text-slate-300">0 Members</span>
+            </div>
+            <div class="text-xs font-bold text-slate-900 dark:text-white">Inspect Member Roster</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">View all USNs, emails & sections</div>
+          </button>
+
+          <a 
+            href="index.html#events" 
+            class="p-3.5 rounded-xl border border-amber-200 dark:border-amber-900/60 bg-white dark:bg-slate-900 hover:border-amber-500 text-left transition shadow-sm group">
+            <div class="flex items-center justify-between mb-1">
+              <i data-lucide="calendar-plus" class="w-4 h-4 text-blue-500 group-hover:scale-110 transition"></i>
+              <span class="font-mono text-xs font-bold text-blue-600">LIVE</span>
+            </div>
+            <div class="text-xs font-bold text-slate-900 dark:text-white">Manage Workshops</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Add, edit or cancel hackathons</div>
+          </a>
+
+          <a 
+            href="index.html#projects" 
+            class="p-3.5 rounded-xl border border-amber-200 dark:border-amber-900/60 bg-white dark:bg-slate-900 hover:border-amber-500 text-left transition shadow-sm group">
+            <div class="flex items-center justify-between mb-1">
+              <i data-lucide="folder-git-2" class="w-4 h-4 text-emerald-500 group-hover:scale-110 transition"></i>
+              <span class="font-mono text-xs font-bold text-emerald-600">GALLERY</span>
+            </div>
+            <div class="text-xs font-bold text-slate-900 dark:text-white">Student Projects</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Curate club member showcases</div>
+          </a>
+        </div>
+      </div>
+
       <!-- DIGITAL TECH CLUB ID CARD (Modern Academic Minimalist) -->
       <div id="digital-id-card" class="ticket-pass p-6 sm:p-7 rounded-2xl bg-gradient-to-br from-white via-slate-50 to-blue-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/20 border-2 border-blue-500 shadow-xl">
         
         <!-- ID Header -->
         <div class="flex items-start justify-between border-b border-slate-200 dark:border-slate-800 pb-4 mb-4">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-mono font-extrabold text-base shadow-sm">
+            <div id="card-avatar-badge" class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-mono font-extrabold text-base shadow-sm">
               BST
             </div>
             <div>
-              <div class="text-xs font-mono font-extrabold tracking-wider uppercase text-blue-600 dark:text-blue-400">BST TECH CLUB ID</div>
+              <div id="card-type-label" class="text-xs font-mono font-extrabold tracking-wider uppercase text-blue-600 dark:text-blue-400">BST TECH CLUB ID</div>
               <div class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Department of CSE (AI & ML)</div>
             </div>
           </div>
 
           <div class="text-right">
-            <span class="text-[10px] text-slate-400 uppercase font-mono font-semibold">MEMBER PASS ID</span>
+            <span id="card-pass-label" class="text-[10px] text-slate-400 uppercase font-mono font-semibold">MEMBER PASS ID</span>
             <div id="card-club-id" class="font-mono text-sm sm:text-base font-extrabold text-blue-600 dark:text-blue-400">
               BST-2026-XXXX
             </div>
@@ -441,9 +497,9 @@
                 <div class="font-mono font-semibold text-blue-600 dark:text-blue-400">Cohort 2026</div>
               </div>
               <div>
-                <span class="text-[10px] uppercase font-mono text-slate-400">STATUS</span>
-                <div class="font-mono font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ACTIVE MEMBER
+                <span class="text-[10px] uppercase font-mono text-slate-400">STATUS / ROLE</span>
+                <div id="card-status-badge" class="font-mono font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                  <span id="card-status-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> <span id="card-status-text">ACTIVE MEMBER</span>
                 </div>
               </div>
             </div>
@@ -929,6 +985,10 @@
       authContainer.classList.add('hidden');
       dashContainer.classList.remove('hidden');
 
+      const vault = window.AuthEngine.getMembersVault();
+      const currentMemberRecord = vault[session.techClubId] || session;
+      const isAdmin = (currentMemberRecord.role === 'Admin' || session.role === 'Admin');
+
       document.getElementById('dash-user-name').textContent = session.name;
       document.getElementById('card-club-id').textContent = session.techClubId;
       document.getElementById('card-name').textContent = session.name;
@@ -936,9 +996,70 @@
       document.getElementById('card-section').textContent = `SEC ${session.section}`;
       document.getElementById('card-dept').textContent = session.department;
       document.getElementById('card-email').textContent = session.email;
-      
-      const vault = window.AuthEngine.getMembersVault();
-      const currentMemberRecord = vault[session.techClubId] || session;
+
+      // Dynamic Admin vs Member ID Badge Styling
+      const rolePill = document.getElementById('dash-role-pill');
+      const roleTitle = document.getElementById('dash-role-title');
+      const idCard = document.getElementById('digital-id-card');
+      const cardTypeLabel = document.getElementById('card-type-label');
+      const cardPassLabel = document.getElementById('card-pass-label');
+      const cardStatusBadge = document.getElementById('card-status-badge');
+      const cardStatusText = document.getElementById('card-status-text');
+      const cardAvatar = document.getElementById('card-avatar-badge');
+      const adminSuite = document.getElementById('admin-suite-card');
+
+      if (isAdmin) {
+        if (rolePill) {
+          rolePill.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700 text-xs font-mono font-bold mb-1 shadow-sm';
+        }
+        if (roleTitle) roleTitle.textContent = '👑 Permanent Club Founder & Head Admin';
+        if (idCard) {
+          idCard.className = 'ticket-pass p-6 sm:p-7 rounded-2xl bg-gradient-to-br from-amber-50/70 via-white to-amber-100/30 dark:from-slate-900 dark:via-slate-900 dark:to-amber-950/40 border-2 border-amber-500 shadow-xl shadow-amber-500/10 ring-2 ring-amber-400/20';
+        }
+        if (cardAvatar) {
+          cardAvatar.className = 'w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 to-amber-500 text-white flex items-center justify-center font-mono font-extrabold text-base shadow-sm ring-2 ring-amber-400/30';
+          cardAvatar.innerHTML = '<i data-lucide="crown" class="w-5 h-5"></i>';
+        }
+        if (cardTypeLabel) {
+          cardTypeLabel.textContent = '👑 FOUNDER & HEAD ADMIN PASS';
+          cardTypeLabel.className = 'text-xs font-mono font-extrabold tracking-wider uppercase text-amber-600 dark:text-amber-400 flex items-center gap-1.5';
+        }
+        if (cardPassLabel) cardPassLabel.textContent = 'HEAD ADMINISTRATOR ID';
+        if (cardStatusBadge) {
+          cardStatusBadge.className = 'font-mono font-extrabold text-amber-600 dark:text-amber-400 flex items-center gap-1';
+        }
+        if (cardStatusText) cardStatusText.textContent = '👑 HEAD ADMIN (PERMANENT)';
+        if (adminSuite) {
+          adminSuite.classList.remove('hidden');
+          const adminCount = document.getElementById('admin-member-count-stat');
+          if (adminCount) {
+            adminCount.textContent = `${Object.keys(vault || {}).length} Members`;
+          }
+        }
+      } else {
+        if (rolePill) {
+          rolePill.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-xs font-mono font-medium mb-1';
+        }
+        if (roleTitle) roleTitle.textContent = 'Active Tech Club Member';
+        if (idCard) {
+          idCard.className = 'ticket-pass p-6 sm:p-7 rounded-2xl bg-gradient-to-br from-white via-slate-50 to-blue-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/20 border-2 border-blue-500 shadow-xl';
+        }
+        if (cardAvatar) {
+          cardAvatar.className = 'w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-mono font-extrabold text-base shadow-sm';
+          cardAvatar.textContent = 'BST';
+        }
+        if (cardTypeLabel) {
+          cardTypeLabel.textContent = 'BST TECH CLUB ID';
+          cardTypeLabel.className = 'text-xs font-mono font-extrabold tracking-wider uppercase text-blue-600 dark:text-blue-400';
+        }
+        if (cardPassLabel) cardPassLabel.textContent = 'MEMBER PASS ID';
+        if (cardStatusBadge) {
+          cardStatusBadge.className = 'font-mono font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1';
+        }
+        if (cardStatusText) cardStatusText.textContent = 'ACTIVE MEMBER';
+        if (adminSuite) adminSuite.classList.add('hidden');
+      }
+
       updateMemberCountBadges();
       // Purge any legacy temporary Wi-Fi IP override so links are always authentic HTTPS
       try { localStorage.removeItem('bst_custom_host'); } catch (e) {}
@@ -1221,8 +1342,13 @@
                 ${index + 1}
               </div>
               <div class="min-w-0">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
                   <span class="font-bold text-xs text-slate-900 dark:text-white truncate">${m.name || 'Member'}</span>
+                  ${m.role === 'Admin' ? `
+                    <span class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-mono text-[9px] font-extrabold border border-amber-300 dark:border-amber-700 flex items-center gap-1 shadow-sm">
+                      👑 FOUNDER & ADMIN
+                    </span>
+                  ` : ''}
                   <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-semibold">${m.section || 'AIML'}</span>
                 </div>
                 <div class="text-[11px] font-mono text-slate-500 dark:text-slate-400 truncate">
