@@ -381,22 +381,22 @@
         </div>
       </div>
 
-      <!-- ADMIN COMMAND SUITE (ONLY SHOWN FOR HEAD ADMIN) -->
+      <!-- ROOT ARCHITECT COMMAND SUITE (ONLY SHOWN FOR ROOT ARCHITECT) -->
       <div id="admin-suite-card" class="hidden academic-card p-6 rounded-2xl shadow-sm border-2 border-amber-500/60 bg-gradient-to-br from-amber-50/50 via-white to-amber-50/20 dark:from-amber-950/20 dark:via-slate-900 dark:to-amber-950/10">
         <div class="flex items-start justify-between gap-3 mb-4">
           <div>
             <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-amber-600 dark:text-amber-400">
-              <i data-lucide="crown" class="w-4 h-4 text-amber-500"></i> Permanent Head Admin Control Suite
+              <i data-lucide="terminal" class="w-4 h-4 text-amber-500"></i> Root Architect Control Suite [UID 0]
             </div>
             <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">
-              Club Lead Operations & Roster Oversight
+              Kernel Sovereignty & Main Branch Hierarchy Oversight
             </h3>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              You are the permanent Administrator of BST Tech Club (first member to onboard). You have full management rights across domain workshops, student roll calls, and registrations.
+              root / UID 0. Complete kernel sovereignty; master key holder. Promote or demote club members across the 4-tier hierarchy, curate domain tracks, and manage main branch merges.
             </p>
           </div>
           <span class="px-2.5 py-1 rounded-lg bg-amber-500 text-slate-950 text-xs font-mono font-extrabold uppercase shadow-sm flex items-center gap-1">
-            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> SUPERADMIN
+            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> ROOT [UID 0]
           </span>
         </div>
 
@@ -534,7 +534,7 @@
               Invite Peers to Join BST Tech Club
             </h3>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Share your personal invite link or show your QR code. When batchmates scan or click, they are guided straight to registration with your referral!
+              Share your personal invite link or show your QR code. When batchmates join via your link, your referral count increases. <b>Inviting 5+ peers automatically unlocks Staff Contributor rank!</b>
             </p>
           </div>
           
@@ -660,6 +660,108 @@
         </div>
       </div>
 
+      <!-- MEMBER ACTIONS: 4. ENGINEERING CLAN HIERARCHY & ROLES MATRIX -->
+      <div class="academic-card p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+        <div class="flex items-start justify-between gap-3 mb-4">
+          <div>
+            <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-purple-600 dark:text-purple-400">
+              <i data-lucide="git-merge" class="w-3.5 h-3.5"></i> Clan Governance System
+            </div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">
+              Engineering Clan Hierarchy & Branch Roles
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Clash-of-Clans style departmental hierarchy governed by software engineering ranks.
+            </p>
+          </div>
+          <span class="px-2.5 py-1 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 text-xs font-mono font-bold border border-purple-200 dark:border-purple-800">
+            4 TIERS
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <!-- Tier 4: Root Architect (Founder) -->
+          <div class="p-4 rounded-xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/40 dark:bg-amber-950/20 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-amber-800 dark:text-amber-300">
+                  <i data-lucide="terminal" class="w-3.5 h-3.5"></i> Root Architect (Founder)
+                </span>
+                <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200 font-extrabold border border-amber-300/60">
+                  ROOT ARCHITECT PASS
+                </span>
+              </div>
+              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                root / UID 0. Complete kernel sovereignty; master key holder. First member to register is locked permanently as Root Architect and cannot be demoted.
+              </p>
+            </div>
+            <div class="mt-2 text-[10px] font-mono font-bold text-amber-700 dark:text-amber-400">
+              Equiv: Leader • Kernel Sovereignty
+            </div>
+          </div>
+
+          <!-- Tier 3: Core Maintainer -->
+          <div class="p-4 rounded-xl border border-purple-200 dark:border-purple-900/60 bg-purple-50/40 dark:bg-purple-950/20 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-purple-800 dark:text-purple-300">
+                  <i data-lucide="git-branch" class="w-3.5 h-3.5"></i> Core Maintainer
+                </span>
+                <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-900/60 text-purple-900 dark:text-purple-200 font-extrabold border border-purple-300/60">
+                  CORE MAINTAINER PASS
+                </span>
+              </div>
+              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                Has write/merge permissions to the main branch. Heads domain tracks (Competitive Programming, Robotics, AI & ML).
+              </p>
+            </div>
+            <div class="mt-2 text-[10px] font-mono font-bold text-purple-700 dark:text-purple-400">
+              Equiv: Co-Leader • Main Branch Merges
+            </div>
+          </div>
+
+          <!-- Tier 2: Staff Contributor -->
+          <div class="p-4 rounded-xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/40 dark:bg-emerald-950/20 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-emerald-800 dark:text-emerald-300">
+                  <i data-lucide="code-2" class="w-3.5 h-3.5"></i> Staff Contributor
+                </span>
+                <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-200 font-extrabold border border-emerald-300/60">
+                  STAFF CONTRIBUTOR PASS
+                </span>
+              </div>
+              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                Trusted senior builder; earned automatically by inviting 5+ peers or shipping code. Can verify ticket hashes.
+              </p>
+            </div>
+            <div class="mt-2 text-[10px] font-mono font-bold text-emerald-700 dark:text-emerald-400">
+              Equiv: Elder • Unlocked at 5+ Referrals
+            </div>
+          </div>
+
+          <!-- Tier 1: Active Developer -->
+          <div class="p-4 rounded-xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/40 dark:bg-blue-950/20 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-blue-800 dark:text-blue-300">
+                  <i data-lucide="cpu" class="w-3.5 h-3.5"></i> Active Developer
+                </span>
+                <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/60 text-blue-900 dark:text-blue-200 font-extrabold border border-blue-300/60">
+                  ACTIVE DEVELOPER PASS
+                </span>
+              </div>
+              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                Verified student member in the CSE (AI & ML) registry. Minted upon initial account registration.
+              </p>
+            </div>
+            <div class="mt-2 text-[10px] font-mono font-bold text-blue-700 dark:text-blue-400">
+              Equiv: Member • Userland Access
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
   </main>
@@ -710,6 +812,17 @@
         <button onclick="syncAndRefreshDirectory()" title="Refresh Roster" class="p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition">
           <i data-lucide="refresh-cw" class="w-4 h-4"></i>
         </button>
+      </div>
+
+      <!-- Clan Hierarchy Badges Legend -->
+      <div class="px-4 py-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/60 flex items-center justify-between text-[10px] font-mono overflow-x-auto gap-2">
+        <span class="text-slate-400 uppercase font-semibold shrink-0">Clan Ranks:</span>
+        <div class="flex items-center gap-1.5 shrink-0">
+          <span class="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold border border-amber-300 dark:border-amber-700">Root Architect</span>
+          <span class="px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300 font-bold border border-purple-300 dark:border-purple-700">Maintainer</span>
+          <span class="px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold border border-emerald-300 dark:border-emerald-700">Staff</span>
+          <span class="px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-semibold border border-blue-200 dark:border-blue-800">Active Dev</span>
+        </div>
       </div>
 
       <!-- Member List Table / Container -->
@@ -987,7 +1100,7 @@
 
       const vault = window.AuthEngine.getMembersVault();
       const currentMemberRecord = vault[session.techClubId] || session;
-      const isAdmin = (currentMemberRecord.role === 'Admin' || session.role === 'Admin');
+      const userRank = window.AuthEngine.normalizeMemberRank ? window.AuthEngine.normalizeMemberRank(currentMemberRecord.role || session.role) : 'Active Developer';
 
       document.getElementById('dash-user-name').textContent = session.name;
       document.getElementById('card-club-id').textContent = session.techClubId;
@@ -997,66 +1110,95 @@
       document.getElementById('card-dept').textContent = session.department;
       document.getElementById('card-email').textContent = session.email;
 
-      // Dynamic Admin vs Member ID Badge Styling
+      // Dynamic 4-Tier Clan Hierarchy Card & Pass Styling
       const rolePill = document.getElementById('dash-role-pill');
       const roleTitle = document.getElementById('dash-role-title');
+      const roleIcon = document.getElementById('dash-role-icon');
       const idCard = document.getElementById('digital-id-card');
       const cardTypeLabel = document.getElementById('card-type-label');
       const cardPassLabel = document.getElementById('card-pass-label');
       const cardStatusBadge = document.getElementById('card-status-badge');
+      const cardStatusDot = document.getElementById('card-status-dot');
       const cardStatusText = document.getElementById('card-status-text');
       const cardAvatar = document.getElementById('card-avatar-badge');
       const adminSuite = document.getElementById('admin-suite-card');
 
-      if (isAdmin) {
-        if (rolePill) {
-          rolePill.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700 text-xs font-mono font-bold mb-1 shadow-sm';
-        }
-        if (roleTitle) roleTitle.textContent = 'Permanent Club Founder & Head Admin';
-        if (idCard) {
-          idCard.className = 'ticket-pass p-6 sm:p-7 rounded-2xl bg-gradient-to-br from-amber-50/70 via-white to-amber-100/30 dark:from-slate-900 dark:via-slate-900 dark:to-amber-950/40 border-2 border-amber-500 shadow-xl shadow-amber-500/10 ring-2 ring-amber-400/20';
-        }
+      if (userRank === 'Root Architect') {
+        if (rolePill) rolePill.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700 text-xs font-mono font-bold mb-1 shadow-sm';
+        if (roleTitle) roleTitle.textContent = 'Root Architect (Founder)';
+        if (roleIcon) roleIcon.setAttribute('data-lucide', 'terminal');
+        if (idCard) idCard.className = 'ticket-pass p-6 sm:p-7 rounded-2xl bg-gradient-to-br from-amber-50/70 via-white to-amber-100/30 dark:from-slate-900 dark:via-slate-900 dark:to-amber-950/40 border-2 border-amber-500 shadow-xl shadow-amber-500/10 ring-2 ring-amber-400/20';
         if (cardAvatar) {
           cardAvatar.className = 'w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 to-amber-500 text-white flex items-center justify-center font-mono font-extrabold text-base shadow-sm ring-2 ring-amber-400/30';
-          cardAvatar.innerHTML = '<i data-lucide="shield-check" class="w-5 h-5"></i>';
+          cardAvatar.innerHTML = '<i data-lucide="terminal" class="w-5 h-5"></i>';
         }
         if (cardTypeLabel) {
-          cardTypeLabel.textContent = 'FOUNDER & HEAD ADMIN PASS';
+          cardTypeLabel.textContent = 'ROOT ARCHITECT PASS';
           cardTypeLabel.className = 'text-xs font-mono font-extrabold tracking-wider uppercase text-amber-600 dark:text-amber-400 flex items-center gap-1.5';
         }
-        if (cardPassLabel) cardPassLabel.textContent = 'HEAD ADMINISTRATOR ID';
-        if (cardStatusBadge) {
-          cardStatusBadge.className = 'font-mono font-extrabold text-amber-600 dark:text-amber-400 flex items-center gap-1';
-        }
-        if (cardStatusText) cardStatusText.textContent = 'HEAD ADMIN (PERMANENT)';
+        if (cardPassLabel) cardPassLabel.textContent = 'ROOT ARCHITECT PASS';
+        if (cardStatusBadge) cardStatusBadge.className = 'font-mono font-extrabold text-amber-600 dark:text-amber-400 flex items-center gap-1';
+        if (cardStatusDot) cardStatusDot.className = 'w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse';
+        if (cardStatusText) cardStatusText.textContent = 'ROOT ARCHITECT [UID 0]';
         if (adminSuite) {
           adminSuite.classList.remove('hidden');
           const adminCount = document.getElementById('admin-member-count-stat');
-          if (adminCount) {
-            adminCount.textContent = `${Object.keys(vault || {}).length} Members`;
-          }
+          if (adminCount) adminCount.textContent = `${Object.keys(vault || {}).length} Members`;
         }
-      } else {
-        if (rolePill) {
-          rolePill.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-xs font-mono font-medium mb-1';
-        }
-        if (roleTitle) roleTitle.textContent = 'Active Tech Club Member';
-        if (idCard) {
-          idCard.className = 'ticket-pass p-6 sm:p-7 rounded-2xl bg-gradient-to-br from-white via-slate-50 to-blue-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/20 border-2 border-blue-500 shadow-xl';
-        }
+      } else if (userRank === 'Core Maintainer') {
+        if (rolePill) rolePill.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950/80 text-purple-800 dark:text-purple-300 border border-purple-300 dark:border-purple-700 text-xs font-mono font-bold mb-1 shadow-sm';
+        if (roleTitle) roleTitle.textContent = 'Core Maintainer';
+        if (roleIcon) roleIcon.setAttribute('data-lucide', 'git-branch');
+        if (idCard) idCard.className = 'ticket-pass p-6 sm:p-7 rounded-2xl bg-gradient-to-br from-purple-50/70 via-white to-purple-100/30 dark:from-slate-900 dark:via-slate-900 dark:to-purple-950/40 border-2 border-purple-500 shadow-xl shadow-purple-500/10 ring-2 ring-purple-400/20';
         if (cardAvatar) {
-          cardAvatar.className = 'w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-mono font-extrabold text-base shadow-sm';
-          cardAvatar.textContent = 'BST';
+          cardAvatar.className = 'w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-purple-500 text-white flex items-center justify-center font-mono font-extrabold text-base shadow-sm ring-2 ring-purple-400/30';
+          cardAvatar.innerHTML = '<i data-lucide="git-branch" class="w-5 h-5"></i>';
         }
         if (cardTypeLabel) {
-          cardTypeLabel.textContent = 'BST TECH CLUB ID';
+          cardTypeLabel.textContent = 'CORE MAINTAINER PASS';
+          cardTypeLabel.className = 'text-xs font-mono font-extrabold tracking-wider uppercase text-purple-600 dark:text-purple-400 flex items-center gap-1.5';
+        }
+        if (cardPassLabel) cardPassLabel.textContent = 'CORE MAINTAINER PASS';
+        if (cardStatusBadge) cardStatusBadge.className = 'font-mono font-extrabold text-purple-600 dark:text-purple-400 flex items-center gap-1';
+        if (cardStatusDot) cardStatusDot.className = 'w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse';
+        if (cardStatusText) cardStatusText.textContent = 'CORE MAINTAINER [MAIN BRANCH]';
+        if (adminSuite) adminSuite.classList.add('hidden');
+      } else if (userRank === 'Staff Contributor') {
+        if (rolePill) rolePill.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 text-xs font-mono font-bold mb-1 shadow-sm';
+        if (roleTitle) roleTitle.textContent = 'Staff Contributor';
+        if (roleIcon) roleIcon.setAttribute('data-lucide', 'code-2');
+        if (idCard) idCard.className = 'ticket-pass p-6 sm:p-7 rounded-2xl bg-gradient-to-br from-emerald-50/70 via-white to-emerald-100/30 dark:from-slate-900 dark:via-slate-900 dark:to-emerald-950/40 border-2 border-emerald-500 shadow-xl shadow-emerald-500/10 ring-2 ring-emerald-400/20';
+        if (cardAvatar) {
+          cardAvatar.className = 'w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-emerald-500 text-white flex items-center justify-center font-mono font-extrabold text-base shadow-sm ring-2 ring-emerald-400/30';
+          cardAvatar.innerHTML = '<i data-lucide="code-2" class="w-5 h-5"></i>';
+        }
+        if (cardTypeLabel) {
+          cardTypeLabel.textContent = 'STAFF CONTRIBUTOR PASS';
+          cardTypeLabel.className = 'text-xs font-mono font-extrabold tracking-wider uppercase text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5';
+        }
+        if (cardPassLabel) cardPassLabel.textContent = 'STAFF CONTRIBUTOR PASS';
+        if (cardStatusBadge) cardStatusBadge.className = 'font-mono font-extrabold text-emerald-600 dark:text-emerald-400 flex items-center gap-1';
+        if (cardStatusDot) cardStatusDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse';
+        if (cardStatusText) cardStatusText.textContent = 'STAFF CONTRIBUTOR [VERIFIED REVIEWER]';
+        if (adminSuite) adminSuite.classList.add('hidden');
+      } else {
+        // Active Developer
+        if (rolePill) rolePill.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-xs font-mono font-medium mb-1 border border-blue-200 dark:border-blue-800';
+        if (roleTitle) roleTitle.textContent = 'Active Developer';
+        if (roleIcon) roleIcon.setAttribute('data-lucide', 'cpu');
+        if (idCard) idCard.className = 'ticket-pass p-6 sm:p-7 rounded-2xl bg-gradient-to-br from-white via-slate-50 to-blue-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/20 border-2 border-blue-500 shadow-xl';
+        if (cardAvatar) {
+          cardAvatar.className = 'w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-mono font-extrabold text-base shadow-sm';
+          cardAvatar.innerHTML = '<i data-lucide="cpu" class="w-5 h-5"></i>';
+        }
+        if (cardTypeLabel) {
+          cardTypeLabel.textContent = 'ACTIVE DEVELOPER PASS';
           cardTypeLabel.className = 'text-xs font-mono font-extrabold tracking-wider uppercase text-blue-600 dark:text-blue-400';
         }
-        if (cardPassLabel) cardPassLabel.textContent = 'MEMBER PASS ID';
-        if (cardStatusBadge) {
-          cardStatusBadge.className = 'font-mono font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1';
-        }
-        if (cardStatusText) cardStatusText.textContent = 'ACTIVE MEMBER';
+        if (cardPassLabel) cardPassLabel.textContent = 'ACTIVE DEVELOPER PASS';
+        if (cardStatusBadge) cardStatusBadge.className = 'font-mono font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1';
+        if (cardStatusDot) cardStatusDot.className = 'w-1.5 h-1.5 rounded-full bg-blue-500';
+        if (cardStatusText) cardStatusText.textContent = 'ACTIVE DEVELOPER [USERLAND]';
         if (adminSuite) adminSuite.classList.add('hidden');
       }
 
@@ -1297,6 +1439,23 @@
       showToast('Roster up to date!', 'check-circle-2');
     }
 
+    async function handleRankChange(clubId, newRank) {
+      try {
+        await window.AuthEngine.updateMemberRank(clubId, newRank);
+        showToast(`Updated ${clubId} to ${newRank}`, 'shield-check');
+        renderDirectoryList();
+        const active = window.AuthEngine.getActiveSession();
+        if (active) {
+          const vault = window.AuthEngine.getMembersVault();
+          const refreshed = vault[active.techClubId] || active;
+          renderMemberDashboard(refreshed);
+        }
+      } catch (e) {
+        showToast(e.message, 'alert-circle');
+        renderDirectoryList();
+      }
+    }
+
     function renderDirectoryList() {
       const container = document.getElementById('modal-members-list');
       if (!container) return;
@@ -1304,6 +1463,9 @@
       const query = (document.getElementById('directory-search-input')?.value || '').toLowerCase().trim();
       const vault = window.AuthEngine ? window.AuthEngine.getMembersVault() : {};
       const members = Object.values(vault || {});
+
+      const activeSession = window.AuthEngine ? window.AuthEngine.getActiveSession() : null;
+      const isViewerRoot = window.AuthEngine && typeof window.AuthEngine.isRootArchitect === 'function' ? window.AuthEngine.isRootArchitect(activeSession) : false;
 
       const filtered = members.filter(m => {
         if (!query) return true;
@@ -1335,6 +1497,37 @@
       }
 
       container.innerHTML = filtered.map((m, index) => {
+        const mRank = window.AuthEngine.normalizeMemberRank ? window.AuthEngine.normalizeMemberRank(m.role) : (m.role || 'Active Developer');
+        const isTargetRoot = (mRank === 'Root Architect');
+
+        let badgeHtml = '';
+        if (mRank === 'Root Architect') {
+          badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-mono text-[9px] font-extrabold border border-amber-300 dark:border-amber-700 flex items-center gap-1 shadow-sm"><i data-lucide="terminal" class="w-3 h-3"></i> ROOT ARCHITECT</span>`;
+        } else if (mRank === 'Core Maintainer') {
+          badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/80 text-purple-800 dark:text-purple-300 font-mono text-[9px] font-extrabold border border-purple-300 dark:border-purple-700 flex items-center gap-1 shadow-sm"><i data-lucide="git-branch" class="w-3 h-3"></i> CORE MAINTAINER</span>`;
+        } else if (mRank === 'Staff Contributor') {
+          badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 font-mono text-[9px] font-extrabold border border-emerald-300 dark:border-emerald-700 flex items-center gap-1 shadow-sm"><i data-lucide="code-2" class="w-3 h-3"></i> STAFF CONTRIBUTOR</span>`;
+        } else {
+          badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono text-[9px] font-semibold border border-blue-200 dark:border-blue-800 flex items-center gap-1"><i data-lucide="cpu" class="w-3 h-3"></i> ACTIVE DEV</span>`;
+        }
+
+        let adminControlHtml = '';
+        if (isViewerRoot) {
+          if (isTargetRoot) {
+            adminControlHtml = `<span class="text-[10px] font-mono text-amber-600 dark:text-amber-400 flex items-center gap-1 font-bold px-2 py-1 bg-amber-50 dark:bg-amber-950/40 rounded-lg border border-amber-200 dark:border-amber-900/60" title="Immutable UID 0 Founder"><i data-lucide="shield-check" class="w-3 h-3"></i> UID 0</span>`;
+          } else {
+            adminControlHtml = `
+              <div class="flex items-center gap-1">
+                <select onchange="handleRankChange('${m.techClubId}', this.value)" title="Assign Clan Rank" class="text-[10px] font-mono font-semibold py-1 px-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500 shadow-sm cursor-pointer">
+                  <option value="Active Developer" ${mRank === 'Active Developer' ? 'selected' : ''}>Dev</option>
+                  <option value="Staff Contributor" ${mRank === 'Staff Contributor' ? 'selected' : ''}>Staff</option>
+                  <option value="Core Maintainer" ${mRank === 'Core Maintainer' ? 'selected' : ''}>Maintainer</option>
+                </select>
+              </div>
+            `;
+          }
+        }
+
         return `
           <div class="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 transition hover:border-blue-500/50">
             <div class="flex items-center gap-3 min-w-0">
@@ -1344,11 +1537,7 @@
               <div class="min-w-0">
                 <div class="flex items-center gap-2 flex-wrap">
                   <span class="font-bold text-xs text-slate-900 dark:text-white truncate">${m.name || 'Member'}</span>
-                  ${m.role === 'Admin' ? `
-                    <span class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-mono text-[9px] font-extrabold border border-amber-300 dark:border-amber-700 flex items-center gap-1 shadow-sm">
-                      FOUNDER & ADMIN
-                    </span>
-                  ` : ''}
+                  ${badgeHtml}
                   <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-semibold">${m.section || 'AIML'}</span>
                 </div>
                 <div class="text-[11px] font-mono text-slate-500 dark:text-slate-400 truncate">
@@ -1357,7 +1546,8 @@
               </div>
             </div>
 
-            <div class="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-1 sm:pt-0 border-t sm:border-0 border-slate-100 dark:border-slate-800/80">
+            <div class="flex items-center justify-between sm:justify-end gap-2.5 shrink-0 pt-1 sm:pt-0 border-t sm:border-0 border-slate-100 dark:border-slate-800/80">
+              ${adminControlHtml}
               <span class="font-mono text-xs font-extrabold text-blue-600 dark:text-blue-400 bg-blue-50/70 dark:bg-blue-950/60 px-2.5 py-1 rounded-lg border border-blue-200/50 dark:border-blue-900/50">
                 ${m.techClubId}
               </span>

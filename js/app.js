@@ -69,11 +69,20 @@ function checkAuthNavbarState() {
   const verifiedDot = document.getElementById('nav-verified-dot');
 
   if (session && navText && navLink) {
-    if (session.role === 'Admin') {
-      navText.textContent = `Head Admin • ${session.name.split(' ')[0]}`;
+    const role = window.AuthEngine.normalizeMemberRank ? window.AuthEngine.normalizeMemberRank(session.role) : session.role;
+    const firstName = (session.name || 'Member').split(' ')[0];
+
+    if (role === 'Root Architect') {
+      navText.textContent = `Root Architect • ${firstName}`;
       navLink.className = 'holographic-id-badge inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-white transition shadow-md border border-amber-300/60 ring-2 ring-amber-400/20';
+    } else if (role === 'Core Maintainer') {
+      navText.textContent = `Maintainer • ${firstName}`;
+      navLink.className = 'holographic-id-badge inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white transition shadow-md border border-purple-300/60 ring-2 ring-purple-400/20';
+    } else if (role === 'Staff Contributor') {
+      navText.textContent = `Staff • ${firstName}`;
+      navLink.className = 'holographic-id-badge inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white transition shadow-md border border-emerald-300/60 ring-2 ring-emerald-400/20';
     } else {
-      navText.textContent = `${session.techClubId} (${session.name.split(' ')[0]})`;
+      navText.textContent = `${session.techClubId} (${firstName})`;
       navLink.className = 'holographic-id-badge inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition shadow-sm border border-blue-400/40';
     }
     if (verifiedDot) verifiedDot.classList.remove('hidden');

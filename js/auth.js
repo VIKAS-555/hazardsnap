@@ -15,6 +15,58 @@ const ATTEMPTS_STORAGE_KEY = 'devsphere_login_attempts_v1';
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 60 * 1000; // 60 seconds lockout
 
+// --- High-Tech Clan Hierarchy Configuration ---
+const CLUB_RANKS = {
+  'Root Architect': {
+    rankLevel: 4,
+    name: 'Root Architect',
+    title: 'Root Architect (Founder)',
+    passLabel: 'ROOT ARCHITECT PASS',
+    statusLabel: 'ROOT ARCHITECT [UID 0]',
+    avatarIcon: 'terminal',
+    badgeClass: 'bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700',
+    description: 'root / UID 0. Complete kernel sovereignty; master key holder.'
+  },
+  'Core Maintainer': {
+    rankLevel: 3,
+    name: 'Core Maintainer',
+    title: 'Core Maintainer',
+    passLabel: 'CORE MAINTAINER PASS',
+    statusLabel: 'CORE MAINTAINER [MAIN BRANCH]',
+    avatarIcon: 'git-branch',
+    badgeClass: 'bg-purple-100 dark:bg-purple-950/80 text-purple-800 dark:text-purple-300 border-purple-300 dark:border-purple-700',
+    description: 'Has write/merge permissions to the main branch. Heads domain tracks (CP, Robotics, AI).'
+  },
+  'Staff Contributor': {
+    rankLevel: 2,
+    name: 'Staff Contributor',
+    title: 'Staff Contributor',
+    passLabel: 'STAFF CONTRIBUTOR PASS',
+    statusLabel: 'STAFF CONTRIBUTOR [VERIFIED REVIEWER]',
+    avatarIcon: 'code-2',
+    badgeClass: 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700',
+    description: 'Trusted senior builder; earned by inviting 5+ peers or shipping code. Can verify ticket hashes.'
+  },
+  'Active Developer': {
+    rankLevel: 1,
+    name: 'Active Developer',
+    title: 'Active Developer',
+    passLabel: 'ACTIVE DEVELOPER PASS',
+    statusLabel: 'ACTIVE DEVELOPER [USERLAND]',
+    avatarIcon: 'cpu',
+    badgeClass: 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+    description: 'Verified student member in the CSE (AI & ML) registry.'
+  }
+};
+
+function normalizeMemberRank(role) {
+  if (!role) return 'Active Developer';
+  if (role === 'Root Architect' || role === 'Admin' || role === 'Head Admin' || role === 'Founder') return 'Root Architect';
+  if (role === 'Core Maintainer' || role === 'Co-Leader') return 'Core Maintainer';
+  if (role === 'Staff Contributor' || role === 'Elder') return 'Staff Contributor';
+  return 'Active Developer';
+}
+
 // --- Web Crypto SHA-256 Helper ---
 async function hashPasswordWithSalt(password, salt) {
   const enc = new TextEncoder();
@@ -187,27 +239,39 @@ async function registerNewMember({ name, usn, section, email, department, passwo
   const salt = generateRandomSalt();
   const passwordHash = await hashPasswordWithSalt(password, salt);
 
-  // If referred by another member, increment their referral count
+  // If referred by another member, increment their referral count and check auto-promotion to Staff Contributor
   if (referredBy && vault[referredBy]) {
     vault[referredBy].referralCount = (vault[referredBy].referralCount || 0) + 1;
+    // Auto-promote to Staff Contributor if 5+ peers referred!
+    if (normalizeMemberRank(vault[referredBy].role) === 'Active Developer' && vault[referredBy].referralCount >= 5) {
+      vault[referredBy].role = 'Staff Contributor';
+      if (window.SupabaseEngine && window.SupabaseEngine.isConfigured()) {
+        try {
+          const client = window.SupabaseEngine.getClient();
+          if (client) {
+            client.from('members').update({ role: 'Staff Contributor' }).eq('tech_club_id', referredBy).then();
+          }
+        } catch (e) {}
+      }
+    }
   }
 
-  // Determine if this user is the First Member -> Permanent Admin
+  // Determine if this user is the First Member -> Permanent Root Architect (Founder) [UID 0]
   const existingMembers = Object.values(vault);
-  let hasExistingAdmin = existingMembers.some(m => m.role === 'Admin');
+  let hasRootArchitect = existingMembers.some(m => normalizeMemberRank(m.role) === 'Root Architect');
 
   // Check cloud database if possible to ensure global consistency
-  if (!hasExistingAdmin && window.SupabaseEngine && window.SupabaseEngine.isConfigured()) {
+  if (!hasRootArchitect && window.SupabaseEngine && window.SupabaseEngine.isConfigured()) {
     try {
       const cloudMembers = await window.SupabaseEngine.fetchMembers();
       if (cloudMembers && Object.keys(cloudMembers).length > 0) {
-        hasExistingAdmin = Object.values(cloudMembers).some(m => m.role === 'Admin');
+        hasRootArchitect = Object.values(cloudMembers).some(m => normalizeMemberRank(m.role) === 'Root Architect');
       }
     } catch (e) {}
   }
 
-  // Whoever registers first becomes permanent Admin!
-  const assignedRole = (!hasExistingAdmin) ? 'Admin' : 'Member';
+  // Whoever registers first becomes permanent Root Architect [UID 0]!
+  const assignedRole = (!hasRootArchitect) ? 'Root Architect' : 'Active Developer';
 
   const newMember = {
     techClubId: clubId,
@@ -291,16 +355,16 @@ async function authenticateMember(identifier, password, rememberMe = true) {
   // Success
   clearFailedAttempts();
 
-  // Permanent First-Member Admin Verification:
-  // If no member is currently Admin, this first member is crowned permanent Admin!
+  // Permanent First-Member Root Architect [UID 0] Verification:
+  // If no Root Architect exists yet, this first member is crowned permanent Root Architect!
   const allVaultMembers = Object.values(vault);
-  const hasExistingAdmin = allVaultMembers.some(m => m.role === 'Admin');
-  if (!hasExistingAdmin && allVaultMembers.length > 0) {
+  const hasRootArchitect = allVaultMembers.some(m => normalizeMemberRank(m.role) === 'Root Architect');
+  if (!hasRootArchitect && allVaultMembers.length > 0) {
     const earliestMember = allVaultMembers.sort((a, b) => new Date(a.joinedAt || 0) - new Date(b.joinedAt || 0))[0];
     if (earliestMember && (earliestMember.techClubId === member.techClubId || allVaultMembers.length === 1)) {
-      member.role = 'Admin';
+      member.role = 'Root Architect';
       if (vault[member.techClubId]) {
-        vault[member.techClubId].role = 'Admin';
+        vault[member.techClubId].role = 'Root Architect';
       }
       saveMembersVault(vault);
 
@@ -309,10 +373,27 @@ async function authenticateMember(identifier, password, rememberMe = true) {
         try {
           const client = window.SupabaseEngine.getClient();
           if (client) {
-            client.from('members').update({ role: 'Admin' }).eq('tech_club_id', member.techClubId).then();
+            client.from('members').update({ role: 'Root Architect' }).eq('tech_club_id', member.techClubId).then();
           }
         } catch (e) {}
       }
+    }
+  }
+
+  // Auto-promotion: 5+ referrals unlocks Staff Contributor
+  if (normalizeMemberRank(member.role) === 'Active Developer' && (member.referralCount || 0) >= 5) {
+    member.role = 'Staff Contributor';
+    if (vault[member.techClubId]) {
+      vault[member.techClubId].role = 'Staff Contributor';
+    }
+    saveMembersVault(vault);
+    if (window.SupabaseEngine && window.SupabaseEngine.isConfigured()) {
+      try {
+        const client = window.SupabaseEngine.getClient();
+        if (client) {
+          client.from('members').update({ role: 'Staff Contributor' }).eq('tech_club_id', member.techClubId).then();
+        }
+      } catch (e) {}
     }
   }
 
@@ -374,13 +455,87 @@ async function syncWithCloud() {
   return getMembersVault();
 }
 
-function isUserAdmin(session) {
+function getRankInfo(role) {
+  const norm = normalizeMemberRank(role);
+  return CLUB_RANKS[norm] || CLUB_RANKS['Active Developer'];
+}
+
+function isRootArchitect(session) {
   if (!session) return false;
-  return session.role === 'Admin' || session.role === 'Head Admin' || session.techClubId === 'BST-2026-8001';
+  return normalizeMemberRank(session.role) === 'Root Architect';
+}
+
+function isMaintainer(session) {
+  if (!session) return false;
+  const rank = normalizeMemberRank(session.role);
+  return rank === 'Core Maintainer' || rank === 'Root Architect';
+}
+
+function isStaffContributor(session) {
+  if (!session) return false;
+  const rank = normalizeMemberRank(session.role);
+  return rank === 'Staff Contributor' || rank === 'Core Maintainer' || rank === 'Root Architect';
+}
+
+function isUserAdmin(session) {
+  return isRootArchitect(session);
+}
+
+/**
+ * Promote / Demote / Reassign member rank
+ * Authorized for Root Architect only
+ */
+async function updateMemberRank(targetClubId, newRank) {
+  const activeSession = getActiveSession();
+  if (!activeSession || !isRootArchitect(activeSession)) {
+    throw new Error('Kernel Sovereignty Violation: Only Root Architect [UID 0] can assign member ranks.');
+  }
+
+  const validRanks = ['Root Architect', 'Core Maintainer', 'Staff Contributor', 'Active Developer'];
+  if (!validRanks.includes(newRank)) {
+    throw new Error(`Invalid rank: ${newRank}`);
+  }
+
+  const vault = getMembersVault();
+  const target = vault[targetClubId];
+  if (!target) {
+    throw new Error(`Member with ID ${targetClubId} not found.`);
+  }
+
+  // Permanent founder protection: Cannot demote Root Architect
+  if (normalizeMemberRank(target.role) === 'Root Architect' && targetClubId !== activeSession.techClubId && newRank !== 'Root Architect') {
+    throw new Error('Root Architect [UID 0] possesses immutable kernel sovereignty and cannot be demoted.');
+  }
+
+  target.role = newRank;
+  saveMembersVault(vault);
+
+  // Sync to Supabase cloud if connected
+  if (window.SupabaseEngine && window.SupabaseEngine.isConfigured()) {
+    try {
+      const client = window.SupabaseEngine.getClient();
+      if (client) {
+        await client.from('members').update({ role: newRank }).eq('tech_club_id', targetClubId);
+      }
+    } catch (e) {
+      console.warn('[AuthEngine] Cloud rank update notice:', e.message);
+    }
+  }
+
+  // If the target is the active session itself, update the active session
+  if (activeSession.techClubId === targetClubId) {
+    activeSession.role = newRank;
+    setActiveSession(activeSession);
+  }
+
+  return target;
 }
 
 // Export for browser
 window.AuthEngine = {
+  CLUB_RANKS,
+  normalizeMemberRank,
+  getRankInfo,
   getMembersVault,
   registerNewMember,
   authenticateMember,
@@ -390,5 +545,9 @@ window.AuthEngine = {
   logoutMember,
   checkLockout,
   syncWithCloud,
-  isUserAdmin
+  isUserAdmin,
+  isRootArchitect,
+  isMaintainer,
+  isStaffContributor,
+  updateMemberRank
 };
