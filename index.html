@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BST Tech Club | Department of CSE (AI & ML)</title>
+  <meta name="description" content="Official technical society portal for Department of Computer Science & Engineering (AI & ML). Focus domains: Competative Programming, Robotics, Open Source, and Hackathons.">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polygon points='12 2 2 7 12 12 22 7 12 2'/><polyline points='2 17 12 22 22 17'/><polyline points='2 12 12 17 22 12'/></svg>">
+</head>
+<body class="academic-grid-pattern min-h-screen text-slate-800 dark:text-slate-100 antialiased selection:bg-blue-500 selection:text-white">
+
+  <!-- ============================================================
+       TOP NAVIGATION BAR
+       ============================================================ -->
+  <header class="glass-nav sticky top-0 z-40 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Brand Logo & College Title -->
+        <a href="#" class="flex items-center gap-3 group">
+          <div class="w-9 h-9 rounded-lg bg-blue-600 dark:bg-blue-500 text-white flex items-center justify-center font-mono font-bold text-lg shadow-sm group-hover:scale-105 transition-transform">
+            <i data-lucide="terminal" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-base tracking-tight club-name-text text-slate-900 dark:text-white">BST Tech Club</span>
+              <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/80 text-blue-600 dark:text-blue-400 font-semibold uppercase border border-blue-100 dark:border-blue-900">CSE (AI & ML)</span>
+            </div>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium college-name-text">Bosscoder School Of Technology</p>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation Links (Team section removed) -->
+        <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-slate-600 dark:text-slate-300">
+          <a href="#about" class="hover:text-blue-600 dark:hover:text-blue-400 transition">About</a>
+          <a href="#domains" class="hover:text-blue-600 dark:hover:text-blue-400 transition">Domains</a>
+          <a href="#events" class="hover:text-blue-600 dark:hover:text-blue-400 transition flex items-center gap-1.5">
+            Events & Workshops
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          </a>
+          <a href="#projects" class="hover:text-blue-600 dark:hover:text-blue-400 transition">Projects</a>
+          <a href="#faqs" class="hover:text-blue-600 dark:hover:text-blue-400 transition">FAQ</a>
+          <a href="#ai-advisor" class="nav-ask-ai-pill">
+            <span class="ai-sparkle-icon"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i></span>
+            <span>Ask AI</span>
+          </a>
+        </nav>
+
+        <!-- Right Controls: Theme Toggle & Portal Link -->
+        <div class="flex items-center gap-3">
+          <!-- Dark/Light Theme Button -->
+          <button onclick="toggleTheme()" aria-label="Toggle Dark/Light Mode" class="theme-toggle-btn p-2 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+            <i data-lucide="moon" class="w-4 h-4"></i>
+          </button>
+
+          <!-- Cloud Database Status Pill (Option A Realtime Multi-Device Sync) -->
+          <button onclick="openCloudConfigModal()" id="cloud-sync-status-btn" title="Cloud Database: Option A Multi-Device Sync" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-mono rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/80 text-slate-600 dark:text-slate-300 hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 transition">
+            <span id="cloud-status-dot" class="w-2 h-2 rounded-full bg-amber-400"></span>
+            <span id="cloud-status-text">Cloud Sync</span>
+          </button>
+
+          <!-- User RSVP passes pill -->
+          <button onclick="alert('Viewing your registered passes in the events section below!')" id="user-rsvps-count" class="hidden text-xs font-mono font-medium px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+            0 Passes
+          </button>
+
+          <!-- Member Portal Button / Session Badge -->
+          <a href="login.html" id="nav-auth-link" class="holographic-id-badge inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700 transition shadow-sm border border-blue-500/40">
+            <div class="relative flex items-center justify-center">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5 text-blue-200 badge-shield-icon"></i>
+              <span id="nav-verified-dot" class="verified-pulse-dot hidden"></span>
+            </div>
+            <span id="nav-auth-text">BST Member Portal</span>
+          </a>
+
+          <!-- Mobile Hamburger -->
+          <button id="mobile-menu-btn" aria-label="Toggle Menu" class="md:hidden p-2 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Mobile Drawer Menu -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 pt-3 pb-5 space-y-3 text-sm font-medium">
+      <a href="#about" class="block py-1.5 text-slate-700 dark:text-slate-200">About</a>
+      <a href="#domains" class="block py-1.5 text-slate-700 dark:text-slate-200">Domains</a>
+      <a href="#events" class="block py-1.5 text-slate-700 dark:text-slate-200">Events & Workshops</a>
+      <a href="#projects" class="block py-1.5 text-slate-700 dark:text-slate-200">Projects</a>
+      <a href="#faqs" class="block py-1.5 text-slate-700 dark:text-slate-200">FAQ</a>
+      <button onclick="openCloudConfigModal()" class="w-full text-left py-1.5 text-slate-700 dark:text-slate-200 flex items-center gap-2">
+        <i data-lucide="database" class="w-4 h-4 text-blue-600 dark:text-blue-400"></i> Cloud Database Setup
+      </button>
+      <a href="#ai-advisor" class="block py-1.5 text-blue-600 dark:text-blue-400 font-mono text-xs flex items-center gap-1.5">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Ask BST AI Advisor
+      </a>
+      <div class="pt-2 border-t border-slate-100 dark:border-slate-900 flex justify-center">
+        <a href="login.html" class="w-full py-2 text-center text-xs font-semibold rounded-lg bg-blue-600 text-white">
+          Open BST Member Portal
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       HERO SECTION (Clean Minimalist Academic)
+       ============================================================ -->
+  <section id="about" class="pt-16 pb-16 sm:pt-24 sm:pb-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-3xl mx-auto">
+      
+      <!-- Academic Status Tag -->
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm text-xs font-medium text-slate-600 dark:text-slate-300 mb-6 shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-blue-600 dark:bg-blue-400"></span>
+        <span>Department of CSE (AI & ML)</span>
+        <span class="text-slate-300 dark:text-slate-700">•</span>
+        <span class="font-mono text-slate-500">USN: 2392608001 – 2392608302</span>
+      </div>
+
+      <!-- Main Headline -->
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.15] mb-6">
+        Where CSE (AI & ML) Builders <br class="hidden sm:block">
+        <span id="code-future-lens" class="code-lens-wrapper group/lens relative inline-block cursor-crosshair">
+          <span class="code-lens-front text-blue-600 dark:text-blue-400 underline decoration-blue-200 dark:decoration-blue-900 underline-offset-8 inline-block">
+            Code the Future.
+          </span>
+          <span class="code-lens-reveal" aria-hidden="true">
+            <span id="lens-code-content" class="code-lens-content"></span>
+          </span>
+          <span class="code-lens-glass" aria-hidden="true">
+            <span id="lens-lang-badge" class="lens-badge">🔍 Python • click to switch</span>
+          </span>
+        </span>
+      </h1>
+
+      <!-- Subheadline -->
+      <p id="hero-subtagline" class="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed mb-8 max-w-2xl mx-auto">
+        A student-led technical community pushing the boundaries of Competative Programming, Robotics, Open Source, and Hackathons.
+      </p>
+
+      <!-- CTA Buttons -->
+      <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-14">
+        <a href="#events" class="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-sm flex items-center gap-2 transition hover:-translate-y-0.5">
+          <i data-lucide="calendar" class="w-4 h-4"></i> View Events & Schedule
+        </a>
+        <a href="login.html" class="px-6 py-3 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 font-semibold text-sm transition flex items-center gap-2">
+          <i data-lucide="user-plus" class="w-4 h-4 text-blue-500"></i> Member Sign-In / Join
+        </a>
+        <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="px-3.5 py-3 rounded-xl border border-slate-300 dark:border-slate-700 hover:border-slate-500 dark:hover:border-slate-500 text-slate-700 dark:text-slate-200 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center justify-center shadow-sm" title="GitHub Repository" aria-label="GitHub Repository">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- Stats Grid -->
+      <div id="hero-stats-container" class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto">
+        <!-- Rendered by JS from config -->
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FOCUS DOMAINS / TRACKS (4 SPECIFIC DOMAINS)
+       ============================================================ -->
+  <section id="domains" class="py-16 border-t border-slate-200 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
+        <div>
+          <span class="text-xs font-mono font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">Technical Verticals</span>
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight mt-1">Our 4 Core Domains</h2>
+        </div>
+        <p class="text-sm text-slate-500 dark:text-slate-400 max-w-md">
+          Hands-on study tracks, peer mentoring, and competitive sprints designed specifically for CSE (AI & ML) undergraduates.
+        </p>
+      </div>
+
+      <div id="domains-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Rendered dynamically: Competative Programming, Robotics, Open Source, Hackathon -->
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================
+       WORKSHOPS, LABS & HACKATHONS (EMPTY BY DEFAULT WITH ADD/EDIT/DELETE)
+       ============================================================ -->
+  <section id="events" class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="border-b border-slate-200 dark:border-slate-800 pb-6 mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div>
+        <div class="inline-flex items-center gap-2 text-xs font-mono font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-1">
+          <i data-lucide="ticket" class="w-4 h-4"></i> Technical Sessions & RSVP
+        </div>
+        <h2 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Workshops, Labs & Hackathons</h2>
+        <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
+          Reserve your seat for upcoming technical sessions or manage club workshops.
+        </p>
+      </div>
+
+      <!-- Action & Filter toolbar -->
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <!-- Add Event Button -->
+        <button onclick="openEventEditorModal()" class="px-3.5 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-1.5 shadow-sm transition">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Event
+        </button>
+
+        <!-- Live Search -->
+        <div class="relative min-w-[200px]">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+          <input 
+            type="text" 
+            id="event-search-input" 
+            placeholder="Search events..." 
+            class="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <!-- Filter Pills -->
+        <div class="flex items-center gap-1.5 p-1 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/70 overflow-x-auto text-xs font-medium">
+          <button onclick="filterEvents('all', this)" data-type="all" class="event-filter-btn px-3 py-1 rounded-md transition active bg-blue-600 text-white">All</button>
+          <button onclick="filterEvents('upcoming', this)" data-type="upcoming" class="event-filter-btn px-3 py-1 rounded-md text-slate-600 dark:text-slate-300 transition hover:text-slate-900">Upcoming</button>
+          <button onclick="filterEvents('hackathons', this)" data-type="hackathons" class="event-filter-btn px-3 py-1 rounded-md text-slate-600 dark:text-slate-300 transition hover:text-slate-900">Hackathons</button>
+          <button onclick="filterEvents('past', this)" data-type="past" class="event-filter-btn px-3 py-1 rounded-md text-slate-600 dark:text-slate-300 transition hover:text-slate-900">Past</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Events Grid -->
+    <div id="events-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Injected dynamically by app.js -->
+    </div>
+  </section>
+
+  <!-- ============================================================
+       STUDENT PROJECTS GALLERY (EMPTY BY DEFAULT WITH ADD/EDIT/DELETE)
+       ============================================================ -->
+  <section id="projects" class="py-16 border-t border-slate-200 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
+        <div>
+          <span class="text-xs font-mono font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">Shipped by Members</span>
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight mt-1">Student Projects Gallery</h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 max-w-md mt-1">
+            Showcase of applications, robotics builds, open source tools, and hackathon prototypes created by CSE (AI & ML) members.
+          </p>
+        </div>
+
+        <div>
+          <button onclick="openProjectEditorModal()" class="px-4 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1.5 shadow-sm transition">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Project
+          </button>
+        </div>
+      </div>
+
+      <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FAQS ACCORDION
+       ============================================================ -->
+  <section id="faqs" class="py-16 border-t border-slate-200 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/40">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-10">
+        <span class="text-xs font-mono font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">Common Inquiries</span>
+        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight mt-1">Frequently Asked Questions</h2>
+      </div>
+
+      <!-- ============================================================
+           ASK BST AI (Simplistic, Minimal & Effortless)
+           ============================================================ -->
+      <div id="ai-advisor" class="mb-10">
+        
+        <!-- Minimal Unified Search Bar -->
+        <form id="ai-query-form" onsubmit="handleAiQuery(event)" class="relative">
+          <div class="relative flex items-center rounded-2xl border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-all p-1.5">
+            <div class="pl-3.5 pr-2 text-blue-500 flex items-center pointer-events-none">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+            </div>
+            <input 
+              type="text" 
+              id="ai-user-query" 
+              required
+              placeholder="Ask anything about eligibility, domains, or events..." 
+              class="w-full py-2.5 px-2 bg-transparent text-slate-900 dark:text-white text-xs sm:text-sm focus:outline-none placeholder:text-slate-400"
+              autocomplete="off"
+            />
+            <button 
+              type="submit" 
+              id="ai-submit-button" 
+              class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold flex items-center gap-1.5 transition shadow-sm shrink-0"
+            >
+              <span>Ask AI</span>
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </form>
+
+        <!-- Minimal Quick Question Chips -->
+        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-3">
+          <button type="button" onclick="fillAndAskAi('Who is eligible to join BST Tech Club and what is the USN range?')" class="px-3 py-1 rounded-full bg-slate-100 hover:bg-blue-50 dark:bg-slate-800/80 dark:hover:bg-blue-950/60 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition text-[11px] font-medium border border-transparent hover:border-blue-200 dark:hover:border-blue-900">
+            🎓 Check Eligibility
+          </button>
+          <button type="button" onclick="fillAndAskAi('Explain the 4 core domains in BST Tech Club.')" class="px-3 py-1 rounded-full bg-slate-100 hover:bg-blue-50 dark:bg-slate-800/80 dark:hover:bg-blue-950/60 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition text-[11px] font-medium border border-transparent hover:border-blue-200 dark:hover:border-blue-900">
+            ⚡ 4 Domains
+          </button>
+          <button type="button" onclick="fillAndAskAi('How do I RSVP for an event and get my pass?')" class="px-3 py-1 rounded-full bg-slate-100 hover:bg-blue-50 dark:bg-slate-800/80 dark:hover:bg-blue-950/60 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition text-[11px] font-medium border border-transparent hover:border-blue-200 dark:hover:border-blue-900">
+            🎟️ How to RSVP
+          </button>
+        </div>
+
+        <!-- AI Output Box (Hidden until asked) -->
+        <div id="ai-response-container" class="hidden mt-4 academic-card rounded-2xl p-5 border border-blue-200 dark:border-blue-900/60 bg-white dark:bg-slate-900 shadow-lg relative transition-all">
+          <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100 dark:border-slate-800">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+              <span class="text-xs font-mono font-bold text-slate-900 dark:text-white uppercase tracking-wider" id="ai-response-model-tag">AI Answer</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="copyAiResponse()" class="px-2 py-1 rounded text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1 transition text-xs font-mono" title="Copy answer">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy
+              </button>
+              <button type="button" onclick="closeAiResponse()" class="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition" title="Close">
+                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Loading Skeleton -->
+          <div id="ai-loading-state" class="hidden py-4 space-y-2">
+            <div class="flex items-center gap-2 text-xs font-mono text-blue-600 dark:text-blue-400">
+              <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
+              <span>Consulting BST CSE (AI & ML) knowledge base...</span>
+            </div>
+            <div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded animate-pulse w-3/4"></div>
+            <div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded animate-pulse w-1/2"></div>
+          </div>
+
+          <!-- Output Text Box -->
+          <div id="ai-answer-content" class="text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed space-y-2.5">
+          </div>
+        </div>
+
+      </div>
+
+      <div id="faqs-container" class="space-y-3">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       BUILD. COLLABORATE. SHIP. SECTION (Linear / Vercel Developer Canvas)
+       ============================================================ -->
+  <section class="py-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+    <!-- Ambient Neon Glow -->
+    <div class="absolute inset-x-8 top-12 bottom-12 bg-gradient-to-r from-blue-600/20 via-indigo-600/25 to-purple-600/20 rounded-3xl blur-3xl -z-10 pointer-events-none opacity-80 dark:opacity-50"></div>
+
+    <div class="academic-card relative rounded-3xl p-8 sm:p-14 text-center border border-slate-300/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl shadow-2xl overflow-hidden">
+      
+      <!-- Architectural Corner Crosshair Reticles -->
+      <span class="absolute top-3 left-3 text-blue-500/60 dark:text-blue-400/50 font-mono text-xs select-none pointer-events-none">+</span>
+      <span class="absolute top-3 right-3 text-blue-500/60 dark:text-blue-400/50 font-mono text-xs select-none pointer-events-none">+</span>
+      <span class="absolute bottom-3 left-3 text-blue-500/60 dark:text-blue-400/50 font-mono text-xs select-none pointer-events-none">+</span>
+      <span class="absolute bottom-3 right-3 text-blue-500/60 dark:text-blue-400/50 font-mono text-xs select-none pointer-events-none">+</span>
+
+      <!-- High-tech subtle dot-grid canvas background -->
+      <div class="absolute inset-0 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:24px_24px] opacity-[0.04] dark:opacity-[0.08] pointer-events-none"></div>
+
+      <div class="max-w-2xl mx-auto relative z-10">
+        
+        <!-- Live Status Pill -->
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-900/60 bg-blue-50/80 dark:bg-blue-950/50 backdrop-blur-sm text-[11px] font-mono font-medium text-blue-700 dark:text-blue-300 mb-6 shadow-sm">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>CSE (AI & ML) COHORT • 2026</span>
+          <span class="text-blue-300 dark:text-blue-700">•</span>
+          <span class="text-slate-500 dark:text-slate-400">DEV PROTOCOL</span>
+        </div>
+
+        <!-- 3-Pillar Micro Badges -->
+        <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-6">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 text-xs font-mono font-semibold text-slate-800 dark:text-slate-200 shadow-sm transition hover:border-blue-500/50">
+            <i data-lucide="hammer" class="w-3.5 h-3.5 text-amber-500"></i> BUILD
+          </span>
+          <span class="text-slate-300 dark:text-slate-700 font-mono">•</span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 text-xs font-mono font-semibold text-slate-800 dark:text-slate-200 shadow-sm transition hover:border-blue-500/50">
+            <i data-lucide="users" class="w-3.5 h-3.5 text-blue-500"></i> COLLABORATE
+          </span>
+          <span class="text-slate-300 dark:text-slate-700 font-mono">•</span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 text-xs font-mono font-semibold text-slate-800 dark:text-slate-200 shadow-sm transition hover:border-blue-500/50">
+            <i data-lucide="rocket" class="w-3.5 h-3.5 text-purple-500"></i> SHIP
+          </span>
+        </div>
+
+
+
+        <!-- Description -->
+        <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed mb-10 max-w-xl mx-auto">
+          Work with fellow students on real-world projects, explore new technologies, participate in technical events, and turn your ideas into something people can actually use.
+        </p>
+
+        <!-- Magnetic Glowing CTA Buttons -->
+        <div class="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+          <a href="login.html" class="group relative inline-flex items-center gap-2.5 px-8 py-3.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-950 font-bold text-xs uppercase tracking-wider shadow-lg hover:shadow-blue-500/25 transition-all duration-300 hover:-translate-y-0.5">
+            <span class="absolute -inset-0.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 opacity-0 group-hover:opacity-100 transition duration-300 blur-sm -z-10"></span>
+            <i data-lucide="sparkles" class="w-4 h-4 text-blue-400 dark:text-blue-600"></i>
+            <span>Join DevSphere Community</span>
+            <i data-lucide="arrow-right" class="w-4 h-4 transition-transform group-hover:translate-x-1"></i>
+          </a>
+
+          <a href="mailto:contact@bsttechclub.edu" class="group inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl border border-slate-300 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-400 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-white/70 dark:bg-slate-900/60 backdrop-blur-md font-bold text-xs uppercase tracking-wider shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
+            <i data-lucide="mail" class="w-4 h-4 text-slate-400 group-hover:text-blue-500 transition-colors"></i>
+            <span>Contact Faculty Advisor</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 py-12 text-xs text-slate-500 dark:text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-3">
+        <div class="w-7 h-7 rounded-md bg-blue-600 text-white flex items-center justify-center font-mono font-bold text-xs">
+          BST
+        </div>
+        <div>
+          <span class="font-bold text-slate-800 dark:text-slate-200 club-full-name">BST Tech Club</span>
+          <span class="block text-[11px] college-name-text">Department of CSE (AI & ML)</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-6">
+        <a href="#about" class="hover:text-blue-600 dark:hover:text-blue-400 transition">About</a>
+        <a href="#domains" class="hover:text-blue-600 dark:hover:text-blue-400 transition">Domains</a>
+        <a href="#events" class="hover:text-blue-600 dark:hover:text-blue-400 transition">Events</a>
+        <a href="#projects" class="hover:text-blue-600 dark:hover:text-blue-400 transition">Projects</a>
+        <a href="login.html" class="hover:text-blue-600 dark:hover:text-blue-400 transition">Member Portal</a>
+        <a href="https://github.com" target="_blank" rel="noopener" class="hover:text-blue-600 dark:hover:text-blue-400 transition">GitHub</a>
+      </div>
+
+      <div class="text-right">
+        <p>&copy; 2026 BST Tech Club. All rights reserved.</p>
+        <p class="text-[10px] text-slate-400 mt-0.5">Department of Computer Science & Engineering (AI & ML).</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============================================================
+       MODAL: EVENT EDITOR (ADD / EDIT / UPDATE EVENT)
+       ============================================================ -->
+  <div id="event-editor-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+    <div class="academic-card max-w-lg w-full rounded-2xl shadow-2xl p-6 sm:p-7 relative border border-slate-200 dark:border-slate-800 max-h-[90vh] overflow-y-auto">
+      <button onclick="closeEventEditorModal()" aria-label="Close" class="absolute top-4 right-4 p-2 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="mb-5">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-blue-50 dark:bg-blue-950/80 text-blue-600 dark:text-blue-400 text-xs font-mono font-medium mb-1">
+          <i data-lucide="calendar" class="w-3.5 h-3.5"></i> Event Management
+        </span>
+        <h3 id="event-editor-modal-title" class="text-lg font-bold text-slate-900 dark:text-white">
+          Schedule Event
+        </h3>
+      </div>
+
+      <form id="event-editor-form" onsubmit="handleEventEditorSubmit(event)" class="space-y-3.5 text-xs">
+        <input type="hidden" id="edit-event-id" value="">
+
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Event Title *</label>
+          <input type="text" id="edit-event-title" required placeholder="e.g. ROS 2 Rover Building Workshop" class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Event Type</label>
+            <select id="edit-event-type" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <option value="Workshop">Workshop</option>
+              <option value="Hackathon">Hackathon</option>
+              <option value="Hands-on Lab">Hands-on Lab</option>
+              <option value="Bootcamp">Bootcamp</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Domain</label>
+            <select id="edit-event-category" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <option value="Competative Programming">Competative Programming</option>
+              <option value="Robotics">Robotics</option>
+              <option value="Open Source">Open Source</option>
+              <option value="Hackathon">Hackathon</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Status</label>
+            <select id="edit-event-status" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <option value="Upcoming">Upcoming</option>
+              <option value="Past">Past (Concluded)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Seats Available</label>
+            <input type="number" id="edit-event-seats" min="5" max="300" value="90" required class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Date *</label>
+            <input type="text" id="edit-event-date" required placeholder="e.g. October 24, 2026" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Time *</label>
+            <input type="text" id="edit-event-time" required placeholder="e.g. 03:30 PM - 05:30 PM" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Venue *</label>
+          <input type="text" id="edit-event-venue" required placeholder="e.g. CSE (AI & ML) Lab 4 / Seminar Hall" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Speaker / Lead Name</label>
+            <input type="text" id="edit-event-speaker-name" placeholder="e.g. Rohan V." class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Speaker Role</label>
+            <input type="text" id="edit-event-speaker-role" placeholder="e.g. Robotics Domain Lead" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Description *</label>
+          <textarea id="edit-event-description" required rows="3" placeholder="Brief outline of the workshop or hackathon..." class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+        </div>
+
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="closeEventEditorModal()" class="px-4 py-2 font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold">Save Event</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: PROJECT EDITOR (ADD / EDIT / UPDATE STUDENT PROJECT)
+       ============================================================ -->
+  <div id="project-editor-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+    <div class="academic-card max-w-lg w-full rounded-2xl shadow-2xl p-6 sm:p-7 relative border border-slate-200 dark:border-slate-800 max-h-[90vh] overflow-y-auto">
+      <button onclick="closeProjectEditorModal()" aria-label="Close" class="absolute top-4 right-4 p-2 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="mb-5">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-blue-50 dark:bg-blue-950/80 text-blue-600 dark:text-blue-400 text-xs font-mono font-medium mb-1">
+          <i data-lucide="folder-plus" class="w-3.5 h-3.5"></i> Project Showcase
+        </span>
+        <h3 id="project-editor-modal-title" class="text-lg font-bold text-slate-900 dark:text-white">
+          Add Student Project
+        </h3>
+      </div>
+
+      <form id="project-editor-form" onsubmit="handleProjectEditorSubmit(event)" class="space-y-3.5 text-xs">
+        <input type="hidden" id="edit-project-id" value="">
+
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Project Title *</label>
+          <input type="text" id="edit-project-title" required placeholder="e.g. AutoRover Edge AI" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Tagline / Subtitle</label>
+          <input type="text" id="edit-project-tagline" placeholder="e.g. Autonomous Obstacle Navigation with OpenCV" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Domain</label>
+            <select id="edit-project-category" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <option value="Competative Programming">Competative Programming</option>
+              <option value="Robotics">Robotics</option>
+              <option value="Open Source">Open Source</option>
+              <option value="Hackathon">Hackathon</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Badge</label>
+            <input type="text" id="edit-project-badge" placeholder="e.g. Hackathon Winner" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Tech Stack (comma-separated)</label>
+          <input type="text" id="edit-project-tech" placeholder="e.g. Python, ROS 2, OpenCV, PyTorch" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Description *</label>
+          <textarea id="edit-project-description" required rows="3" placeholder="Explain what the project does and how it was built..." class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">GitHub Repo URL</label>
+            <input type="url" id="edit-project-github" placeholder="https://github.com/..." class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Live Demo URL</label>
+            <input type="url" id="edit-project-demo" placeholder="https://demo.example.com" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="closeProjectEditorModal()" class="px-4 py-2 font-semibold text-slate-600 dark:text-slate-400">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold">Publish Project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL 1: RSVP REGISTRATION FORM
+       ============================================================ -->
+  <div id="rsvp-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+    <div class="academic-card max-w-lg w-full rounded-2xl shadow-2xl p-6 sm:p-7 relative border border-slate-200 dark:border-slate-800 max-h-[90vh] overflow-y-auto">
+      
+      <button onclick="closeRsvpModal()" aria-label="Close" class="absolute top-4 right-4 p-2 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="mb-5">
+        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-blue-50 dark:bg-blue-950/80 text-blue-600 dark:text-blue-400 text-xs font-mono font-medium mb-2">
+          <i data-lucide="calendar-check" class="w-3.5 h-3.5"></i> Event Registration
+        </div>
+        <h3 id="modal-event-title" class="text-lg font-bold text-slate-900 dark:text-white leading-snug">
+          Workshop Title
+        </h3>
+        <p id="modal-event-meta" class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">
+          Date • Time • Venue
+        </p>
+        <div class="mt-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+          <i data-lucide="users" class="w-3.5 h-3.5"></i>
+          <span id="modal-event-seats">Seats open</span>
+        </div>
+      </div>
+
+      <!-- RSVP Form -->
+      <form onsubmit="handleRsvpSubmit(event)" class="space-y-4">
+        <input type="hidden" id="modal-event-id-hidden" value="">
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Full Name *</label>
+          <input 
+            type="text" 
+            id="rsvp-name" 
+            required 
+            placeholder="e.g. Full Name" 
+            class="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">College Email *</label>
+            <input 
+              type="email" 
+              id="rsvp-email" 
+              required 
+              placeholder="e.g. 1234567890@svyasa-sas.edu.in" 
+              class="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Student USN *</label>
+            <input 
+              type="number" 
+              id="rsvp-student-id" 
+              required 
+              min="2392608001" 
+              max="2392608302" 
+              placeholder="Enter University Seat Number" 
+              class="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <p class="text-[10px] text-slate-400 mt-1">Authorized USN range: 2392608001 to 2392608302</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Academic Branch</label>
+            <select id="rsvp-dept" class="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <option value="CSE (AI & ML)" selected>CSE (AI & ML)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Year of Study</label>
+            <select id="rsvp-year" class="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <option value="1st Year">1st Year (Freshman)</option>
+              <option value="2nd Year" selected>2nd Year (Sophomore)</option>
+              <option value="3rd Year">3rd Year (Junior)</option>
+              <option value="4th Year">4th Year (Senior)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pt-3 flex items-center justify-end gap-3">
+          <button type="button" onclick="closeRsvpModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1.5 shadow-sm transition">
+            <i data-lucide="check" class="w-4 h-4"></i> Confirm RSVP & Generate Pass
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL 2: DIGITAL ADMISSION PASS / TICKET
+       ============================================================ -->
+  <div id="pass-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+    <div class="academic-card max-w-md w-full rounded-2xl shadow-2xl p-6 relative border border-slate-200 dark:border-slate-800">
+      
+      <button onclick="closePassModal()" aria-label="Close" class="absolute top-4 right-4 p-2 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="text-center mb-5">
+        <span class="inline-block p-2 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 mb-2">
+          <i data-lucide="check" class="w-5 h-5"></i>
+        </span>
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white">Admission Pass Confirmed</h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400">Save this pass or present the QR code at the lab entrance.</p>
+      </div>
+
+      <!-- Ticket Card -->
+      <div id="rsvp-ticket-card" class="ticket-pass p-5 rounded-xl bg-slate-50 dark:bg-slate-900/90 mb-5">
+        
+        <div class="flex items-start justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-800">
+          <div>
+            <span class="text-[10px] font-mono font-bold tracking-wider uppercase text-blue-600 dark:text-blue-400">BST PASS</span>
+            <div id="pass-ticket-id" class="font-mono text-xs font-extrabold text-slate-800 dark:text-slate-100 mt-0.5">—</div>
+          </div>
+          <div class="text-right">
+            <span class="text-[10px] text-slate-400 uppercase font-medium">STATUS</span>
+            <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400">VERIFIED</div>
+          </div>
+        </div>
+
+        <div class="py-3">
+          <div id="pass-event-title" class="font-bold text-sm text-slate-900 dark:text-white leading-snug mb-3">
+            Event Name
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-xs mb-3">
+            <div>
+              <span class="text-[10px] text-slate-400 uppercase">Attendee</span>
+              <div id="pass-student-name" class="font-semibold text-slate-800 dark:text-slate-200 truncate">—</div>
+              <div id="pass-student-id" class="font-mono text-[10px] text-slate-500">—</div>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 uppercase">Academic Branch</span>
+              <div id="pass-meta" class="font-medium text-slate-700 dark:text-slate-300 truncate">CSE (AI & ML)</div>
+            </div>
+          </div>
+
+          <div class="text-xs pt-2 border-t border-slate-200 dark:border-slate-800/60">
+            <div class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
+              <i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-500"></i>
+              <span id="pass-datetime" class="font-medium">Date & Time</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 mt-1">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-blue-500"></i>
+              <span id="pass-venue" class="font-medium truncate">Venue Location</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- QR Verification Box -->
+        <div id="pass-qr-box" class="pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-center">
+          <!-- QR rendered by JS -->
+        </div>
+
+      </div>
+
+      <!-- Action buttons -->
+      <div class="flex items-center gap-2">
+        <button id="pass-cal-btn" class="flex-1 py-2 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center justify-center gap-1.5 transition">
+          <i data-lucide="calendar-plus" class="w-3.5 h-3.5"></i> Add to Calendar
+        </button>
+        <button onclick="printTicketPass()" class="flex-1 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+          <i data-lucide="printer" class="w-3.5 h-3.5"></i> Print Ticket
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL 3: SUPABASE CLOUD DATABASE CONFIGURATION & STATUS (OPTION A)
+       ============================================================ -->
+  <div id="cloud-config-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+    <div class="academic-card max-w-lg w-full rounded-2xl shadow-2xl p-6 sm:p-7 relative border border-slate-200 dark:border-slate-800 max-h-[90vh] overflow-y-auto">
+      <button onclick="closeCloudConfigModal()" aria-label="Close" class="absolute top-4 right-4 p-2 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="mb-5">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-blue-50 dark:bg-blue-950/80 text-blue-600 dark:text-blue-400 text-xs font-mono font-medium mb-1">
+          <i data-lucide="database" class="w-3.5 h-3.5"></i> Multi-Device Architecture (Option A)
+        </span>
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white">
+          Cloud Database & Live Sync
+        </h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+          Synchronize members, technical sessions, RSVPs, and student projects across all phones and laptops in CSE (AI & ML).
+        </p>
+      </div>
+
+      <!-- Live Status Card -->
+      <div id="cloud-status-banner" class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 flex items-center justify-between gap-3 mb-5">
+        <div class="flex items-center gap-2.5">
+          <span id="cloud-modal-indicator" class="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0"></span>
+          <div>
+            <div id="cloud-modal-status-text" class="text-xs font-bold text-slate-800 dark:text-slate-200">Local Fallback Mode</div>
+            <div id="cloud-modal-detail-text" class="text-[11px] text-slate-500 dark:text-slate-400">Data persists in this browser. Connect Supabase to sync across all devices.</div>
+          </div>
+        </div>
+        <button type="button" onclick="testCloudConnectionUI()" class="px-2.5 py-1 text-[11px] font-semibold rounded-md border border-slate-300 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition shrink-0">
+          Ping Database
+        </button>
+      </div>
+
+      <!-- Credentials Form -->
+      <form id="cloud-credentials-form" onsubmit="handleCloudConfigSubmit(event)" class="space-y-3.5 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Supabase Project URL</label>
+          <input 
+            type="url" 
+            id="cloud-input-url" 
+            placeholder="https://xyzabcdefg.supabase.co" 
+            class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          <p class="text-[10px] text-slate-400 mt-0.5">Found under Supabase Dashboard &rarr; Project Settings &rarr; API &rarr; Project URL</p>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Supabase Anon Public API Key</label>
+          <input 
+            type="password" 
+            id="cloud-input-key" 
+            placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." 
+            class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          <p class="text-[10px] text-slate-400 mt-0.5">Safe client-side anon public key under API &rarr; Project API keys &rarr; anon public</p>
+        </div>
+
+        <div class="pt-2 flex items-center justify-between gap-3">
+          <button type="button" onclick="clearCloudCredentialsUI()" class="text-rose-600 dark:text-rose-400 hover:underline text-[11px] font-medium">
+            Reset to Local
+          </button>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="closeCloudConfigModal()" class="px-3.5 py-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+              Close
+            </button>
+            <button type="submit" class="px-4 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1.5 shadow-sm transition">
+              <i data-lucide="save" class="w-3.5 h-3.5"></i> Save & Connect
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Quick 3-step setup guide -->
+      <div class="mt-5 pt-4 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 space-y-1.5">
+        <div class="font-bold text-slate-700 dark:text-slate-300 text-xs">How to connect free Supabase in 2 minutes:</div>
+        <div>1. Create free project on <a href="https://supabase.com" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">supabase.com</a>.</div>
+        <div>2. Open <b>SQL Editor</b>, paste the code from <code class="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-blue-600 dark:text-blue-400">supabase-schema.sql</code>, and click <b>Run</b>.</div>
+        <div>3. Paste your <b>Project URL</b> and <b>anon key</b> into the fields above (or into <code class="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-blue-600 dark:text-blue-400">js/supabase-config.js</code>).</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

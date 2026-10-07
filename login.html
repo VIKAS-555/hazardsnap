@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Member Portal & Secure Access | DevSphere Tech Club</title>
+  <meta name="description" content="Secure login and student onboarding for DevSphere Technical Society. Access your digital member ID card, register for hackathons, and invite peers.">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect width='18' height='11' x='3' y='11' rx='2' ry='2'/><path d='M7 11V7a5 5 0 0 1 10 0v4'/></svg>">
+</head>
+<body class="academic-grid-pattern min-h-screen text-slate-800 dark:text-slate-100 antialiased flex flex-col justify-between selection:bg-blue-500 selection:text-white">
+
+  <!-- ============================================================
+       TOP MINIMALIST HEADER
+       ============================================================ -->
+  <header class="glass-nav sticky top-0 z-40 transition-colors">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      
+      <a href="index.html" class="flex items-center gap-3 group">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 dark:bg-blue-500 text-white flex items-center justify-center font-mono font-bold text-sm shadow-sm group-hover:scale-105 transition-transform">
+          <i data-lucide="terminal" class="w-4 h-4"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-sm sm:text-base tracking-tight text-slate-900 dark:text-white">BST Tech Club</span>
+            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/80 text-blue-600 dark:text-blue-400 font-semibold uppercase border border-blue-100 dark:border-blue-900">Portal</span>
+          </div>
+        </div>
+      </a>
+
+      <div class="flex items-center gap-3">
+        <!-- Return to Home -->
+        <a href="index.html" class="text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 transition">
+          <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back to Main Site
+        </a>
+
+        <!-- Dark/Light Theme Button -->
+        <button onclick="toggleTheme()" aria-label="Toggle Theme" class="theme-toggle-btn p-2 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+          <i data-lucide="moon" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ============================================================
+       MAIN CONTENT CONTAINER
+       ============================================================ -->
+  <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 sm:py-12 flex flex-col justify-center">
+
+    <!-- VIEW A: AUTHENTICATION TABS (Shown when logged out) -->
+    <div id="auth-forms-container" class="w-full max-w-xl mx-auto">
+      
+      <!-- Referral Alert Banner (If accessed via ?ref=DS-XXXX) -->
+      <div id="referral-banner" class="hidden mb-6 p-4 rounded-xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/80 dark:bg-blue-950/40 text-blue-900 dark:text-blue-200 flex items-start gap-3 shadow-sm animate-fade-in">
+        <i data-lucide="gift" class="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5"></i>
+        <div class="text-xs leading-relaxed">
+          <span class="font-bold">Member Referral Invitation!</span>
+          <p id="referral-banner-text" class="mt-0.5 text-blue-800 dark:text-blue-300">
+            You've been invited by an existing tech club member. Complete registration below to get your personalized Tech Club ID.
+          </p>
+        </div>
+      </div>
+
+      <!-- Security Trust Bar -->
+      <div class="text-center mb-6">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-3 shadow-sm">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-500"></i>
+          <span>Secure Web Crypto SHA-256 Authentication</span>
+          <span class="text-slate-300 dark:text-slate-700">•</span>
+          <span>Zero Plaintext Storage</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          BST Tech Club Portal
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+          Sign in with your Tech Club ID or register your official CSE (AI & ML) college credentials.
+        </p>
+      </div>
+
+      <!-- Tab Switcher (Sign In vs New Member Join) -->
+      <div class="flex items-center p-1 rounded-xl bg-slate-200/70 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 mb-6">
+        <button 
+          id="tab-btn-signin" 
+          onclick="switchAuthTab('signin')" 
+          class="flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm">
+          <i data-lucide="log-in" class="w-3.5 h-3.5 text-blue-500"></i>
+          Existing Member Sign In
+        </button>
+        <button 
+          id="tab-btn-register" 
+          onclick="switchAuthTab('register')" 
+          class="flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+          <i data-lucide="user-plus" class="w-3.5 h-3.5 text-blue-500"></i>
+          New Member Join
+        </button>
+      </div>
+
+      <!-- FORM 1: EXISTING MEMBER SIGN IN -->
+      <div id="form-signin-card" class="academic-card p-6 sm:p-8 rounded-2xl shadow-xl">
+        <form onsubmit="handleSignIn(event)" class="space-y-4">
+          
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+              Tech Club ID or College Email
+            </label>
+            <div class="relative">
+              <i data-lucide="user" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+              <input 
+                type="text" 
+                id="signin-identifier" 
+                required 
+                placeholder="e.g. BST-2026-XXXX or 1234567890@svyasa-sas.edu.in" 
+                class="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1">You can enter either your unique Tech Club ID or your registered college email.</p>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Password</label>
+              <button type="button" onclick="showForgotPasswordHint()" class="text-[11px] text-blue-600 dark:text-blue-400 hover:underline">
+                Forgot password?
+              </button>
+            </div>
+            <div class="relative">
+              <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+              <input 
+                type="password" 
+                id="signin-password" 
+                required 
+                placeholder="••••••••••••" 
+                class="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+              <button 
+                type="button" 
+                onclick="togglePasswordVisibility('signin-password', this)" 
+                class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+                <i data-lucide="eye" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between text-xs pt-1">
+            <label class="flex items-center gap-2 cursor-pointer text-slate-600 dark:text-slate-400">
+              <input type="checkbox" id="signin-remember" checked class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+              <span>Remember this session</span>
+            </label>
+          </div>
+
+          <button 
+            type="submit" 
+            id="signin-submit-btn" 
+            class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition flex items-center justify-center gap-2">
+            <i data-lucide="shield" class="w-4 h-4"></i> Sign In to Member Portal
+          </button>
+
+        </form>
+      </div>
+
+      <!-- FORM 2: NEW MEMBER REGISTRATION -->
+      <div id="form-register-card" class="hidden academic-card p-6 sm:p-8 rounded-2xl shadow-xl">
+        <div class="mb-5 border-b border-slate-100 dark:border-slate-800 pb-3">
+          <h2 class="text-base font-bold text-slate-900 dark:text-white">New Member Induction & ID Minting</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Provide your student information to generate your unique Tech Club ID and profile.
+          </p>
+        </div>
+
+        <form onsubmit="handleRegister(event)" class="space-y-4">
+          <input type="hidden" id="register-referred-by" value="">
+
+          <!-- Full Name -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Full Legal / College Name *</label>
+            <div class="relative">
+              <i data-lucide="user" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+              <input 
+                type="text" 
+                id="reg-name" 
+                required 
+                placeholder="e.g. Tanya Sen" 
+                class="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+            </div>
+          </div>
+
+          <!-- USN & Section Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">University Seat Number (USN) *</label>
+              <div class="relative">
+                <i data-lucide="hash" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                <input 
+                  type="number" 
+                  id="reg-usn" 
+                  required 
+                  min="2392608001" 
+                  max="2392608302" 
+                  placeholder="Enter University Seat Number" 
+                  class="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+              </div>
+              <p class="text-[10px] text-slate-400 mt-1">Authorized USN range: 2392608001 to 2392608302</p>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Section / Division *</label>
+              <div class="relative">
+                <i data-lucide="layout-grid" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                <input 
+                  type="text" 
+                  id="reg-section" 
+                  required 
+                  placeholder="e.g. A, B, C" 
+                  class="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+              </div>
+            </div>
+          </div>
+
+          <!-- College Email -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">College Email ID *</label>
+            <div class="relative">
+              <i data-lucide="mail" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+              <input 
+                type="email" 
+                id="reg-email" 
+                required 
+                placeholder="e.g. 1234567890@svyasa-sas.edu.in" 
+                class="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1">Official college domains or student institutional mail IDs.</p>
+          </div>
+
+          <!-- Academic Branch (Only CSE AI & ML) -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Academic Branch</label>
+            <div class="relative">
+              <i data-lucide="graduation-cap" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+              <select 
+                id="reg-dept" 
+                class="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+                <option value="CSE (AI & ML)" selected>CSE (AI & ML)</option>
+              </select>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1">Exclusive technical society for CSE (AI & ML) students.</p>
+          </div>
+
+          <!-- Password with Strength Meter -->
+          <div class="pt-1 border-t border-slate-100 dark:border-slate-800">
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Create Password *</label>
+            <div class="relative">
+              <i data-lucide="key" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+              <input 
+                type="password" 
+                id="reg-password" 
+                required 
+                minlength="8" 
+                oninput="checkPasswordStrength(this.value)" 
+                placeholder="At least 8 chars with number/symbol" 
+                class="w-full pl-10 pr-10 py-2 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+              <button 
+                type="button" 
+                onclick="togglePasswordVisibility('reg-password', this)" 
+                class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                <i data-lucide="eye" class="w-4 h-4"></i>
+              </button>
+            </div>
+
+            <!-- Strength Bar -->
+            <div class="mt-2">
+              <div class="h-1.5 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div id="password-strength-bar" class="h-full w-0 transition-all duration-300 bg-rose-500"></div>
+              </div>
+              <div class="flex justify-between items-center text-[10px] text-slate-500 mt-1">
+                <span id="password-strength-label">Security: Enter password</span>
+                <span class="text-slate-400">Can be edited anytime after joining</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Confirm Password -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Confirm Password *</label>
+            <div class="relative">
+              <i data-lucide="check-check" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+              <input 
+                type="password" 
+                id="reg-confirm-password" 
+                required 
+                placeholder="Re-enter password" 
+                class="w-full pl-10 pr-10 py-2 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button 
+            type="submit" 
+            id="register-submit-btn" 
+            class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition flex items-center justify-center gap-2">
+            <i data-lucide="sparkles" class="w-4 h-4"></i> Mint Tech Club ID & Register
+          </button>
+
+        </form>
+      </div>
+
+    </div>
+
+    <!-- VIEW B: AUTHENTICATED MEMBER DASHBOARD & DIGITAL ID CARD -->
+    <!-- (Rendered dynamically when session is active) -->
+    <div id="member-dashboard-container" class="hidden w-full max-w-2xl mx-auto space-y-6">
+      
+      <!-- Top Welcome Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
+        <div>
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-xs font-mono font-medium mb-1">
+            <i data-lucide="badge-check" class="w-3.5 h-3.5"></i> Active Tech Club Member
+          </div>
+          <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+            Welcome, <span id="dash-user-name">Member</span>
+          </h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">
+            Official BST Tech Club Member Badge & Cryptographic Vault
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <a href="index.html#events" class="px-3.5 py-2 text-xs font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-sm flex items-center gap-1.5 transition">
+            <i data-lucide="calendar" class="w-3.5 h-3.5"></i> Browse Workshops
+          </a>
+          <button onclick="handleLogout()" class="px-3.5 py-2 text-xs font-semibold rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/40 dark:hover:text-rose-400 text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition">
+            <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Sign Out
+          </button>
+        </div>
+      </div>
+
+      <!-- DIGITAL TECH CLUB ID CARD (Modern Academic Minimalist) -->
+      <div id="digital-id-card" class="ticket-pass p-6 sm:p-7 rounded-2xl bg-gradient-to-br from-white via-slate-50 to-blue-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/20 border-2 border-blue-500 shadow-xl">
+        
+        <!-- ID Header -->
+        <div class="flex items-start justify-between border-b border-slate-200 dark:border-slate-800 pb-4 mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-mono font-extrabold text-base shadow-sm">
+              BST
+            </div>
+            <div>
+              <div class="text-xs font-mono font-extrabold tracking-wider uppercase text-blue-600 dark:text-blue-400">BST TECH CLUB ID</div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Department of CSE (AI & ML)</div>
+            </div>
+          </div>
+
+          <div class="text-right">
+            <span class="text-[10px] text-slate-400 uppercase font-mono font-semibold">MEMBER PASS ID</span>
+            <div id="card-club-id" class="font-mono text-sm sm:text-base font-extrabold text-blue-600 dark:text-blue-400">
+              BST-2026-XXXX
+            </div>
+          </div>
+        </div>
+
+        <!-- ID Card Body -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 items-center">
+          
+          <div class="sm:col-span-2 space-y-3">
+            <div>
+              <span class="text-[10px] uppercase font-mono text-slate-400">MEMBER NAME</span>
+              <div id="card-name" class="text-base font-extrabold text-slate-900 dark:text-white leading-tight">Student Name</div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div>
+                <span class="text-[10px] uppercase font-mono text-slate-400">USN NUMBER</span>
+                <div id="card-usn" class="font-mono font-semibold text-slate-800 dark:text-slate-200">2392608001</div>
+              </div>
+              <div>
+                <span class="text-[10px] uppercase font-mono text-slate-400">SECTION</span>
+                <div id="card-section" class="font-mono font-semibold text-slate-800 dark:text-slate-200">AIML-A</div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div>
+                <span class="text-[10px] uppercase font-mono text-slate-400">ACADEMIC BRANCH</span>
+                <div id="card-dept" class="font-medium text-slate-700 dark:text-slate-300 truncate">CSE (AI & ML)</div>
+              </div>
+              <div>
+                <span class="text-[10px] uppercase font-mono text-slate-400">COLLEGE EMAIL</span>
+                <div id="card-email" class="font-mono text-slate-700 dark:text-slate-300 truncate">1234567890@svyasa-sas.edu.in</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Member Referral & Verification QR Code -->
+          <div class="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+            <div id="card-qr-container" class="w-28 h-28 flex items-center justify-center">
+              <!-- Rendered by JS -->
+            </div>
+            <span class="text-[10px] font-mono text-slate-400 mt-2 text-center">Scan to Join via Referral</span>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- MEMBER ACTIONS: 1. SHARE REFERRAL LINK & QR (REQUESTED FEATURE) -->
+      <div class="academic-card p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+        <div class="flex items-start justify-between gap-3 mb-4">
+          <div>
+            <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-blue-600 dark:text-blue-400">
+              <i data-lucide="share-2" class="w-3.5 h-3.5"></i> Peer Referral & Sign-Up Share
+            </div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">
+              Invite Peers to Join BST Tech Club
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Share your personal invite link or show the QR code above. When fellow students scan or click, they are guided straight to the registration page with your referral!
+            </p>
+          </div>
+          
+          <div class="text-right shrink-0">
+            <span class="text-[10px] uppercase font-mono text-slate-400">PEERS REFERRED</span>
+            <div id="card-referral-count" class="text-lg font-mono font-extrabold text-emerald-600 dark:text-emerald-400">0</div>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <div class="relative flex-1">
+            <i data-lucide="link" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <input 
+              type="text" 
+              id="referral-link-input" 
+              readonly 
+              class="w-full pl-10 pr-4 py-2 text-xs font-mono rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-300 focus:outline-none">
+          </div>
+          <button 
+            onclick="copyReferralLink()" 
+            class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-xs font-bold flex items-center justify-center gap-1.5 transition">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Invite Link
+          </button>
+          <button 
+            onclick="shareViaNative()" 
+            class="px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-center gap-1.5 transition">
+            <i data-lucide="qr-code" class="w-3.5 h-3.5"></i> Share QR
+          </button>
+        </div>
+
+        <!-- Helpful Mobile Camera Scanning Tip when testing on localhost -->
+        <div id="localhost-phone-tip" class="hidden mt-3 p-2.5 rounded-xl bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200/60 dark:border-blue-900/50 text-[11px] text-blue-700 dark:text-blue-300 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <i data-lucide="smartphone" class="w-4 h-4 shrink-0 text-blue-600 dark:text-blue-400"></i>
+            <span><b>Mobile Phone Scanning:</b> Mobile cameras cannot open <code class="px-1 py-0.5 rounded bg-blue-100/60 dark:bg-blue-900/50">localhost</code>. Connect to the same Wi-Fi and set your computer's IP address.</span>
+          </div>
+          <button type="button" onclick="promptCustomNetworkHost()" class="underline font-bold whitespace-nowrap text-blue-800 dark:text-blue-200 hover:text-blue-600">Set Wi-Fi IP</button>
+        </div>
+      </div>
+
+      <!-- MEMBER ACTIONS: 2. EDIT PASSWORD (REQUESTED FEATURE) -->
+      <div class="academic-card p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+        <div class="mb-4">
+          <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-blue-600 dark:text-blue-400">
+            <i data-lucide="key-round" class="w-3.5 h-3.5"></i> Security Settings
+          </div>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">
+            Edit / Update Member Password
+          </h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            You can update your account password at any time. It will be securely salted and hashed.
+          </p>
+        </div>
+
+        <form onsubmit="handlePasswordChange(event)" class="space-y-3 max-w-lg">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Current Password</label>
+            <input 
+              type="password" 
+              id="pwd-current" 
+              required 
+              placeholder="Enter existing password" 
+              class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">New Password</label>
+              <input 
+                type="password" 
+                id="pwd-new" 
+                required 
+                minlength="8" 
+                placeholder="At least 8 chars" 
+                class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Confirm New Password</label>
+              <input 
+                type="password" 
+                id="pwd-confirm-new" 
+                required 
+                placeholder="Re-enter new password" 
+                class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <button 
+              type="submit" 
+              class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider shadow-sm transition flex items-center gap-1.5">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i> Update Password
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ============================================================
+       PAGE FOOTER
+       ============================================================ -->
+  <footer class="border-t border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-950/70 py-6 text-xs text-slate-500 dark:text-slate-400">
+    <div class="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+      <div>
+        <span class="font-bold text-slate-800 dark:text-slate-200">BST Tech Club</span> • Bosscoder School Of Technology
+      </div>
+      <div>
+        <span>Cryptographically verified client-side vault</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    /* ============================================================
+       LOGIN & REGISTRATION CONTROLLER
+       ============================================================ */
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      initTheme();
+      checkActiveSessionState();
+      handleReferralUrlParam();
+      if (window.lucide) window.lucide.createIcons();
+
+      // Silent cloud vault sync
+      if (window.AuthEngine && typeof window.AuthEngine.syncWithCloud === 'function') {
+        try {
+          await window.AuthEngine.syncWithCloud();
+        } catch (e) {
+          console.warn('[Login Portal] Background sync:', e);
+        }
+      }
+    });
+
+    // Theme initialization
+    function initTheme() {
+      const savedTheme = localStorage.getItem('devsphere-theme');
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      updateThemeIcons();
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('devsphere-theme', isDark ? 'dark' : 'light');
+      updateThemeIcons();
+    }
+
+    function updateThemeIcons() {
+      const isDark = document.documentElement.classList.contains('dark');
+      const btns = document.querySelectorAll('.theme-toggle-btn');
+      btns.forEach(b => {
+        b.innerHTML = isDark 
+          ? `<i data-lucide="sun" class="w-4 h-4 text-amber-400"></i>` 
+          : `<i data-lucide="moon" class="w-4 h-4 text-slate-600"></i>`;
+      });
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    // Toggle tab between Sign In and Register
+    function switchAuthTab(tab) {
+      const signinBtn = document.getElementById('tab-btn-signin');
+      const registerBtn = document.getElementById('tab-btn-register');
+      const signinCard = document.getElementById('form-signin-card');
+      const registerCard = document.getElementById('form-register-card');
+
+      if (tab === 'signin') {
+        signinBtn.className = 'flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm';
+        registerBtn.className = 'flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
+        signinCard.classList.remove('hidden');
+        registerCard.classList.add('hidden');
+      } else {
+        registerBtn.className = 'flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm';
+        signinBtn.className = 'flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
+        registerCard.classList.remove('hidden');
+        signinCard.classList.add('hidden');
+      }
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    // Check URL parameters for Referral code e.g. login.html?ref=DS-2026-DEMO
+    function handleReferralUrlParam() {
+      const params = new URLSearchParams(window.location.search);
+      const refCode = params.get('ref');
+      if (refCode) {
+        // Automatically switch to registration tab
+        switchAuthTab('register');
+        document.getElementById('register-referred-by').value = refCode;
+        
+        const banner = document.getElementById('referral-banner');
+        const bannerText = document.getElementById('referral-banner-text');
+        banner.classList.remove('hidden');
+        bannerText.textContent = `You've been invited by Member ${refCode}! Complete your onboarding below to get your official Tech Club ID and access all events.`;
+      }
+    }
+
+    // Password visibility toggle
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      btn.innerHTML = isPassword 
+        ? `<i data-lucide="eye-off" class="w-4 h-4 text-blue-500"></i>`
+        : `<i data-lucide="eye" class="w-4 h-4"></i>`;
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    // Real-time password strength checker
+    function checkPasswordStrength(password) {
+      const bar = document.getElementById('password-strength-bar');
+      const label = document.getElementById('password-strength-label');
+      if (!bar || !label) return;
+
+      let score = 0;
+      if (password.length >= 8) score++;
+      if (/[A-Z]/.test(password)) score++;
+      if (/[0-9]/.test(password)) score++;
+      if (/[^A-Za-z0-9]/.test(password)) score++;
+
+      if (password.length === 0) {
+        bar.style.width = '0%';
+        label.textContent = 'Security: Enter password';
+        bar.className = 'h-full transition-all duration-300 bg-slate-300';
+      } else if (score <= 1) {
+        bar.style.width = '25%';
+        label.textContent = 'Security: Weak';
+        bar.className = 'h-full transition-all duration-300 bg-rose-500';
+      } else if (score === 2) {
+        bar.style.width = '50%';
+        label.textContent = 'Security: Moderate';
+        bar.className = 'h-full transition-all duration-300 bg-amber-500';
+      } else if (score === 3) {
+        bar.style.width = '75%';
+        label.textContent = 'Security: Strong';
+        bar.className = 'h-full transition-all duration-300 bg-blue-500';
+      } else {
+        bar.style.width = '100%';
+        label.textContent = 'Security: Excellent (256-bit ready)';
+        bar.className = 'h-full transition-all duration-300 bg-emerald-500';
+      }
+    }
+
+    function showForgotPasswordHint() {
+      alert('Security note: For password recovery, please contact your Faculty Advisor or Core Tech Lead with your college ID verification.');
+    }
+
+    // --- SUBMIT: SIGN IN ---
+    async function handleSignIn(e) {
+      e.preventDefault();
+      const identifier = document.getElementById('signin-identifier').value;
+      const password = document.getElementById('signin-password').value;
+      const remember = document.getElementById('signin-remember').checked;
+      const submitBtn = document.getElementById('signin-submit-btn');
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Authenticating...`;
+      if (window.lucide) window.lucide.createIcons();
+
+      try {
+        const session = await window.AuthEngine.authenticateMember(identifier, password, remember);
+        showToast(`Welcome back, ${session.name}!`, 'check-circle-2');
+        renderMemberDashboard(session);
+      } catch (err) {
+        showToast(err.message, 'alert-circle');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<i data-lucide="shield" class="w-4 h-4"></i> Sign In to Member Portal`;
+        if (window.lucide) window.lucide.createIcons();
+      }
+    }
+
+    // --- SUBMIT: NEW MEMBER REGISTRATION ---
+    async function handleRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('reg-name').value;
+      const usn = document.getElementById('reg-usn').value;
+      const section = document.getElementById('reg-section').value;
+      const email = document.getElementById('reg-email').value;
+      const department = document.getElementById('reg-dept').value;
+      const password = document.getElementById('reg-password').value;
+      const confirmPassword = document.getElementById('reg-confirm-password').value;
+      const referredBy = document.getElementById('register-referred-by').value;
+      const submitBtn = document.getElementById('register-submit-btn');
+
+      // USN Range Check: 2392608001 to 2392608302
+      const usnNum = parseInt(usn.trim(), 10);
+      if (isNaN(usnNum) || usnNum < 2392608001 || usnNum > 2392608302) {
+        showToast('USN must be within the range 2392608001 to 2392608302.', 'alert-circle');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showToast('Passwords do not match. Please recheck.', 'alert-circle');
+        return;
+      }
+
+      if (password.length < 8) {
+        showToast('Password must be at least 8 characters long.', 'alert-circle');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Minting Tech Club ID...`;
+      if (window.lucide) window.lucide.createIcons();
+
+      try {
+        const member = await window.AuthEngine.registerNewMember({
+          name,
+          usn,
+          section,
+          email,
+          department: 'CSE (AI & ML)',
+          password,
+          referredBy
+        });
+
+        // Automatically log them into their newly minted session
+        window.AuthEngine.setActiveSession(member, true);
+        showToast(`Welcome to BST Tech Club! Your Tech Club ID is ${member.techClubId}`, 'sparkles');
+        renderMemberDashboard(member);
+      } catch (err) {
+        showToast(err.message, 'alert-circle');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<i data-lucide="sparkles" class="w-4 h-4"></i> Mint Tech Club ID & Register`;
+        if (window.lucide) window.lucide.createIcons();
+      }
+    }
+
+    // Check if an existing session is already stored
+    function checkActiveSessionState() {
+      const session = window.AuthEngine.getActiveSession();
+      if (session) {
+        renderMemberDashboard(session);
+      }
+    }
+
+    // Render the logged-in member dashboard and digital ID card
+    function renderMemberDashboard(session) {
+      const authContainer = document.getElementById('auth-forms-container');
+      const dashContainer = document.getElementById('member-dashboard-container');
+
+      authContainer.classList.add('hidden');
+      dashContainer.classList.remove('hidden');
+
+      document.getElementById('dash-user-name').textContent = session.name;
+      document.getElementById('card-club-id').textContent = session.techClubId;
+      document.getElementById('card-name').textContent = session.name;
+      document.getElementById('card-usn').textContent = session.usn;
+      document.getElementById('card-section').textContent = `SEC ${session.section}`;
+      document.getElementById('card-dept').textContent = session.department;
+      document.getElementById('card-email').textContent = session.email;
+      
+      const vault = window.AuthEngine.getMembersVault();
+      const currentMemberRecord = vault[session.techClubId] || session;
+      // Check if running on localhost to display helpful mobile camera scanning tip
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const phoneTip = document.getElementById('localhost-phone-tip');
+      if (phoneTip) {
+        if (isLocalhost) phoneTip.classList.remove('hidden');
+        else phoneTip.classList.add('hidden');
+      }
+
+      // Construct unique referral URL (support optional custom host / Wi-Fi IP for phone testing)
+      const customHost = localStorage.getItem('bst_custom_host');
+      let origin = window.location.origin;
+      if (customHost && isLocalhost) {
+        origin = customHost.startsWith('http') ? customHost : `http://${customHost}`;
+        if (!origin.includes(':') && window.location.port) {
+          origin += `:${window.location.port}`;
+        }
+      }
+
+      const baseUrl = origin + window.location.pathname;
+      const referralUrl = `${baseUrl}?ref=${session.techClubId}`;
+      document.getElementById('referral-link-input').value = referralUrl;
+
+      // Render Referral QR Code
+      const qrContainer = document.getElementById('card-qr-container');
+      qrContainer.innerHTML = `
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=112x112&data=${encodeURIComponent(referralUrl)}" 
+             alt="Referral QR Code" 
+             class="w-24 h-24 object-contain rounded"
+             onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'font-mono text-[9px] text-center font-bold p-1\\'>QR CODE READY<br>${session.techClubId}</div>';">
+      `;
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    // Set custom Wi-Fi IP for mobile phone camera scanning
+    function promptCustomNetworkHost() {
+      const current = localStorage.getItem('bst_custom_host') || '';
+      const entered = prompt("Enter your laptop's Wi-Fi IP address (e.g. 192.168.1.15) so phone cameras on the same Wi-Fi can open it:", current);
+      if (entered !== null) {
+        if (entered.trim()) {
+          localStorage.setItem('bst_custom_host', entered.trim());
+        } else {
+          localStorage.removeItem('bst_custom_host');
+        }
+        const session = window.AuthEngine.getActiveSession();
+        if (session) renderMemberDashboard(session);
+        showToast('Updated Referral QR Code!', 'check-circle-2');
+      }
+    }
+
+    // Copy Referral Link
+    function copyReferralLink() {
+      const input = document.getElementById('referral-link-input');
+      if (!input) return;
+      input.select();
+      navigator.clipboard.writeText(input.value).then(() => {
+        showToast('Invite link copied to clipboard! Share it with friends.', 'copy');
+      }).catch(() => {
+        document.execCommand('copy');
+        showToast('Invite link copied!', 'copy');
+      });
+    }
+
+    // Share via native Web Share API
+    function shareViaNative() {
+      const input = document.getElementById('referral-link-input');
+      const session = window.AuthEngine.getActiveSession();
+      if (!input || !session) return;
+
+      if (navigator.share) {
+        navigator.share({
+          title: 'Join BST Tech Club',
+          text: `Join BST Tech Club with my referral ID (${session.techClubId})!`,
+          url: input.value
+        }).catch(() => {});
+      } else {
+        copyReferralLink();
+      }
+    }
+
+    // Handle Password Change
+    async function handlePasswordChange(e) {
+      e.preventDefault();
+      const session = window.AuthEngine.getActiveSession();
+      if (!session) return;
+
+      const current = document.getElementById('pwd-current').value;
+      const newPwd = document.getElementById('pwd-new').value;
+      const confirmPwd = document.getElementById('pwd-confirm-new').value;
+
+      if (newPwd !== confirmPwd) {
+        showToast('New passwords do not match.', 'alert-circle');
+        return;
+      }
+
+      try {
+        await window.AuthEngine.changeMemberPassword(session.techClubId, current, newPwd);
+        showToast('Password updated successfully! Salt & hash regenerated.', 'check-circle-2');
+        e.target.reset();
+      } catch (err) {
+        showToast(err.message, 'alert-circle');
+      }
+    }
+
+    // Handle Logout
+    function handleLogout() {
+      window.AuthEngine.logoutMember();
+    }
+
+    // Toast Notification helper
+    function showToast(message, iconName = 'info') {
+      let container = document.getElementById('toast-container');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        document.body.appendChild(container);
+      }
+
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `
+        <i data-lucide="${iconName}" class="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0"></i>
+        <span class="text-slate-800 dark:text-slate-100 flex-1">${message}</span>
+      `;
+
+      container.appendChild(toast);
+      if (window.lucide) window.lucide.createIcons();
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px) scale(0.95)';
+        toast.style.transition = 'all 0.2s ease';
+        setTimeout(() => toast.remove(), 200);
+      }, 3500);
+    }
+  </script>
+</body>
+</html>

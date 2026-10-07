@@ -1,0 +1,507 @@
+/* Clean Minimalist & Modern Academic Styling */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  
+  /* Light Theme */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
+  --card-hover-border: #cbd5e1;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --accent-primary: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-light: #eff6ff;
+  --accent-ring: rgba(37, 99, 235, 0.2);
+  --badge-bg: #f1f5f9;
+  --badge-text: #334155;
+  --modal-overlay: rgba(15, 23, 42, 0.6);
+  --header-glass: rgba(255, 255, 255, 0.85);
+  --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-elevation: 0 20px 25px -5px rgba(0, 0, 0, 0.07), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+}
+
+html.dark {
+  /* Dark Theme */
+  --bg-primary: #090d16;
+  --bg-secondary: #0f172a;
+  --bg-tertiary: #1e293b;
+  --card-bg: #0d1322;
+  --card-border: #1e293b;
+  --card-hover-border: #334155;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent-primary: #3b82f6;
+  --accent-hover: #60a5fa;
+  --accent-light: rgba(59, 130, 246, 0.12);
+  --accent-ring: rgba(59, 130, 246, 0.25);
+  --badge-bg: #1e293b;
+  --badge-text: #cbd5e1;
+  --modal-overlay: rgba(0, 0, 0, 0.75);
+  --header-glass: rgba(9, 13, 22, 0.85);
+  --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  --shadow-elevation: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.25s ease, color 0.25s ease;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+code, pre, .font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Glass Header */
+.glass-nav {
+  background-color: var(--header-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--card-border);
+}
+
+/* Academic Subtle Grid Background */
+.academic-grid-pattern {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+}
+
+html.dark .academic-grid-pattern {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+}
+
+/* Subtle Cards */
+.academic-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.academic-card:hover {
+  border-color: var(--card-hover-border);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card);
+}
+
+/* Ticket Pass Stylings for RSVP Confirmation */
+.ticket-pass {
+  background: var(--card-bg);
+  border: 2px dashed var(--accent-primary);
+  position: relative;
+}
+
+.ticket-pass::before,
+.ticket-pass::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: var(--bg-primary);
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.ticket-pass::before {
+  left: -11px;
+}
+
+.ticket-pass::after {
+  right: -11px;
+}
+
+/* Toast Notifications */
+#toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  padding: 12px 18px;
+  border-radius: 10px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow-elevation);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  animation: toastIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  max-width: 380px;
+}
+
+@keyframes toastIn {
+  from {
+    transform: translateY(20px) scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Smooth modal transitions */
+.modal-backdrop {
+  background-color: var(--modal-overlay);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Interactive Pill Badges */
+.filter-btn.active {
+  background-color: var(--accent-primary) !important;
+  color: #ffffff !important;
+  border-color: var(--accent-primary) !important;
+}
+
+/* Print Ticket pass */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #rsvp-ticket-card, #rsvp-ticket-card * {
+    visibility: visible;
+  }
+  #rsvp-ticket-card {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}
+
+/* ============================================================
+   DEEPSEEK-STYLE DETECTIVE CODE LENS (Compact Solid Black)
+   ============================================================ */
+.code-lens-wrapper {
+  --lens-x: -300px;
+  --lens-y: -300px;
+  --lens-radius: 8px;
+  --lens-offset-x: 180px;
+  --lens-offset-y: 32px;
+  --lens-opacity: 0;
+  position: relative;
+  display: inline-block;
+  cursor: crosshair;
+  padding: 4px 12px;
+  margin: -4px -12px;
+  border-radius: 12px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Invisible interaction hit-test area spanning the full code length */
+.code-lens-wrapper::before {
+  content: '';
+  position: absolute;
+  top: -24px;
+  bottom: -24px;
+  left: calc(-1 * var(--lens-offset-x, 180px));
+  right: calc(-1 * var(--lens-offset-x, 180px));
+  z-index: 5;
+  cursor: crosshair;
+}
+
+.code-lens-front {
+  position: relative;
+  z-index: 1;
+  transition: opacity 0.15s ease;
+}
+
+.code-lens-reveal {
+  position: absolute;
+  top: calc(var(--lens-offset-y) * -1);
+  bottom: calc(var(--lens-offset-y) * -1);
+  left: calc(var(--lens-offset-x) * -1);
+  right: calc(var(--lens-offset-x) * -1);
+  background: #000000 !important;
+  border-radius: 9999px;
+  pointer-events: none;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: var(--lens-opacity);
+  clip-path: circle(var(--lens-radius) at calc(var(--lens-x) + var(--lens-offset-x)) calc(var(--lens-y) + var(--lens-offset-y)));
+  -webkit-clip-path: circle(var(--lens-radius) at calc(var(--lens-x) + var(--lens-offset-x)) calc(var(--lens-y) + var(--lens-offset-y)));
+  box-shadow: none;
+  border: none;
+}
+
+.code-lens-content {
+  font-family: var(--font-mono);
+  font-size: clamp(1.15rem, 3.2vw, 2.25rem);
+  font-weight: 700;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+  text-shadow: 0 0 16px rgba(59, 130, 246, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.code-lens-glass {
+  position: absolute;
+  left: var(--lens-x);
+  top: var(--lens-y);
+  width: calc(var(--lens-radius) * 2);
+  height: calc(var(--lens-radius) * 2);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 25;
+  opacity: var(--lens-opacity);
+  border: 1.5px solid rgba(59, 130, 246, 0.8);
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.8), 0 0 8px rgba(59, 130, 246, 0.25);
+  background: transparent !important;
+}
+
+.lens-badge {
+  position: absolute;
+  top: -26px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  padding: 2px 9px;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: #60a5fa;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 640px) {
+  .code-lens-wrapper {
+    --lens-radius: 6px;
+    --lens-offset-x: 100px;
+    --lens-offset-y: 24px;
+  }
+}
+
+/* ============================================================
+   AURORA NEURAL SHIMMER - ASK AI PILL
+   ============================================================ */
+.nav-ask-ai-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  background-color: rgba(239, 246, 255, 0.85);
+  color: #2563eb;
+  border: 1px solid rgba(191, 219, 254, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1;
+  text-decoration: none;
+}
+
+.dark .nav-ask-ai-pill {
+  background-color: rgba(15, 23, 42, 0.75);
+  color: #93c5fd;
+  border-color: rgba(30, 58, 138, 0.6);
+}
+
+.nav-ask-ai-pill::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #38bdf8, #6366f1, #ec4899, #38bdf8);
+  background-size: 300% 100%;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  z-index: -1;
+  filter: blur(6px);
+}
+
+.nav-ask-ai-pill:hover::before {
+  opacity: 0.85;
+  animation: auroraFlow 2.5s linear infinite;
+}
+
+.nav-ask-ai-pill:hover {
+  transform: translateY(-1.5px);
+  border-color: rgba(129, 140, 248, 0.8);
+  color: #1e40af;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+}
+
+.dark .nav-ask-ai-pill:hover {
+  color: #ffffff;
+  border-color: rgba(165, 180, 252, 0.6);
+  box-shadow: 0 4px 18px rgba(99, 102, 241, 0.5);
+}
+
+.nav-ask-ai-pill .ai-sparkle-icon {
+  display: inline-flex;
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.3s ease;
+}
+
+.nav-ask-ai-pill:hover .ai-sparkle-icon {
+  transform: rotate(360deg) scale(1.25);
+  color: #6366f1;
+}
+
+.dark .nav-ask-ai-pill:hover .ai-sparkle-icon {
+  color: #a5b4fc;
+}
+
+@keyframes auroraFlow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
+/* ============================================================
+   HOLOGRAPHIC STUDENT ID BADGE
+   ============================================================ */
+.holographic-id-badge {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Holographic sheen light reflection beam */
+.holographic-id-badge::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -160%;
+  width: 75%;
+  height: 200%;
+  background: linear-gradient(
+    115deg,
+    transparent 20%,
+    rgba(56, 189, 248, 0.15) 35%,
+    rgba(255, 255, 255, 0.22) 50%,
+    rgba(147, 197, 253, 0.3) 58%,
+    rgba(129, 140, 248, 0.2) 68%,
+    transparent 82%
+  );
+  transform: rotate(22deg);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 2;
+}
+
+.holographic-id-badge:hover::after {
+  opacity: 1;
+  animation: holographicGleam 1.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.holographic-id-badge:hover {
+  transform: translateY(-1.5px);
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 20px -2px rgba(37, 99, 235, 0.65), 0 0 12px rgba(59, 130, 246, 0.45);
+  border-color: rgba(147, 197, 253, 0.7) !important;
+}
+
+.holographic-id-badge .badge-shield-icon {
+  display: inline-flex;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
+}
+
+.holographic-id-badge:hover .badge-shield-icon {
+  transform: scale(1.2);
+  filter: drop-shadow(0 0 6px rgba(96, 165, 250, 0.9));
+}
+
+/* Live verified pulse dot */
+.verified-pulse-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background-color: #10b981;
+  border: 1.5px solid #1e3a8a;
+  box-shadow: 0 0 6px #10b981;
+  animation: pulseDot 2s ease-in-out infinite;
+}
+
+@keyframes holographicGleam {
+  0% {
+    left: -160%;
+  }
+  100% {
+    left: 220%;
+  }
+}
+
+@keyframes pulseDot {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 0.75;
+  }
+}
+
