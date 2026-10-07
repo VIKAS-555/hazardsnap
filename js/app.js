@@ -70,7 +70,7 @@ function checkAuthNavbarState() {
 
   if (session && navText && navLink) {
     if (session.role === 'Admin') {
-      navText.textContent = `👑 Head Admin • ${session.name.split(' ')[0]}`;
+      navText.textContent = `Head Admin • ${session.name.split(' ')[0]}`;
       navLink.className = 'holographic-id-badge inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-white transition shadow-md border border-amber-300/60 ring-2 ring-amber-400/20';
     } else {
       navText.textContent = `${session.techClubId} (${session.name.split(' ')[0]})`;
