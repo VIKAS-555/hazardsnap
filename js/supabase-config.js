@@ -14,7 +14,7 @@
 
 window.SUPABASE_CONFIG = {
   // Supabase Project URL
-  url: 'https://vltpqzsonqqxzysaxdv.supabase.co',
+  url: 'https://vltpqzsonqqxxzysaxdv.supabase.co',
 
   // Supabase Anon Public Key
   anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsdHBxenNvbnFxeHh6eXNheGR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzODkxMjgsImV4cCI6MjEwNjk2NTEyOH0.nO1PEvIb3DH_gDstueJE9zOxvIEF8ozntRrU82E7IUg'

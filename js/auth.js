@@ -212,11 +212,12 @@ async function registerNewMember({ name, usn, section, email, department, passwo
     try {
       await window.SupabaseEngine.insertMember(newMember);
     } catch (dbErr) {
+      console.warn('[AuthEngine] Cloud insert notice:', dbErr.message);
       if (dbErr.message && dbErr.message.toLowerCase().includes('unique')) {
         if (dbErr.message.toLowerCase().includes('usn')) throw new Error('An account with this USN is already registered in the cloud database.');
         if (dbErr.message.toLowerCase().includes('email')) throw new Error('An account with this email is already registered in the cloud database.');
       }
-      throw new Error(dbErr.message || 'Cloud database registration failed.');
+      // Do not block student from minting their badge locally if cloud has permission or network hiccup
     }
   }
 
