@@ -414,11 +414,17 @@
           </div>
 
           <!-- Dynamic Member Referral & Verification QR Code -->
-          <div class="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
-            <div id="card-qr-container" class="w-28 h-28 flex items-center justify-center">
-              <!-- Rendered by JS -->
+          <div class="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm relative group">
+            <div id="card-qr-container" class="w-28 h-28 flex items-center justify-center p-1 bg-white rounded-lg border border-slate-100">
+              <!-- Rendered by JS in 0ms -->
             </div>
-            <span class="text-[10px] font-mono text-slate-400 mt-2 text-center">Scan to Join via Referral</span>
+            <div class="mt-2 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span class="text-[10px] font-mono font-semibold text-slate-500 dark:text-slate-400">Scan via Mobile Camera</span>
+            </div>
+            <button type="button" onclick="downloadReferralQr()" title="Save QR Image" class="mt-1 text-[10px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+              <i data-lucide="download" class="w-3 h-3"></i> Save QR Badge
+            </button>
           </div>
 
         </div>
@@ -436,7 +442,7 @@
               Invite Peers to Join BST Tech Club
             </h3>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Share your personal invite link or show the QR code above. When fellow students scan or click, they are guided straight to the registration page with your referral!
+              Share your personal invite link or show your QR code. When batchmates scan or click, they are guided straight to registration with your referral!
             </p>
           </div>
           
@@ -457,13 +463,18 @@
           </div>
           <button 
             onclick="copyReferralLink()" 
-            class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-xs font-bold flex items-center justify-center gap-1.5 transition">
-            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Invite Link
+            class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-xs font-bold flex items-center justify-center gap-1.5 transition">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Link
+          </button>
+          <button 
+            onclick="shareViaWhatsApp()" 
+            class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-sm">
+            <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WhatsApp Invite
           </button>
           <button 
             onclick="shareViaNative()" 
             class="px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-center gap-1.5 transition">
-            <i data-lucide="qr-code" class="w-3.5 h-3.5"></i> Share QR
+            <i data-lucide="share-2" class="w-3.5 h-3.5"></i> Share
           </button>
         </div>
 
@@ -554,6 +565,7 @@
   </footer>
 
   <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
   <script src="js/supabase-client.js"></script>
@@ -629,19 +641,35 @@
       if (window.lucide) window.lucide.createIcons();
     }
 
-    // Check URL parameters for Referral code e.g. login.html?ref=DS-2026-DEMO
+    // Check URL parameters for Referral code e.g. login.html?ref=DS-2026-8166
     function handleReferralUrlParam() {
       const params = new URLSearchParams(window.location.search);
       const refCode = params.get('ref');
       if (refCode) {
         // Automatically switch to registration tab
         switchAuthTab('register');
-        document.getElementById('register-referred-by').value = refCode;
+        const refInput = document.getElementById('register-referred-by');
+        if (refInput) refInput.value = refCode;
         
         const banner = document.getElementById('referral-banner');
         const bannerText = document.getElementById('referral-banner-text');
-        banner.classList.remove('hidden');
-        bannerText.textContent = `You've been invited by Member ${refCode}! Complete your onboarding below to get your official Tech Club ID and access all events.`;
+        if (banner && bannerText) {
+          banner.classList.remove('hidden');
+          // Lookup referrer name if cached in vault
+          const vault = window.AuthEngine && window.AuthEngine.getMembersVault ? window.AuthEngine.getMembersVault() : {};
+          const referrer = vault[refCode];
+          const inviterName = referrer ? referrer.name : `Member ${refCode}`;
+          bannerText.innerHTML = `You've been personally invited by <b>${inviterName}</b> (<span class="font-mono font-semibold text-blue-600 dark:text-blue-400">${refCode}</span>)! Complete your registration below to mint your official Tech Club ID and access all workshops, hackathons, and project showcases.`;
+        }
+
+        // Smooth autofocus to the full name field
+        setTimeout(() => {
+          const nameInput = document.getElementById('reg-name');
+          if (nameInput) {
+            nameInput.focus();
+            nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 300);
       }
     }
 
@@ -813,30 +841,100 @@
         else phoneTip.classList.add('hidden');
       }
 
-      // Construct unique referral URL (support optional custom host / Wi-Fi IP for phone testing)
+      // Construct unique referral URL (defaults to live Vercel URL so phone cameras scanning laptop screens open the real site!)
+      const referralUrl = getLiveReferralUrl(session.techClubId);
+      document.getElementById('referral-link-input').value = referralUrl;
+
+      // Render smooth client-side QR Code (0ms canvas or SVG)
+      renderSmoothQrCode('card-qr-container', referralUrl, 112);
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    const VERCEL_PRODUCTION_URL = 'https://bst-club-portal.vercel.app';
+
+    function getLiveReferralUrl(clubId) {
+      const host = window.location.hostname;
+      const isLocal = host === 'localhost' || host === '127.0.0.1' || window.location.protocol === 'file:';
+      
       const customHost = localStorage.getItem('bst_custom_host');
-      let origin = window.location.origin;
-      if (customHost && isLocalhost) {
-        origin = customHost.startsWith('http') ? customHost : `http://${customHost}`;
-        if (!origin.includes(':') && window.location.port) {
-          origin += `:${window.location.port}`;
+      if (customHost && isLocal) {
+        let origin = customHost.startsWith('http') ? customHost : `http://${customHost}`;
+        if (!origin.includes(':') && window.location.port) origin += `:${window.location.port}`;
+        return `${origin}/login.html?ref=${encodeURIComponent(clubId)}`;
+      }
+
+      // Automatically default to live Vercel URL so phone cameras scanning laptop screens open the real web app!
+      const baseOrigin = isLocal ? VERCEL_PRODUCTION_URL : window.location.origin;
+      return `${baseOrigin}/login.html?ref=${encodeURIComponent(clubId)}`;
+    }
+
+    function renderSmoothQrCode(containerId, url, size = 112) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (window.QRCode) {
+        try {
+          new QRCode(container, {
+            text: url,
+            width: size,
+            height: size,
+            colorDark: '#0f172a',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
+          });
+          const canvas = container.querySelector('canvas') || container.querySelector('img');
+          if (canvas) {
+            canvas.style.borderRadius = '6px';
+            canvas.style.margin = 'auto';
+            canvas.style.display = 'block';
+          }
+          return;
+        } catch (err) {
+          console.warn('[QR Render] Client-side canvas fallback:', err);
         }
       }
 
-      const baseUrl = origin + window.location.pathname;
-      const referralUrl = `${baseUrl}?ref=${session.techClubId}`;
-      document.getElementById('referral-link-input').value = referralUrl;
-
-      // Render Referral QR Code
-      const qrContainer = document.getElementById('card-qr-container');
-      qrContainer.innerHTML = `
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=112x112&data=${encodeURIComponent(referralUrl)}" 
+      // Ultra-fast progressive image fallback
+      container.innerHTML = `
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=${size * 2}x${size * 2}&data=${encodeURIComponent(url)}&margin=4" 
              alt="Referral QR Code" 
-             class="w-24 h-24 object-contain rounded"
-             onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'font-mono text-[9px] text-center font-bold p-1\\'>QR CODE READY<br>${session.techClubId}</div>';">
+             class="w-full h-full object-contain rounded"
+             loading="eager"
+             onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'font-mono text-[9px] text-center font-bold p-1\\'>QR CODE READY<br>${url}</div>';">
       `;
+    }
 
-      if (window.lucide) window.lucide.createIcons();
+    // Share via WhatsApp with pre-filled collegiate message
+    function shareViaWhatsApp() {
+      const session = window.AuthEngine.getActiveSession();
+      if (!session) return;
+      const refUrl = getLiveReferralUrl(session.techClubId);
+      const text = `Hey! Join the official BST Tech Club (Department of CSE - AI & ML, Cohort 2026).\n\nRegister using my peer invitation link to mint your official Tech Club ID and access all events, workshops, and hackathons:\n${refUrl}`;
+      const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+      window.open(whatsappUrl, '_blank');
+    }
+
+    // Download QR Code as PNG image for saving to mobile gallery
+    function downloadReferralQr() {
+      const qrContainer = document.getElementById('card-qr-container');
+      const canvas = qrContainer ? qrContainer.querySelector('canvas') : null;
+      const session = window.AuthEngine.getActiveSession();
+      const clubId = session ? session.techClubId : 'bst-member';
+
+      if (canvas) {
+        const link = document.createElement('a');
+        link.download = `${clubId}-referral-qr.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        showToast('Referral QR Code downloaded to your device!', 'download');
+      } else {
+        const img = qrContainer ? qrContainer.querySelector('img') : null;
+        if (img && img.src) {
+          window.open(img.src, '_blank');
+        }
+      }
     }
 
     // Set custom Wi-Fi IP for mobile phone camera scanning

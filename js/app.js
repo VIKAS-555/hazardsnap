@@ -1200,14 +1200,59 @@ function closePassModal() {
 function renderTicketQr(text) {
   const qrBox = document.getElementById('pass-qr-box');
   if (!qrBox) return;
+
+  const baseOrigin = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'https://bst-club-portal.vercel.app'
+    : window.location.origin;
+  const verifyUrl = `${baseOrigin}/login.html?verify=${encodeURIComponent(text)}`;
+
   qrBox.innerHTML = `
-    <div class="p-2 bg-white rounded-lg border border-slate-200 shadow-inner flex flex-col items-center">
-      <img src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=${encodeURIComponent(text)}" 
-           alt="Ticket QR Code" 
-           class="w-28 h-28 object-contain"
-           onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'font-mono text-xs font-bold p-3 text-slate-800 text-center\\'>[VERIFIED QR PASS]<br>${text}</div>';">
-      <span class="font-mono text-[10px] text-slate-500 mt-1 font-semibold">${text}</span>
+    <div class="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col items-center">
+      <div id="ticket-qr-canvas-box" class="w-28 h-28 flex items-center justify-center p-1 bg-white rounded-lg border border-slate-100"></div>
+      <span class="font-mono text-[11px] text-slate-800 dark:text-slate-200 font-bold mt-2 tracking-wider">${text}</span>
+      <span class="text-[9px] font-mono text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1 mt-0.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Scan to Verify Admission Pass
+      </span>
     </div>
+  `;
+
+  renderSmoothQrCode('ticket-qr-canvas-box', verifyUrl, 100);
+}
+
+function renderSmoothQrCode(containerId, url, size = 112) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = '';
+
+  if (window.QRCode) {
+    try {
+      new QRCode(container, {
+        text: url,
+        width: size,
+        height: size,
+        colorDark: '#0f172a',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+      });
+      const canvas = container.querySelector('canvas') || container.querySelector('img');
+      if (canvas) {
+        canvas.style.borderRadius = '6px';
+        canvas.style.margin = 'auto';
+        canvas.style.display = 'block';
+      }
+      return;
+    } catch (err) {
+      console.warn('[QR Render] Client-side canvas fallback:', err);
+    }
+  }
+
+  // Ultra-fast progressive image fallback
+  container.innerHTML = `
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=${size * 2}x${size * 2}&data=${encodeURIComponent(url)}&margin=4" 
+         alt="QR Pass" 
+         class="w-full h-full object-contain rounded"
+         loading="eager"
+         onerror="this.parentElement.innerHTML='<div class=\\'font-mono text-[9px] text-center font-bold p-1\\'>PASS READY<br>${url}</div>';">
   `;
 }
 
