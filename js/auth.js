@@ -25,7 +25,7 @@ const CLUB_RANKS = {
     statusLabel: 'LEAD ADMINISTRATOR [UID 0]',
     avatarIcon: 'terminal',
     badgeClass: 'bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700',
-    description: 'root / UID 0. Head of platform infrastructure, club administration, and member role governance.'
+    description: 'root / UID 0. Head of platform infrastructure and club governance. Multi-admin governance enabled. Appoints Core Maintainers and promotes members. Exempt from automated contribution demotion.'
   },
   'Core Maintainer': {
     rankLevel: 3,
@@ -35,7 +35,7 @@ const CLUB_RANKS = {
     statusLabel: 'CORE MAINTAINER [MAIN BRANCH]',
     avatarIcon: 'git-branch',
     badgeClass: 'bg-purple-100 dark:bg-purple-950/80 text-purple-800 dark:text-purple-300 border-purple-300 dark:border-purple-700',
-    description: 'Main branch merge authority. Directs domain tracks (CP, Robotics, AI & ML) and reviews code submissions.'
+    description: 'Main branch merge authority. Directs domain tracks (CP, Robotics, AI & ML). Appointed exclusively by Lead Administrator. Exempt from automated contribution demotion.'
   },
   'Staff Contributor': {
     rankLevel: 2,
@@ -45,7 +45,7 @@ const CLUB_RANKS = {
     statusLabel: 'STAFF CONTRIBUTOR [VERIFIED REVIEWER]',
     avatarIcon: 'code-2',
     badgeClass: 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700',
-    description: 'Senior peer builder and mentor. Earned by introducing 5+ student developers or contributing to club projects.'
+    description: 'Senior peer mentor and verified contributor. Earned automatically by Active Developers achieving 100+ contribution points. Must maintain ≥60 points to retain rank. System auto-promotion caps here; higher tiers require Lead Admin appointment.'
   },
   'Active Developer': {
     rankLevel: 1,
@@ -55,9 +55,146 @@ const CLUB_RANKS = {
     statusLabel: 'ACTIVE DEVELOPER [USERLAND]',
     avatarIcon: 'cpu',
     badgeClass: 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
-    description: 'Verified student member in the CSE (AI & ML) registry. Active participant in workshops, hackathons, and projects.'
+    description: 'Verified student member in the CSE (AI & ML) registry. Eligible for automated promotion to Staff Contributor upon reaching 100+ contribution points.'
   }
 };
+
+// --- Contribution Scoring & Automated Governance Criteria ---
+const CONTRIBUTION_CRITERIA = {
+  POINTS_PER_REFERRAL: 20,       // Inviting a verified student peer (+20 pts)
+  POINTS_PER_RSVP: 15,           // RSVP / Attending a workshop or hackathon (+15 pts)
+  POINTS_PER_PROJECT: 25,        // Code contributions & project showcases (+25 pts)
+
+  STAFF_PROMOTION_THRESHOLD: 100, // Active Developer -> Staff Contributor (at 100+ points)
+  STAFF_MAINTENANCE_THRESHOLD: 60  // Staff Contributor -> Active Developer (if below 60 points)
+};
+
+/**
+ * Calculate member's real-time contribution points and eligibility
+ */
+function calculateMemberContribution(member) {
+  if (!member) {
+    return {
+      totalPoints: 0,
+      referralCount: 0,
+      referralPoints: 0,
+      rsvpCount: 0,
+      rsvpPoints: 0,
+      projectCount: 0,
+      projectPoints: 0,
+      isStaffEligible: false,
+      isStaffMaintained: false
+    };
+  }
+
+  const referralCount = member.referralCount || 0;
+  
+  let rsvpCount = member.eventsAttended || 0;
+  if (!rsvpCount && member.rsvps) {
+    rsvpCount = Object.keys(member.rsvps).length;
+  }
+  try {
+    const active = getActiveSession();
+    if (active && active.techClubId === member.techClubId) {
+      const stored = JSON.parse(localStorage.getItem('devsphere-user-rsvps') || '{}');
+      const localCount = Object.keys(stored).length;
+      if (localCount > rsvpCount) rsvpCount = localCount;
+    }
+  } catch (e) {}
+
+  const projectCount = member.projectsContributed || 0;
+
+  const referralPoints = referralCount * CONTRIBUTION_CRITERIA.POINTS_PER_REFERRAL;
+  const rsvpPoints = rsvpCount * CONTRIBUTION_CRITERIA.POINTS_PER_RSVP;
+  const projectPoints = projectCount * CONTRIBUTION_CRITERIA.POINTS_PER_PROJECT;
+  const totalPoints = referralPoints + rsvpPoints + projectPoints;
+
+  return {
+    totalPoints,
+    referralCount,
+    referralPoints,
+    rsvpCount,
+    rsvpPoints,
+    projectCount,
+    projectPoints,
+    isStaffEligible: totalPoints >= CONTRIBUTION_CRITERIA.STAFF_PROMOTION_THRESHOLD,
+    isStaffMaintained: totalPoints >= CONTRIBUTION_CRITERIA.STAFF_MAINTENANCE_THRESHOLD
+  };
+}
+
+/**
+ * Contribution-based Promotion & Demotion Evaluation
+ * Rules:
+ * 1. Club Admin & Core Maintainer are EXEMPT from the contribution system (cannot be auto-promoted or auto-demoted).
+ * 2. Active Developer is auto-promoted to Staff Contributor when achieving 100+ points.
+ * 3. Staff Contributor can contribute, but NEVER auto-promoted higher (auto-promotion caps at Staff Contributor). Higher ranks require Lead Admin appointment only.
+ * 4. Staff Contributor is auto-demoted to Active Developer if contribution drops below 60 points.
+ */
+async function evaluateContributionRank(member, saveToStorage = true) {
+  if (!member) return { member, rankChanged: false };
+  const currentRank = normalizeMemberRank(member.role);
+
+  // Rule 1: Club Admin and Core Maintainer have NO contribution promotion or demotion
+  if (currentRank === 'Root Architect' || currentRank === 'Core Maintainer') {
+    return {
+      member,
+      rankChanged: false,
+      currentRank,
+      reason: 'Governance tier is exempt from contribution-based auto-promotion and auto-demotion.'
+    };
+  }
+
+  const { totalPoints, isStaffEligible, isStaffMaintained } = calculateMemberContribution(member);
+  let newRank = currentRank;
+  let rankChanged = false;
+  let action = null; // 'promoted' | 'demoted'
+
+  // Rule 2: Active Developer auto-promotes to Staff Contributor at 100+ points
+  if (currentRank === 'Active Developer' && isStaffEligible) {
+    newRank = 'Staff Contributor';
+    rankChanged = true;
+    action = 'promoted';
+  } 
+  // Rule 4: Staff Contributor auto-demotes to Active Developer if below 60 points
+  else if (currentRank === 'Staff Contributor' && !isStaffMaintained) {
+    newRank = 'Active Developer';
+    rankChanged = true;
+    action = 'demoted';
+  }
+  // Rule 3: Staff Contributor CANNOT be auto-promoted higher!
+
+  if (rankChanged) {
+    member.role = newRank;
+    if (saveToStorage) {
+      const vault = getMembersVault();
+      if (vault[member.techClubId]) {
+        vault[member.techClubId].role = newRank;
+        saveMembersVault(vault);
+      }
+      const active = getActiveSession();
+      if (active && active.techClubId === member.techClubId) {
+        active.role = newRank;
+        setActiveSession(active);
+      }
+      if (window.SupabaseEngine && window.SupabaseEngine.isConfigured()) {
+        try {
+          const client = window.SupabaseEngine.getClient();
+          if (client) {
+            client.from('members').update({ role: newRank }).eq('tech_club_id', member.techClubId).then();
+          }
+        } catch (e) {}
+      }
+    }
+  }
+
+  return {
+    member,
+    rankChanged,
+    action,
+    newRank,
+    totalPoints
+  };
+}
 
 function normalizeMemberRank(role) {
   if (!role) return 'Active Developer';
@@ -247,20 +384,21 @@ async function registerNewMember({ name, usn, section, email, department, passwo
   const salt = generateRandomSalt();
   const passwordHash = await hashPasswordWithSalt(password, salt);
 
-  // If referred by another member, increment their referral count and check auto-promotion to Staff Contributor
+  // If referred by another member, increment their referral count and evaluate contribution rank
   if (referredBy && vault[referredBy]) {
     vault[referredBy].referralCount = (vault[referredBy].referralCount || 0) + 1;
-    // Auto-promote to Staff Contributor if 5+ peers referred!
-    if (normalizeMemberRank(vault[referredBy].role) === 'Active Developer' && vault[referredBy].referralCount >= 5) {
-      vault[referredBy].role = 'Staff Contributor';
-      if (window.SupabaseEngine && window.SupabaseEngine.isConfigured()) {
-        try {
-          const client = window.SupabaseEngine.getClient();
-          if (client) {
-            client.from('members').update({ role: 'Staff Contributor' }).eq('tech_club_id', referredBy).then();
-          }
-        } catch (e) {}
-      }
+    // Auto-evaluate contribution rank (promotes Active Dev -> Staff at 100+ pts; Maintainer/Admin exempt)
+    await evaluateContributionRank(vault[referredBy], false);
+    if (window.SupabaseEngine && window.SupabaseEngine.isConfigured()) {
+      try {
+        const client = window.SupabaseEngine.getClient();
+        if (client) {
+          client.from('members').update({ 
+            referral_count: vault[referredBy].referralCount,
+            role: vault[referredBy].role 
+          }).eq('tech_club_id', referredBy).then();
+        }
+      } catch (e) {}
     }
   }
 
@@ -392,22 +530,8 @@ async function authenticateMember(identifier, password, rememberMe = true) {
     }
   }
 
-  // Auto-promotion: 5+ referrals unlocks Staff Contributor
-  if (normalizeMemberRank(member.role) === 'Active Developer' && (member.referralCount || 0) >= 5) {
-    member.role = 'Staff Contributor';
-    if (vault[member.techClubId]) {
-      vault[member.techClubId].role = 'Staff Contributor';
-    }
-    saveMembersVault(vault);
-    if (window.SupabaseEngine && window.SupabaseEngine.isConfigured()) {
-      try {
-        const client = window.SupabaseEngine.getClient();
-        if (client) {
-          client.from('members').update({ role: 'Staff Contributor' }).eq('tech_club_id', member.techClubId).then();
-        }
-      } catch (e) {}
-    }
-  }
+  // Contribution System: Evaluate rank (Active Dev auto-promotes to Staff at 100+ pts; Staff auto-demotes if < 60 pts; Maintainer and Admin exempt)
+  await evaluateContributionRank(member, true);
 
   return setActiveSession(member, rememberMe);
 }
@@ -579,6 +703,9 @@ async function promoteMember(targetClubId, newRank) {
 // Export for browser
 window.AuthEngine = {
   CLUB_RANKS,
+  CONTRIBUTION_CRITERIA,
+  calculateMemberContribution,
+  evaluateContributionRank,
   normalizeMemberRank,
   getRankInfo,
   getMembersVault,
