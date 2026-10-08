@@ -75,10 +75,6 @@
           </a>
           <a href="#projects" class="hover:text-blue-600 dark:hover:text-blue-400 transition">Projects</a>
           <a href="#faqs" class="hover:text-blue-600 dark:hover:text-blue-400 transition">FAQ</a>
-          <a href="#ai-advisor" class="nav-ask-ai-pill">
-            <span class="ai-sparkle-icon"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i></span>
-            <span>Ask AI</span>
-          </a>
         </nav>
 
         <!-- Right Controls: Theme Toggle & Portal Link -->
@@ -127,9 +123,6 @@
       <button onclick="openCloudConfigModal()" class="w-full text-left py-1.5 text-slate-700 dark:text-slate-200 flex items-center gap-2">
         <i data-lucide="database" class="w-4 h-4 text-blue-600 dark:text-blue-400"></i> Cloud Database Setup
       </button>
-      <a href="#ai-advisor" class="block py-1.5 text-blue-600 dark:text-blue-400 font-mono text-xs flex items-center gap-1.5">
-        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Ask BST AI Advisor
-      </a>
       <div class="pt-2 border-t border-slate-100 dark:border-slate-900 flex justify-center">
         <a href="login.html" class="w-full py-2 text-center text-xs font-semibold rounded-lg bg-blue-600 text-white">
           Open BST Member Portal
@@ -304,83 +297,6 @@
       <div class="text-center mb-10">
         <span class="text-xs font-mono font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">Common Inquiries</span>
         <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight mt-1">Frequently Asked Questions</h2>
-      </div>
-
-      <!-- ============================================================
-           ASK BST AI (Simplistic, Minimal & Effortless)
-           ============================================================ -->
-      <div id="ai-advisor" class="mb-10">
-        
-        <!-- Minimal Unified Search Bar -->
-        <form id="ai-query-form" onsubmit="handleAiQuery(event)" class="relative">
-          <div class="relative flex items-center rounded-2xl border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-all p-1.5">
-            <div class="pl-3.5 pr-2 text-blue-500 flex items-center pointer-events-none">
-              <i data-lucide="sparkles" class="w-4 h-4"></i>
-            </div>
-            <input 
-              type="text" 
-              id="ai-user-query" 
-              required
-              placeholder="Ask anything about eligibility, domains, or events..." 
-              class="w-full py-2.5 px-2 bg-transparent text-slate-900 dark:text-white text-xs sm:text-sm focus:outline-none placeholder:text-slate-400"
-              autocomplete="off"
-            />
-            <button 
-              type="submit" 
-              id="ai-submit-button" 
-              class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold flex items-center gap-1.5 transition shadow-sm shrink-0"
-            >
-              <span>Ask AI</span>
-              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-            </button>
-          </div>
-        </form>
-
-        <!-- Minimal Quick Question Chips -->
-        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-3">
-          <button type="button" onclick="fillAndAskAi('Who is eligible to join BST Tech Club and what is the USN range?')" class="px-3 py-1 rounded-full bg-slate-100 hover:bg-blue-50 dark:bg-slate-800/80 dark:hover:bg-blue-950/60 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition text-[11px] font-medium border border-transparent hover:border-blue-200 dark:hover:border-blue-900">
-            🎓 Check Eligibility
-          </button>
-          <button type="button" onclick="fillAndAskAi('Explain the 4 core domains in BST Tech Club.')" class="px-3 py-1 rounded-full bg-slate-100 hover:bg-blue-50 dark:bg-slate-800/80 dark:hover:bg-blue-950/60 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition text-[11px] font-medium border border-transparent hover:border-blue-200 dark:hover:border-blue-900">
-            ⚡ 4 Domains
-          </button>
-          <button type="button" onclick="fillAndAskAi('How do I RSVP for an event and get my pass?')" class="px-3 py-1 rounded-full bg-slate-100 hover:bg-blue-50 dark:bg-slate-800/80 dark:hover:bg-blue-950/60 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition text-[11px] font-medium border border-transparent hover:border-blue-200 dark:hover:border-blue-900">
-            🎟️ How to RSVP
-          </button>
-        </div>
-
-        <!-- AI Output Box (Hidden until asked) -->
-        <div id="ai-response-container" class="hidden mt-4 academic-card rounded-2xl p-5 border border-blue-200 dark:border-blue-900/60 bg-white dark:bg-slate-900 shadow-lg relative transition-all">
-          <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100 dark:border-slate-800">
-            <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-              <span class="text-xs font-mono font-bold text-slate-900 dark:text-white uppercase tracking-wider" id="ai-response-model-tag">AI Answer</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <button type="button" onclick="copyAiResponse()" class="px-2 py-1 rounded text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1 transition text-xs font-mono" title="Copy answer">
-                <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy
-              </button>
-              <button type="button" onclick="closeAiResponse()" class="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition" title="Close">
-                <i data-lucide="x" class="w-3.5 h-3.5"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Loading Skeleton -->
-          <div id="ai-loading-state" class="hidden py-4 space-y-2">
-            <div class="flex items-center gap-2 text-xs font-mono text-blue-600 dark:text-blue-400">
-              <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
-              <span>Consulting BST CSE (AI & ML) knowledge base...</span>
-            </div>
-            <div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded animate-pulse w-3/4"></div>
-            <div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded animate-pulse w-1/2"></div>
-          </div>
-
-          <!-- Output Text Box -->
-          <div id="ai-answer-content" class="text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed space-y-2.5">
-          </div>
-        </div>
-
       </div>
 
       <div id="faqs-container" class="space-y-3">
