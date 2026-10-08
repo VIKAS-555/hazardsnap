@@ -713,7 +713,7 @@
               Registered Members Directory
             </h3>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Live roster of CSE (AI & ML) undergraduates who have registered their official Tech Club ID.
+              Official registry of verified Department of CSE (AI & ML) students. Access the real-time roster to view member Tech Club IDs, assigned governance ranks, peer referral stats, and live merit points.
             </p>
           </div>
           <button 
@@ -736,7 +736,7 @@
               Technical Roles & Contribution Tracks
             </h3>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              An open-source governance framework for the Department of CSE (AI & ML). Roles outline collaborative responsibilities, domain mentorship, and technical stewardship across club initiatives.
+              Tiered open-source governance framework for the Department of CSE (AI & ML). Active Developers auto-advance to Staff Contributor via verified contribution points (with active maintenance requirements). Core Maintainers and Lead Administrators manage club governance and are exempt from point-based auto-promotion and demotion.
             </p>
           </div>
           <span class="px-2.5 py-1 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 text-xs font-mono font-bold border border-purple-200 dark:border-purple-800">
@@ -748,7 +748,7 @@
           <!-- Role 4: Lead Administrator -->
           <div class="p-4 rounded-xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/40 dark:bg-amber-950/20 flex flex-col justify-between">
             <div>
-              <div class="flex items-center justify-between mb-1.5">
+              <div class="flex items-center justify-between mb-2">
                 <span class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-amber-800 dark:text-amber-300">
                   <i data-lucide="terminal" class="w-3.5 h-3.5"></i> Lead Administrator (Club Admin)
                 </span>
@@ -756,19 +756,30 @@
                   LEAD ADMIN PASS
                 </span>
               </div>
-              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                Root / UID 0. Head of platform infrastructure, club administration, and member governance. Multi-admin governance: there can be more than one Lead Admin, but never less than one. Lead Admins possess <b>exclusive authority</b> to promote members to Core Maintainer or Lead Admin, and demote any rank lower than them. <b>Exempt from contribution-based auto-promotion and auto-demotion.</b>
+              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-2.5">
+                <b>Root / UID 0.</b> Highest tier in club administration and platform infrastructure. Operates under multi-admin governance (there can be multiple Lead Admins, but never less than one).
               </p>
+              <div class="space-y-1 text-[11px] text-slate-600 dark:text-slate-400 font-mono">
+                <div class="flex items-start gap-1.5">
+                  <span class="text-amber-600 dark:text-amber-400 font-bold shrink-0">▸ Authority:</span>
+                  <span>Exclusive authority to manually promote members to Core Maintainer or Lead Admin, and demote any lower rank.</span>
+                </div>
+                <div class="flex items-start gap-1.5">
+                  <span class="text-amber-600 dark:text-amber-400 font-bold shrink-0">▸ Auto-System:</span>
+                  <span class="text-amber-700 dark:text-amber-300 font-semibold">Exempt from contribution points, auto-promotion, and auto-demotion.</span>
+                </div>
+              </div>
             </div>
-            <div class="mt-2 text-[10px] font-mono font-bold text-amber-700 dark:text-amber-400">
-              Governance: Exclusive Promotion/Demotion Authority • Contribution Exempt
+            <div class="mt-3 pt-2 border-t border-amber-200/60 dark:border-amber-900/40 text-[10px] font-mono font-bold text-amber-700 dark:text-amber-400 flex items-center justify-between">
+              <span>Tier 4 • Platform Governance</span>
+              <span class="px-1.5 py-0.5 rounded bg-amber-200/60 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 text-[9px]">EXEMPT FROM DECAY</span>
             </div>
           </div>
 
           <!-- Role 3: Core Maintainer -->
           <div class="p-4 rounded-xl border border-purple-200 dark:border-purple-900/60 bg-purple-50/40 dark:bg-purple-950/20 flex flex-col justify-between">
             <div>
-              <div class="flex items-center justify-between mb-1.5">
+              <div class="flex items-center justify-between mb-2">
                 <span class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-purple-800 dark:text-purple-300">
                   <i data-lucide="git-branch" class="w-3.5 h-3.5"></i> Core Maintainer
                 </span>
@@ -776,19 +787,30 @@
                   CORE MAINTAINER PASS
                 </span>
               </div>
-              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                Main branch merge authority. Directs domain tracks (Competitive Programming, Robotics, AI & ML) and reviews code submissions. <b>Appointed exclusively by Lead Administrators. Exempt from contribution-based auto-promotion and auto-demotion.</b>
+              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-2.5">
+                <b>Main Branch Authority.</b> Oversees domain tracks (Competitive Programming, Robotics, AI & ML), coordinates technical project architecture, and reviews code submissions.
               </p>
+              <div class="space-y-1 text-[11px] text-slate-600 dark:text-slate-400 font-mono">
+                <div class="flex items-start gap-1.5">
+                  <span class="text-purple-600 dark:text-purple-400 font-bold shrink-0">▸ Promotion:</span>
+                  <span>Appointed exclusively by Lead Administrators. Cannot be unlocked through automated contribution points.</span>
+                </div>
+                <div class="flex items-start gap-1.5">
+                  <span class="text-purple-600 dark:text-purple-400 font-bold shrink-0">▸ Auto-System:</span>
+                  <span class="text-purple-700 dark:text-purple-300 font-semibold">Exempt from contribution points, auto-promotion, and auto-demotion.</span>
+                </div>
+              </div>
             </div>
-            <div class="mt-2 text-[10px] font-mono font-bold text-purple-700 dark:text-purple-400">
-              Focus: Domain Tracks & Technical Reviews • Contribution Exempt
+            <div class="mt-3 pt-2 border-t border-purple-200/60 dark:border-purple-900/40 text-[10px] font-mono font-bold text-purple-700 dark:text-purple-400 flex items-center justify-between">
+              <span>Tier 3 • Technical Leadership</span>
+              <span class="px-1.5 py-0.5 rounded bg-purple-200/60 dark:bg-purple-900/40 text-purple-900 dark:text-purple-200 text-[9px]">EXEMPT FROM DECAY</span>
             </div>
           </div>
 
           <!-- Role 2: Staff Contributor -->
           <div class="p-4 rounded-xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/40 dark:bg-emerald-950/20 flex flex-col justify-between">
             <div>
-              <div class="flex items-center justify-between mb-1.5">
+              <div class="flex items-center justify-between mb-2">
                 <span class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-emerald-800 dark:text-emerald-300">
                   <i data-lucide="code-2" class="w-3.5 h-3.5"></i> Staff Contributor
                 </span>
@@ -796,19 +818,34 @@
                   STAFF CONTRIBUTOR PASS
                 </span>
               </div>
-              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                Senior peer mentor and reviewer. <b>Auto-promoted at 100+ points.</b> Must maintain ≥60 points; falling below 60 points triggers <b>automatic demotion</b> to Active Developer. Staff Contributors can continue earning points, but <b>the system NEVER auto-promotes higher</b> (further promotion to Core Maintainer is by Lead Admin appointment only).
+              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-2.5">
+                <b>Senior Peer Mentor.</b> Guides junior developers, assists in workshops, and conducts initial code reviews across active repositories.
               </p>
+              <div class="space-y-1 text-[11px] text-slate-600 dark:text-slate-400 font-mono">
+                <div class="flex items-start gap-1.5">
+                  <span class="text-emerald-600 dark:text-emerald-400 font-bold shrink-0">▸ Auto-Promote:</span>
+                  <span>Unlocked automatically when an Active Developer reaches <b>100+ merit points</b>.</span>
+                </div>
+                <div class="flex items-start gap-1.5">
+                  <span class="text-emerald-600 dark:text-emerald-400 font-bold shrink-0">▸ Maintenance:</span>
+                  <span>Must maintain <b>≥60 points</b>. Falling below 60 points triggers <b>auto-demotion</b> to Active Dev.</span>
+                </div>
+                <div class="flex items-start gap-1.5">
+                  <span class="text-emerald-600 dark:text-emerald-400 font-bold shrink-0">▸ System Ceiling:</span>
+                  <span class="text-slate-700 dark:text-slate-300 font-semibold">Auto-promotion strictly caps here. Advancement to higher tiers is by Lead Admin only.</span>
+                </div>
+              </div>
             </div>
-            <div class="mt-2 text-[10px] font-mono font-bold text-emerald-700 dark:text-emerald-400">
-              Advancement: Auto-Promote at 100 pts • Auto-Demote &lt;60 pts • Promotion Ceiling Cap
+            <div class="mt-3 pt-2 border-t border-emerald-200/60 dark:border-emerald-900/40 text-[10px] font-mono font-bold text-emerald-700 dark:text-emerald-400 flex items-center justify-between">
+              <span>Tier 2 • Senior Contributor</span>
+              <span class="px-1.5 py-0.5 rounded bg-emerald-200/60 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-200 text-[9px]">MAINTAIN ≥60 PTS</span>
             </div>
           </div>
 
           <!-- Role 1: Active Developer -->
           <div class="p-4 rounded-xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/40 dark:bg-blue-950/20 flex flex-col justify-between">
             <div>
-              <div class="flex items-center justify-between mb-1.5">
+              <div class="flex items-center justify-between mb-2">
                 <span class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-blue-800 dark:text-blue-300">
                   <i data-lucide="cpu" class="w-3.5 h-3.5"></i> Active Developer
                 </span>
@@ -816,12 +853,23 @@
                   ACTIVE DEVELOPER PASS
                 </span>
               </div>
-              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                Verified student member in the CSE (AI & ML) registry. Active participant in workshops, hackathons, and collaborative projects. Earns contribution points (+20 pts per peer referral, +15 pts per workshop RSVP, +25 pts per project showcase). <b>Automatically promoted to Staff Contributor upon reaching 100 points!</b>
+              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-2.5">
+                <b>Verified Student Member.</b> Entry tier for CSE (AI & ML) undergraduates who claim their official Tech Club ID. Participates in hackathons, workshops, and team builds.
               </p>
+              <div class="space-y-1 text-[11px] text-slate-600 dark:text-slate-400 font-mono">
+                <div class="flex items-start gap-1.5">
+                  <span class="text-blue-600 dark:text-blue-400 font-bold shrink-0">▸ Merit Points:</span>
+                  <span>+20 pts per verified peer referral • +15 pts per workshop RSVP • +25 pts per project showcase.</span>
+                </div>
+                <div class="flex items-start gap-1.5">
+                  <span class="text-blue-600 dark:text-blue-400 font-bold shrink-0">▸ Auto-Promote:</span>
+                  <span class="text-blue-700 dark:text-blue-300 font-semibold">Reaching 100 points automatically promotes you to Staff Contributor rank!</span>
+                </div>
+              </div>
             </div>
-            <div class="mt-2 text-[10px] font-mono font-bold text-blue-700 dark:text-blue-400">
-              Advancement: Earn 100 Merit Points to Auto-Promote to Staff Contributor
+            <div class="mt-3 pt-2 border-t border-blue-200/60 dark:border-blue-900/40 text-[10px] font-mono font-bold text-blue-700 dark:text-blue-400 flex items-center justify-between">
+              <span>Tier 1 • Member Registry</span>
+              <span class="px-1.5 py-0.5 rounded bg-blue-200/60 dark:bg-blue-900/40 text-blue-900 dark:text-blue-200 text-[9px]">TARGET: 100 PTS</span>
             </div>
           </div>
         </div>
