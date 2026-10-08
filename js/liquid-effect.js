@@ -420,89 +420,44 @@
       }
 
       // ============================================================
-      // AQUATIC SWIMMING TORCH (Compact Focused Head + Waving Tail Wake)
+      // TORCH REVEAL SYSTEM: Code is 100% invisible until torch illuminates it
       // ============================================================
-      vec2 headPos = uLightPos * vec2(uAspect, 1.0);
-      vec2 velAspect = uMouseVelocityVec * vec2(uAspect, 1.0);
-      float velSpeed = length(velAspect);
+      
+      // Pointer torch position with fluid distortion
+      vec2 lightDelta = (pAspect - uLightPos * vec2(uAspect, 1.0)) - disp * 1.4;
+      float lightDist = length(lightDelta);
 
-      // Relative displacement with fluid turbulence
-      vec2 d = (pAspect - headPos) - disp * 1.25;
+      // Focused compact torch radius (calibrated smaller range)
+      float lightRadius = 0.24 + uMouseVelocity * 0.10;
+      float normDist = lightDist / lightRadius;
 
-      // Focused compact head radius (smaller torch range)
-      float headRadius = 0.16;
-
-      float torchReveal = 0.0;
-
-      // 1. Stationary Organic Droplet (active when speed is near zero)
-      float angle = atan(d.y, d.x);
-      float organicRadius = headRadius * (1.0 + 0.06 * sin(angle * 3.0 + uTime * 2.2));
-      float statNorm = length(d) / organicRadius;
-      float statReveal = 0.0;
-      if (statNorm < 1.0) {
-        float fStat = 1.0 - statNorm;
-        statReveal = fStat * fStat * (3.0 - 2.0 * fStat);
+      // Primary torch reveal: Smooth Hermite curve that hits EXACTLY 0.0 at the perimeter
+      float lightReveal = 0.0;
+      if (normDist < 1.0) {
+        float f = 1.0 - normDist;
+        // Smooth cubic falloff (zero derivative at boundary = perfectly seamless edge)
+        float smoothFalloff = f * f * (3.0 - 2.0 * f);
+        // Bright radiant center core
+        lightReveal = pow(smoothFalloff, 1.15);
       }
 
-      // 2. Dynamic Swimming Tadpole / Hydrodynamic Wake Shape (active when moving)
-      float moveReveal = 0.0;
-      if (velSpeed > 0.02) {
-        vec2 vDir = velAspect / velSpeed;
-        vec2 nDir = vec2(-vDir.y, vDir.x); // Perpendicular normal
+      // Secondary trailing wake: momentum light behind moving pointer
+      vec2 trailLightDelta = (pAspect - uTrailLightPos * vec2(uAspect, 1.0)) - disp * 1.2;
+      float trailLightDist = length(trailLightDelta);
+      float trailRadius = lightRadius * 1.05;
+      float normTrailDist = trailLightDist / trailRadius;
 
-        // Longitudinal & transverse projections
-        float tLong = dot(d, vDir);
-        float tLat = dot(d, nDir);
-
-        // Hydrodynamic tail stretches behind the head along -velocity
-        float tailLength = headRadius * (1.3 + min(velSpeed * 2.4, 4.5));
-
-        if (tLong >= 0.0) {
-          // Front hemisphere: bulbous head slightly streamlined in motion
-          float forwardSquash = 1.0 + min(velSpeed * 0.15, 0.35);
-          float headDist = length(vec2(tLong * forwardSquash, tLat));
-          float normHead = headDist / headRadius;
-          if (normHead < 1.0) {
-            float fHead = 1.0 - normHead;
-            moveReveal = fHead * fHead * (3.0 - 2.0 * fHead);
-          }
-        } else {
-          // Tail region (behind head)
-          float s = -tLong; // Distance along tail [0 .. tailLength]
-          if (s <= tailLength) {
-            float sNorm = s / tailLength; // [0.0 at neck .. 1.0 at tip]
-
-            // Undulating aquatic wave along the tail (swimming like in water!)
-            float wavePhase = s * 24.0 - uTime * 16.0;
-            float waveAmp = 0.024 * sNorm * min(velSpeed * 0.9, 1.2);
-            float tailWiggle = sin(wavePhase) * waveAmp;
-
-            // Tail width tapers smoothly from head down to a fine tip
-            float tailWidth = headRadius * pow(1.0 - sNorm, 0.85) * (0.95 - 0.55 * sNorm);
-            tailWidth = max(tailWidth, 0.003);
-
-            // Lateral distance to the waving tail spine
-            float lateralDist = abs(tLat - tailWiggle);
-            float latNorm = lateralDist / tailWidth;
-
-            if (latNorm < 1.0) {
-              float fLat = 1.0 - latNorm;
-              float lateralFactor = fLat * fLat * (3.0 - 2.0 * fLat);
-              // Longitudinal fading along the tail towards the tip
-              float longFactor = pow(1.0 - sNorm, 0.55);
-              moveReveal = lateralFactor * longFactor;
-            }
-          }
-        }
+      float trailReveal = 0.0;
+      if (normTrailDist < 1.0) {
+        float fTrail = 1.0 - normTrailDist;
+        float smoothTrailFalloff = fTrail * fTrail * (3.0 - 2.0 * fTrail);
+        trailReveal = smoothTrailFalloff * clamp(uMouseVelocity * 0.55, 0.0, 0.85);
       }
 
-      // Seamless blend between stationary organic droplet and swimming aquatic shape
-      float moveWeight = smoothstep(0.03, 0.14, velSpeed);
-      torchReveal = mix(statReveal, moveReveal, moveWeight);
+      // Active torch illumination: strictly 0.0 outside radius or when cursor is inactive
+      float activeLight = max(lightReveal, trailReveal) * uMouseActive;
 
-      // Radiant center core, strictly multiplied by mouse active state
-      torchReveal = pow(torchReveal, 1.15) * uMouseActive;
-      float activeLight = torchReveal;
+      // TOTAL REVEAL: Strictly 0.0 everywhere unless illuminated under the moving torch!
       float totalReveal = activeLight;
 
       // ============================================================
