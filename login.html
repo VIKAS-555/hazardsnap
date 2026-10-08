@@ -927,14 +927,66 @@
         </button>
       </div>
 
-      <!-- Community Roles Legend -->
-      <div class="px-4 py-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/60 flex items-center justify-between text-[10px] font-mono overflow-x-auto gap-2">
-        <span class="text-slate-400 uppercase font-semibold shrink-0">Community Roles:</span>
+      <!-- Community Roles Interactive Filter Bar -->
+      <div class="px-4 py-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/70 flex items-center justify-between text-[10px] font-mono overflow-x-auto gap-2">
         <div class="flex items-center gap-1.5 shrink-0">
-          <span class="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold border border-amber-300 dark:border-amber-700" title="Governance rule: At least 1 active Lead Admin required">Lead Admin (≥1)</span>
-          <span class="px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300 font-bold border border-purple-300 dark:border-purple-700">Maintainer</span>
-          <span class="px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold border border-emerald-300 dark:border-emerald-700">Staff</span>
-          <span class="px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-semibold border border-blue-200 dark:border-blue-800">Active Dev</span>
+          <span class="text-slate-400 uppercase font-bold text-[9px] flex items-center gap-1">
+            <i data-lucide="filter" class="w-3 h-3 text-blue-500"></i> Roles:
+          </span>
+          <button 
+            type="button" 
+            id="role-filter-ALL" 
+            onclick="setDirectoryRoleFilter('ALL')" 
+            class="px-2 py-0.5 rounded-md text-[10px] font-bold transition-all duration-200 cursor-pointer flex items-center gap-1 shadow-xs"
+            title="Show all registered members">
+            All (<span id="role-count-ALL">0</span>)
+          </button>
+        </div>
+
+        <div class="flex items-center gap-1.5 shrink-0">
+          <button 
+            type="button" 
+            id="role-filter-Root Architect" 
+            onclick="setDirectoryRoleFilter('Root Architect')" 
+            class="px-2 py-0.5 rounded-md text-[10px] font-bold transition-all duration-200 cursor-pointer flex items-center gap-1 shadow-xs" 
+            title="Filter: Lead Administrators (Club Admins)">
+            <i data-lucide="terminal" class="w-2.5 h-2.5"></i>
+            Lead Admin (≥1)
+            <span id="role-count-Root Architect" class="text-[9px] px-1 py-0.2 rounded font-extrabold ml-0.5">0</span>
+          </button>
+
+          <button 
+            type="button" 
+            id="role-filter-Core Maintainer" 
+            onclick="setDirectoryRoleFilter('Core Maintainer')" 
+            class="px-2 py-0.5 rounded-md text-[10px] font-bold transition-all duration-200 cursor-pointer flex items-center gap-1 shadow-xs" 
+            title="Filter: Core Maintainers">
+            <i data-lucide="git-branch" class="w-2.5 h-2.5"></i>
+            Maintainer
+            <span id="role-count-Core Maintainer" class="text-[9px] px-1 py-0.2 rounded font-extrabold ml-0.5">0</span>
+          </button>
+
+          <button 
+            type="button" 
+            id="role-filter-Staff Contributor" 
+            onclick="setDirectoryRoleFilter('Staff Contributor')" 
+            class="px-2 py-0.5 rounded-md text-[10px] font-bold transition-all duration-200 cursor-pointer flex items-center gap-1 shadow-xs" 
+            title="Filter: Staff Contributors">
+            <i data-lucide="code-2" class="w-2.5 h-2.5"></i>
+            Staff
+            <span id="role-count-Staff Contributor" class="text-[9px] px-1 py-0.2 rounded font-extrabold ml-0.5">0</span>
+          </button>
+
+          <button 
+            type="button" 
+            id="role-filter-Active Developer" 
+            onclick="setDirectoryRoleFilter('Active Developer')" 
+            class="px-2 py-0.5 rounded-md text-[10px] font-semibold transition-all duration-200 cursor-pointer flex items-center gap-1 shadow-xs" 
+            title="Filter: Active Developers">
+            <i data-lucide="cpu" class="w-2.5 h-2.5"></i>
+            Active Dev
+            <span id="role-count-Active Developer" class="text-[9px] px-1 py-0.2 rounded font-extrabold ml-0.5">0</span>
+          </button>
         </div>
       </div>
 
@@ -1834,6 +1886,18 @@
       }
     }
 
+    let currentDirectoryRoleFilter = 'ALL';
+
+    function setDirectoryRoleFilter(role) {
+      if (currentDirectoryRoleFilter === role && role !== 'ALL') {
+        currentDirectoryRoleFilter = 'ALL';
+      } else {
+        currentDirectoryRoleFilter = role;
+      }
+      renderDirectoryList();
+      if (window.lucide) window.lucide.createIcons();
+    }
+
     function renderDirectoryList() {
       const container = document.getElementById('modal-members-list');
       if (!container) return;
@@ -1845,12 +1909,81 @@
       const activeSession = window.AuthEngine ? window.AuthEngine.getActiveSession() : null;
       const isViewerRoot = window.AuthEngine && typeof window.AuthEngine.isRootArchitect === 'function' ? window.AuthEngine.isRootArchitect(activeSession) : false;
 
-      const leadAdminCount = members.filter(m => {
+      // Count members per role
+      let countAll = members.length;
+      let countLead = 0;
+      let countMaintainer = 0;
+      let countStaff = 0;
+      let countActive = 0;
+
+      members.forEach(m => {
         const r = window.AuthEngine.normalizeMemberRank ? window.AuthEngine.normalizeMemberRank(m.role) : m.role;
-        return r === 'Root Architect';
-      }).length;
+        if (r === 'Root Architect') countLead++;
+        else if (r === 'Core Maintainer') countMaintainer++;
+        else if (r === 'Staff Contributor') countStaff++;
+        else countActive++;
+      });
+
+      const leadAdminCount = countLead;
+
+      // Update count indicators on buttons
+      const elCountAll = document.getElementById('role-count-ALL');
+      if (elCountAll) elCountAll.textContent = countAll;
+      const elCountLead = document.getElementById('role-count-Root Architect');
+      if (elCountLead) elCountLead.textContent = countLead;
+      const elCountMaintainer = document.getElementById('role-count-Core Maintainer');
+      if (elCountMaintainer) elCountMaintainer.textContent = countMaintainer;
+      const elCountStaff = document.getElementById('role-count-Staff Contributor');
+      if (elCountStaff) elCountStaff.textContent = countStaff;
+      const elCountActive = document.getElementById('role-count-Active Developer');
+      if (elCountActive) elCountActive.textContent = countActive;
+
+      // Dynamic Interactive Button States
+      const btnAll = document.getElementById('role-filter-ALL');
+      const btnLead = document.getElementById('role-filter-Root Architect');
+      const btnMaintainer = document.getElementById('role-filter-Core Maintainer');
+      const btnStaff = document.getElementById('role-filter-Staff Contributor');
+      const btnActive = document.getElementById('role-filter-Active Developer');
+
+      if (btnAll) {
+        btnAll.className = currentDirectoryRoleFilter === 'ALL'
+          ? 'px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-blue-600 text-white shadow-md shadow-blue-500/30 ring-2 ring-blue-400/50 scale-105 transition-all duration-200 cursor-pointer flex items-center gap-1'
+          : 'px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer flex items-center gap-1';
+      }
+
+      if (btnLead) {
+        btnLead.className = currentDirectoryRoleFilter === 'Root Architect'
+          ? 'px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-amber-500 text-slate-950 border-2 border-amber-300 ring-2 ring-amber-400/50 shadow-lg shadow-amber-500/30 scale-105 transition-all duration-200 cursor-pointer flex items-center gap-1'
+          : 'px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50/70 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300/60 dark:border-amber-700/60 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer flex items-center gap-1';
+      }
+
+      if (btnMaintainer) {
+        btnMaintainer.className = currentDirectoryRoleFilter === 'Core Maintainer'
+          ? 'px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-purple-600 text-white border-2 border-purple-400 ring-2 ring-purple-400/50 shadow-lg shadow-purple-500/30 scale-105 transition-all duration-200 cursor-pointer flex items-center gap-1'
+          : 'px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-50/70 hover:bg-purple-100 dark:bg-purple-950/40 dark:hover:bg-purple-950 text-purple-800 dark:text-purple-300 border border-purple-300/60 dark:border-purple-700/60 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer flex items-center gap-1';
+      }
+
+      if (btnStaff) {
+        btnStaff.className = currentDirectoryRoleFilter === 'Staff Contributor'
+          ? 'px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-emerald-600 text-white border-2 border-emerald-400 ring-2 ring-emerald-400/50 shadow-lg shadow-emerald-500/30 scale-105 transition-all duration-200 cursor-pointer flex items-center gap-1'
+          : 'px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50/70 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300/60 dark:border-emerald-700/60 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer flex items-center gap-1';
+      }
+
+      if (btnActive) {
+        btnActive.className = currentDirectoryRoleFilter === 'Active Developer'
+          ? 'px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-blue-600 text-white border-2 border-blue-400 ring-2 ring-blue-400/50 shadow-lg shadow-blue-500/30 scale-105 transition-all duration-200 cursor-pointer flex items-center gap-1'
+          : 'px-2 py-0.5 rounded-md text-[10px] font-semibold bg-blue-50/70 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/60 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer flex items-center gap-1';
+      }
 
       const filtered = members.filter(m => {
+        const mRank = window.AuthEngine.normalizeMemberRank ? window.AuthEngine.normalizeMemberRank(m.role) : (m.role || 'Active Developer');
+        
+        // Category / Role Filter
+        if (currentDirectoryRoleFilter !== 'ALL' && mRank !== currentDirectoryRoleFilter) {
+          return false;
+        }
+
+        // Search Query filter
         if (!query) return true;
         return (
           (m.name && m.name.toLowerCase().includes(query)) ||
@@ -1862,17 +1995,30 @@
       });
 
       if (filtered.length === 0) {
+        const roleLabelMap = {
+          'Root Architect': 'Lead Administrators (Club Admins)',
+          'Core Maintainer': 'Core Maintainers',
+          'Staff Contributor': 'Staff Contributors',
+          'Active Developer': 'Active Developers'
+        };
+        const currentCategoryLabel = roleLabelMap[currentDirectoryRoleFilter] || 'members';
+
         container.innerHTML = `
           <div class="text-center py-10 px-4">
             <div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto mb-3">
               <i data-lucide="users" class="w-6 h-6"></i>
             </div>
             <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">
-              ${members.length === 0 ? 'No members registered yet.' : 'No members found matching "' + query + '"'}
+              ${query ? `No ${currentCategoryLabel} match "${query}"` : `No ${currentCategoryLabel} registered yet.`}
             </p>
-            <p class="text-xs text-slate-400 mt-1">
-              ${members.length === 0 ? 'Be the first to claim your official club ID!' : 'Try searching by a different name or USN.'}
+            <p class="text-xs text-slate-400 mt-1 mb-4">
+              ${currentDirectoryRoleFilter !== 'ALL' ? 'Try switching the category filter or searching all members.' : 'Be the first to claim your official club ID!'}
             </p>
+            ${currentDirectoryRoleFilter !== 'ALL' ? `
+              <button onclick="setDirectoryRoleFilter('ALL')" class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold inline-flex items-center gap-1.5 transition shadow-sm cursor-pointer">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Show All Members (${countAll})
+              </button>
+            ` : ''}
           </div>
         `;
         if (window.lucide) window.lucide.createIcons();
