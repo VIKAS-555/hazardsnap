@@ -1,7 +1,7 @@
 /**
  * BST Tech Club Web App - Core Interactivity & Dynamic Content Engine
  * Branch: CSE (AI & ML)
- * Domains: Competative Programming, Robotics, Open Source, Hackathon
+ * Domains: Competitive Programming, Robotics, Open Source, Hackathon
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -655,7 +655,7 @@ function openEventEditorModal(eventId = null) {
     idInput.value = evt.id;
     document.getElementById('edit-event-title').value = evt.title || '';
     document.getElementById('edit-event-type').value = evt.type || 'Workshop';
-    document.getElementById('edit-event-category').value = evt.category || 'Competative Programming';
+    document.getElementById('edit-event-category').value = (evt.category === 'Competative Programming' ? 'Competitive Programming' : (evt.category || 'Competitive Programming'));
     document.getElementById('edit-event-status').value = evt.status || 'Upcoming';
     document.getElementById('edit-event-date').value = evt.date || '';
     document.getElementById('edit-event-time').value = evt.time || '';
@@ -820,7 +820,7 @@ function renderProjects() {
         </div>
         <h3 class="text-base font-bold text-slate-900 dark:text-white">No Projects Published Yet</h3>
         <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-1 mb-5 leading-relaxed">
-          Members can publish their projects built in Competative Programming, Robotics, Open Source, or Hackathons.
+          Members can publish their projects built in Competitive Programming, Robotics, Open Source, or Hackathons.
         </p>
         <button onclick="openProjectEditorModal()" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition">
           <i data-lucide="plus" class="w-4 h-4"></i> Add First Project
@@ -836,7 +836,7 @@ function renderProjects() {
       <div>
         <div class="flex items-center justify-between gap-2 mb-3">
           <span class="text-xs font-mono font-medium text-slate-500 dark:text-slate-400">
-            ${proj.category}
+            ${proj.category === 'Competative Programming' ? 'Competitive Programming' : (proj.category || 'Competitive Programming')}
           </span>
           <div class="flex items-center gap-2">
             <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-900/40">
@@ -908,7 +908,7 @@ function openProjectEditorModal(projectId = null) {
     idInput.value = proj.id;
     document.getElementById('edit-project-title').value = proj.title || '';
     document.getElementById('edit-project-tagline').value = proj.tagline || '';
-    document.getElementById('edit-project-category').value = proj.category || 'Competative Programming';
+    document.getElementById('edit-project-category').value = (proj.category === 'Competative Programming' ? 'Competitive Programming' : (proj.category || 'Competitive Programming'));
     document.getElementById('edit-project-badge').value = proj.badge || 'Community Project';
     document.getElementById('edit-project-description').value = proj.description || '';
     document.getElementById('edit-project-tech').value = (proj.tech || []).join(', ');

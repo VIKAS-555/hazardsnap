@@ -11,7 +11,7 @@ const clubConfig = {
     shortCollege: "BST",
     department: "CSE (AI & ML)",
     tagline: "Empowering CSE (AI & ML) innovators, builders, and problem solvers.",
-    subtagline: "A student-led technical community pushing the boundaries of Competative Programming, Robotics, Open Source, and Hackathons.",
+    subtagline: "A student-led technical community pushing the boundaries of Competitive Programming, Robotics, Open Source, and Hackathons.",
     established: "2023",
     contactEmail: "contact@bsttechclub.edu",
     location: "CSE (AI & ML) Department, Tech Innovation Hub",
@@ -33,8 +33,8 @@ const clubConfig = {
   // Focus Domains / Tracks (4 Specific Domains Requested)
   domains: [
     {
-      id: "competative-programming",
-      title: "Competative Programming",
+      id: "competitive-programming",
+      title: "Competitive Programming",
       lead: "Algorithms & Problem Solving Track",
       description: "Mastering data structures, algorithmic paradigms, dynamic programming, graph algorithms, and competitive problem solving on Codeforces, LeetCode, and ICPC contests.",
       icon: "code-xml",
@@ -88,7 +88,7 @@ const clubConfig = {
     },
     {
       question: "How can I add my project or propose a workshop?",
-      answer: "Members can add their student projects directly in the Projects Gallery and coordinate with domain leads to schedule hands-on labs in Competative Programming, Robotics, Open Source, or Hackathons."
+      answer: "Members can add their student projects directly in the Projects Gallery and coordinate with domain leads to schedule hands-on labs in Competitive Programming, Robotics, Open Source, or Hackathons."
     }
   ]
 };

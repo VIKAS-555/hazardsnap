@@ -11,7 +11,7 @@ A modern, responsive, high-performance web platform built with **Clean Minimalis
    - Strict student USN range validation: **`2392608001` to `2392608302`**.
 
 2. **4 Core Technical Domains**
-   - **Competative Programming**: Data Structures, Graph Theory, Dynamic Programming, LeetCode, Codeforces.
+   - **Competitive Programming**: Data Structures, Graph Theory, Dynamic Programming, LeetCode, Codeforces.
    - **Robotics**: Microcontrollers, ROS 2, Edge AI, Autonomous Navigation, Computer Vision.
    - **Open Source**: Public software collaboration, Git/GitHub, pull requests, CI/CD, documentation.
    - **Hackathon**: Rapid prototyping, full-stack MVPs in 24–48 hours, pitch storytelling.
