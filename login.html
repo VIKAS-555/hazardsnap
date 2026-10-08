@@ -692,11 +692,11 @@
                 </span>
               </div>
               <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                root / UID 0. Head of platform infrastructure, club administration, and member governance. Exclusive authority to promote members, demote lower ranks, or step down.
+                root / UID 0. Head of platform infrastructure, club administration, and member governance. Multi-admin governance: there can be more than one Lead Admin, but never less than one. Exclusive authority to promote members and demote lower ranks.
               </p>
             </div>
             <div class="mt-2 text-[10px] font-mono font-bold text-amber-700 dark:text-amber-400">
-              Focus: Platform Infrastructure & Role Governance
+              Focus: Platform Infrastructure & Multi-Admin Governance
             </div>
           </div>
 
@@ -818,7 +818,7 @@
       <div class="px-4 py-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/60 flex items-center justify-between text-[10px] font-mono overflow-x-auto gap-2">
         <span class="text-slate-400 uppercase font-semibold shrink-0">Community Roles:</span>
         <div class="flex items-center gap-1.5 shrink-0">
-          <span class="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold border border-amber-300 dark:border-amber-700">Lead Admin</span>
+          <span class="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold border border-amber-300 dark:border-amber-700" title="Governance rule: At least 1 active Lead Admin required">Lead Admin (≥1)</span>
           <span class="px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300 font-bold border border-purple-300 dark:border-purple-700">Maintainer</span>
           <span class="px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold border border-emerald-300 dark:border-emerald-700">Staff</span>
           <span class="px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-semibold border border-blue-200 dark:border-blue-800">Active Dev</span>
@@ -1457,6 +1457,23 @@
       const newLevel = ranksOrder[normalizedNew] || 1;
       const isTargetSelf = (active.techClubId === clubId);
 
+      // Rule: There can be more than one Lead Admin, but NOT less than one.
+      const allMembers = Object.values(vault || {});
+      const leadAdminCount = allMembers.filter(m => {
+        const r = window.AuthEngine.normalizeMemberRank ? window.AuthEngine.normalizeMemberRank(m.role) : m.role;
+        return r === 'Root Architect';
+      }).length;
+
+      if (currentRank === 'Root Architect' && normalizedNew !== 'Root Architect' && leadAdminCount <= 1) {
+        alert(
+          "⚠️ CLUB GOVERNANCE POLICY:\n\n" +
+          "There can be more than one Lead Administrator, but NOT less than one.\n\n" +
+          "You cannot demote the sole active Lead Administrator. Please promote another member to Lead Administrator first before stepping down or demoting this account."
+        );
+        renderDirectoryList();
+        return;
+      }
+
       // Confirm self-demotion
       if (isTargetSelf && newLevel < currentLevel) {
         const confirmed = confirm(
@@ -1535,6 +1552,11 @@
       const activeSession = window.AuthEngine ? window.AuthEngine.getActiveSession() : null;
       const isViewerRoot = window.AuthEngine && typeof window.AuthEngine.isRootArchitect === 'function' ? window.AuthEngine.isRootArchitect(activeSession) : false;
 
+      const leadAdminCount = members.filter(m => {
+        const r = window.AuthEngine.normalizeMemberRank ? window.AuthEngine.normalizeMemberRank(m.role) : m.role;
+        return r === 'Root Architect';
+      }).length;
+
       const filtered = members.filter(m => {
         if (!query) return true;
         return (
@@ -1584,11 +1606,14 @@
         let adminControlHtml = '';
         if (isViewerRoot) {
           if (isTargetSelf) {
+            const selfAdminLabel = leadAdminCount > 1 
+              ? `Lead Admin (${leadAdminCount} active)` 
+              : `Lead Admin (Sole Admin)`;
             adminControlHtml = `
               <div class="flex items-center gap-1.5">
                 <span class="text-[9px] font-mono text-amber-700 dark:text-amber-300 font-extrabold uppercase bg-amber-100/80 dark:bg-amber-950/80 px-1.5 py-0.5 rounded border border-amber-300 dark:border-amber-700">YOU</span>
-                <select onchange="handleRankChange('${m.techClubId}', this.value)" title="Manage Your Role / Step Down" class="text-[10px] font-mono font-semibold py-1 px-1.5 rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50/70 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500 shadow-sm cursor-pointer">
-                  <option value="Root Architect" selected>Lead Admin (Current)</option>
+                <select onchange="handleRankChange('${m.techClubId}', this.value)" title="${leadAdminCount <= 1 ? 'Sole Lead Administrator: Promote another member before stepping down' : 'Manage Your Role / Step Down'}" class="text-[10px] font-mono font-semibold py-1 px-1.5 rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50/70 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500 shadow-sm cursor-pointer">
+                  <option value="Root Architect" selected>${selfAdminLabel}</option>
                   <option value="Core Maintainer">⬇️ Step Down: Maintainer</option>
                   <option value="Staff Contributor">⬇️ Step Down: Staff</option>
                   <option value="Active Developer">⬇️ Step Down: Active Dev</option>
@@ -1596,13 +1621,16 @@
               </div>
             `;
           } else {
+            const targetAdminLabel = (mRank === 'Root Architect') 
+              ? (leadAdminCount > 1 ? `Lead Admin [UID 0] (${leadAdminCount} active)` : `Lead Admin (Sole Admin)`) 
+              : '⭐ Promote to Lead Admin';
             adminControlHtml = `
               <div class="flex items-center gap-1">
                 <select onchange="handleRankChange('${m.techClubId}', this.value)" title="Assign Role / Demote or Promote" class="text-[10px] font-mono font-semibold py-1 px-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500 shadow-sm cursor-pointer">
                   <option value="Active Developer" ${mRank === 'Active Developer' ? 'selected' : ''}>${mRankLevel > 1 ? '⬇️ Demote: Active Dev' : 'Active Dev'}</option>
                   <option value="Staff Contributor" ${mRank === 'Staff Contributor' ? 'selected' : ''}>${mRankLevel > 2 ? '⬇️ Demote: Staff' : (mRankLevel < 2 ? '⬆️ Promote: Staff' : 'Staff Contributor')}</option>
                   <option value="Core Maintainer" ${mRank === 'Core Maintainer' ? 'selected' : ''}>${mRankLevel > 3 ? '⬇️ Demote: Maintainer' : (mRankLevel < 3 ? '⬆️ Promote: Maintainer' : 'Core Maintainer')}</option>
-                  <option value="Root Architect" ${mRank === 'Root Architect' ? 'selected' : ''}>${mRank === 'Root Architect' ? 'Lead Admin [UID 0]' : '⭐ Promote to Lead Admin'}</option>
+                  <option value="Root Architect" ${mRank === 'Root Architect' ? 'selected' : ''}>${targetAdminLabel}</option>
                 </select>
               </div>
             `;

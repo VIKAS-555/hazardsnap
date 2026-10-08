@@ -524,6 +524,18 @@ async function updateMemberRank(targetClubId, newRank) {
     throw new Error(`Member with ID ${targetClubId} not found.`);
   }
 
+  const currentNormalized = normalizeMemberRank(target.role);
+
+  // Club Governance Rule: Multiple Lead Admins are allowed, but NEVER less than one.
+  // If attempting to demote a Lead Admin, verify that at least one OTHER Lead Admin remains.
+  if (currentNormalized === 'Root Architect' && normalizedNewRank !== 'Root Architect') {
+    const allMembers = Object.values(vault);
+    const leadAdminCount = allMembers.filter(m => normalizeMemberRank(m.role) === 'Root Architect').length;
+    if (leadAdminCount <= 1) {
+      throw new Error('Club Governance Rule: There must always be at least one Lead Administrator. You cannot demote the sole active Lead Administrator. Promote another member to Lead Administrator first before stepping down or demoting this account.');
+    }
+  }
+
   // Set admin initialized so intentional self-demotions are permanently respected
   vault._adminInitialized = true;
 
@@ -551,6 +563,11 @@ async function updateMemberRank(targetClubId, newRank) {
   return target;
 }
 
+function getLeadAdminCount() {
+  const vault = getMembersVault();
+  return Object.values(vault).filter(m => normalizeMemberRank(m.role) === 'Root Architect').length;
+}
+
 async function demoteMember(targetClubId, newRank) {
   return updateMemberRank(targetClubId, newRank);
 }
@@ -565,6 +582,7 @@ window.AuthEngine = {
   normalizeMemberRank,
   getRankInfo,
   getMembersVault,
+  getLeadAdminCount,
   registerNewMember,
   authenticateMember,
   changeMemberPassword,
