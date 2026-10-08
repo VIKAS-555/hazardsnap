@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupEventListeners();
   updateRsvpBadges();
   initDetectiveLens();
+  initLiquidCanvas();
   
   if (window.lucide) {
     window.lucide.createIcons();
@@ -42,6 +43,9 @@ function toggleTheme() {
   const isDark = document.documentElement.classList.toggle('dark');
   localStorage.setItem('devsphere-theme', isDark ? 'dark' : 'light');
   updateThemeIcons();
+  if (window.liquidEffect && typeof window.liquidEffect.setTheme === 'function') {
+    window.liquidEffect.setTheme(isDark ? 'dark' : 'light');
+  }
   showToast(isDark ? 'Switched to Dark Mode' : 'Switched to Light Mode', 'moon');
 }
 
@@ -1697,4 +1701,45 @@ function initDetectiveLens() {
 }
 
 window.initDetectiveLens = initDetectiveLens;
+
+/* ============================================================
+   LIQUID EFFECT (GPU WebGL Interactive Fluid Surface)
+   ============================================================ */
+function initLiquidCanvas() {
+  const container = document.getElementById('liquid-effect-container');
+  if (!container) return;
+
+  // Check if LiquidEffect class is loaded
+  if (typeof window.LiquidEffect !== 'undefined') {
+    const isDark = document.documentElement.classList.contains('dark');
+    window.liquidEffect = new window.LiquidEffect(container, {
+      intensity: 0.48,
+      interactive: true,
+      theme: isDark ? 'dark' : 'light'
+    });
+
+    // Subtle physical reactivity on developer canvas controls
+    const interactiveElements = document.querySelectorAll('.pillar-interactive-badge, .cta-liquid-hover');
+    interactiveElements.forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        if (window.liquidEffect) window.liquidEffect.setIntensity(0.78);
+      });
+      el.addEventListener('mouseleave', () => {
+        if (window.liquidEffect) window.liquidEffect.setIntensity(0.48);
+      });
+      el.addEventListener('mousedown', () => {
+        if (window.liquidEffect) window.liquidEffect.setIntensity(0.95);
+      });
+      el.addEventListener('mouseup', () => {
+        if (window.liquidEffect) window.liquidEffect.setIntensity(0.65);
+      });
+    });
+  } else {
+    // Retry shortly if Three.js / LiquidEffect script is still loading asynchronously
+    setTimeout(initLiquidCanvas, 150);
+  }
+}
+
+window.initLiquidCanvas = initLiquidCanvas;
+
 

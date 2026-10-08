@@ -312,7 +312,7 @@
     <!-- Ambient Neon Glow -->
     <div class="absolute inset-x-8 top-12 bottom-12 bg-gradient-to-r from-blue-600/20 via-indigo-600/25 to-purple-600/20 rounded-3xl blur-3xl -z-10 pointer-events-none opacity-80 dark:opacity-50"></div>
 
-    <div class="academic-card relative rounded-3xl p-8 sm:p-14 text-center border border-slate-300/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl shadow-2xl overflow-hidden">
+    <div class="academic-card relative rounded-3xl p-8 sm:p-14 text-center border border-slate-300/80 dark:border-slate-800 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-2xl overflow-hidden min-h-[460px] flex flex-col justify-center">
       
       <!-- Architectural Corner Crosshair Reticles -->
       <span class="absolute top-3 left-3 text-blue-500/60 dark:text-blue-400/50 font-mono text-xs select-none pointer-events-none">+</span>
@@ -322,6 +322,11 @@
 
       <!-- High-tech subtle dot-grid canvas background -->
       <div class="absolute inset-0 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:24px_24px] opacity-[0.04] dark:opacity-[0.08] pointer-events-none"></div>
+
+      <!-- ============================================================
+           LIQUID EFFECT GPU WEBGL SURFACE (Integrated Fluid Layer)
+           ============================================================ -->
+      <div id="liquid-effect-container" class="absolute inset-0 z-0 overflow-hidden pointer-events-none"></div>
 
       <div class="max-w-2xl mx-auto relative z-10">
         
@@ -335,20 +340,18 @@
 
         <!-- 3-Pillar Micro Badges -->
         <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-6">
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 text-xs font-mono font-semibold text-slate-800 dark:text-slate-200 shadow-sm transition hover:border-blue-500/50">
+          <span class="pillar-interactive-badge inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-100/90 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 text-xs font-mono font-semibold text-slate-800 dark:text-slate-200 shadow-sm transition hover:border-blue-500/50 cursor-pointer select-none" data-pillar="build">
             <i data-lucide="hammer" class="w-3.5 h-3.5 text-amber-500"></i> BUILD
           </span>
           <span class="text-slate-300 dark:text-slate-700 font-mono">•</span>
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 text-xs font-mono font-semibold text-slate-800 dark:text-slate-200 shadow-sm transition hover:border-blue-500/50">
+          <span class="pillar-interactive-badge inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-100/90 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 text-xs font-mono font-semibold text-slate-800 dark:text-slate-200 shadow-sm transition hover:border-blue-500/50 cursor-pointer select-none" data-pillar="collaborate">
             <i data-lucide="users" class="w-3.5 h-3.5 text-blue-500"></i> COLLABORATE
           </span>
           <span class="text-slate-300 dark:text-slate-700 font-mono">•</span>
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 text-xs font-mono font-semibold text-slate-800 dark:text-slate-200 shadow-sm transition hover:border-blue-500/50">
+          <span class="pillar-interactive-badge inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-100/90 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 text-xs font-mono font-semibold text-slate-800 dark:text-slate-200 shadow-sm transition hover:border-blue-500/50 cursor-pointer select-none" data-pillar="ship">
             <i data-lucide="rocket" class="w-3.5 h-3.5 text-purple-500"></i> SHIP
           </span>
         </div>
-
-
 
         <!-- Description -->
         <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed mb-10 max-w-xl mx-auto">
@@ -357,14 +360,14 @@
 
         <!-- Magnetic Glowing CTA Buttons -->
         <div class="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
-          <a href="login.html" class="group relative inline-flex items-center gap-2.5 px-8 py-3.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-950 font-bold text-xs uppercase tracking-wider shadow-lg hover:shadow-blue-500/25 transition-all duration-300 hover:-translate-y-0.5">
+          <a href="login.html" class="cta-liquid-hover group relative inline-flex items-center gap-2.5 px-8 py-3.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-950 font-bold text-xs uppercase tracking-wider shadow-lg hover:shadow-blue-500/25 transition-all duration-300 hover:-translate-y-0.5">
             <span class="absolute -inset-0.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 opacity-0 group-hover:opacity-100 transition duration-300 blur-sm -z-10"></span>
             <i data-lucide="sparkles" class="w-4 h-4 text-blue-400 dark:text-blue-600"></i>
             <span>Join BST Tech Club</span>
             <i data-lucide="arrow-right" class="w-4 h-4 transition-transform group-hover:translate-x-1"></i>
           </a>
 
-          <a href="mailto:contact@bsttechclub.edu" class="group inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl border border-slate-300 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-400 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-white/70 dark:bg-slate-900/60 backdrop-blur-md font-bold text-xs uppercase tracking-wider shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
+          <a href="mailto:contact@bsttechclub.edu" class="cta-liquid-hover group inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl border border-slate-300 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-400 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-white/70 dark:bg-slate-900/60 backdrop-blur-md font-bold text-xs uppercase tracking-wider shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
             <i data-lucide="mail" class="w-4 h-4 text-slate-400 group-hover:text-blue-500 transition-colors"></i>
             <span>Contact Faculty Advisor</span>
           </a>
@@ -842,10 +845,12 @@
   <!-- Scripts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="js/liquid-effect.js?v=1.0"></script>
   <script src="js/supabase-config.js"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/config.js"></script>
   <script src="js/auth.js"></script>
-  <script src="js/app.js?v=3.0"></script>
+  <script src="js/app.js?v=3.1"></script>
 </body>
 </html>

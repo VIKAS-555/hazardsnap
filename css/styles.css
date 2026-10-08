@@ -427,3 +427,37 @@ html.dark ::-webkit-scrollbar-thumb {
   }
 }
 
+/* ============================================================
+   LIQUID EFFECT GPU WEBGL SURFACE
+   ============================================================ */
+#liquid-effect-container {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: 1.5rem; /* Matches rounded-3xl */
+}
+
+.liquid-effect-canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+.pillar-interactive-badge {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.pillar-interactive-badge:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liquid-effect-canvas {
+    opacity: 0.85;
+  }
+}
+
+

@@ -1,0 +1,22 @@
+{
+  "name": "bst-tech-club",
+  "version": "3.1.0",
+  "description": "Official technical society portal for Department of Computer Science & Engineering (AI & ML)",
+  "main": "index.html",
+  "dependencies": {
+    "three": "^0.160.0"
+  },
+  "scripts": {
+    "dev": "python3 -m http.server 8000"
+  },
+  "keywords": [
+    "bst",
+    "cse",
+    "webgl",
+    "threejs",
+    "fluid",
+    "portal"
+  ],
+  "author": "XiaoArnav",
+  "license": "MIT"
+}
