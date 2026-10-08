@@ -19,13 +19,13 @@ const LOCKOUT_DURATION_MS = 60 * 1000; // 60 seconds lockout
 const CLUB_RANKS = {
   'Root Architect': {
     rankLevel: 4,
-    name: 'Root Architect',
-    title: 'Root Architect (Founder)',
-    passLabel: 'ROOT ARCHITECT PASS',
-    statusLabel: 'ROOT ARCHITECT [UID 0]',
+    name: 'Lead Administrator',
+    title: 'Lead Administrator',
+    passLabel: 'LEAD ADMIN PASS',
+    statusLabel: 'LEAD ADMINISTRATOR [UID 0]',
     avatarIcon: 'terminal',
     badgeClass: 'bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700',
-    description: 'root / UID 0. System initialization, platform infrastructure, and core club direction.'
+    description: 'root / UID 0. Head of platform infrastructure, club administration, and member role governance.'
   },
   'Core Maintainer': {
     rankLevel: 3,
@@ -61,7 +61,15 @@ const CLUB_RANKS = {
 
 function normalizeMemberRank(role) {
   if (!role) return 'Active Developer';
-  if (role === 'Root Architect' || role === 'Admin' || role === 'Head Admin' || role === 'Founder') return 'Root Architect';
+  if (
+    role === 'Root Architect' || 
+    role === 'Lead Administrator' || 
+    role === 'Lead Admin' || 
+    role === 'Admin' || 
+    role === 'Head Admin' || 
+    role === 'Root Admin' || 
+    role === 'Founder'
+  ) return 'Root Architect';
   if (role === 'Core Maintainer' || role === 'Co-Leader') return 'Core Maintainer';
   if (role === 'Staff Contributor' || role === 'Elder') return 'Staff Contributor';
   return 'Active Developer';
@@ -256,7 +264,7 @@ async function registerNewMember({ name, usn, section, email, department, passwo
     }
   }
 
-  // Determine if this user is the First Member -> Permanent Root Architect (Founder) [UID 0]
+  // Determine if this user is the First Member -> Lead Administrator [UID 0]
   const existingMembers = Object.values(vault);
   let hasRootArchitect = existingMembers.some(m => normalizeMemberRank(m.role) === 'Root Architect');
 
@@ -270,8 +278,11 @@ async function registerNewMember({ name, usn, section, email, department, passwo
     } catch (e) {}
   }
 
-  // Whoever registers first becomes permanent Root Architect [UID 0]!
-  const assignedRole = (!hasRootArchitect) ? 'Root Architect' : 'Active Developer';
+  // Whoever registers first becomes initial Lead Administrator [UID 0]!
+  const assignedRole = (!hasRootArchitect && !vault._adminInitialized) ? 'Root Architect' : 'Active Developer';
+  if (!hasRootArchitect && !vault._adminInitialized) {
+    vault._adminInitialized = true;
+  }
 
   const newMember = {
     techClubId: clubId,
@@ -355,17 +366,18 @@ async function authenticateMember(identifier, password, rememberMe = true) {
   // Success
   clearFailedAttempts();
 
-  // Permanent First-Member Root Architect [UID 0] Verification:
-  // If no Root Architect exists yet, this first member is crowned permanent Root Architect!
+  // Initial First-Member Lead Administrator [UID 0] Verification:
+  // If no Lead Admin exists yet and system has never been initialized, this first member is crowned Lead Admin!
   const allVaultMembers = Object.values(vault);
   const hasRootArchitect = allVaultMembers.some(m => normalizeMemberRank(m.role) === 'Root Architect');
-  if (!hasRootArchitect && allVaultMembers.length > 0) {
+  if (!hasRootArchitect && !vault._adminInitialized && allVaultMembers.length > 0) {
     const earliestMember = allVaultMembers.sort((a, b) => new Date(a.joinedAt || 0) - new Date(b.joinedAt || 0))[0];
     if (earliestMember && (earliestMember.techClubId === member.techClubId || allVaultMembers.length === 1)) {
       member.role = 'Root Architect';
       if (vault[member.techClubId]) {
         vault[member.techClubId].role = 'Root Architect';
       }
+      vault._adminInitialized = true;
       saveMembersVault(vault);
 
       // Persist to Supabase cloud
@@ -481,18 +493,28 @@ function isUserAdmin(session) {
   return isRootArchitect(session);
 }
 
+function isLeadAdmin(session) {
+  return isRootArchitect(session);
+}
+
 /**
  * Assign / Reassign community role
- * Authorized for Root Architect only
+ * Authorized for Lead Administrator [UID 0] only.
+ * Capabilities:
+ * - Lead Admin can demote anyone lower than them
+ * - Lead Admin can promote any member lower than them (or promote another to Lead Admin)
+ * - Lead Admin can demote themselves (step down to lower rank)
+ * - No non-admin has access to demote or promote anyone
  */
 async function updateMemberRank(targetClubId, newRank) {
   const activeSession = getActiveSession();
   if (!activeSession || !isRootArchitect(activeSession)) {
-    throw new Error('Administrative Access Required: Only the Root Architect [UID 0] can assign community roles.');
+    throw new Error('Administrative Access Required: Only the Lead Administrator has access to promote or demote members.');
   }
 
+  const normalizedNewRank = normalizeMemberRank(newRank);
   const validRanks = ['Root Architect', 'Core Maintainer', 'Staff Contributor', 'Active Developer'];
-  if (!validRanks.includes(newRank)) {
+  if (!validRanks.includes(normalizedNewRank)) {
     throw new Error(`Invalid role: ${newRank}`);
   }
 
@@ -502,12 +524,10 @@ async function updateMemberRank(targetClubId, newRank) {
     throw new Error(`Member with ID ${targetClubId} not found.`);
   }
 
-  // Permanent founder protection: Cannot modify Root Architect
-  if (normalizeMemberRank(target.role) === 'Root Architect' && targetClubId !== activeSession.techClubId && newRank !== 'Root Architect') {
-    throw new Error('Root Architect [UID 0] is the permanent founding lead and cannot be reassigned.');
-  }
+  // Set admin initialized so intentional self-demotions are permanently respected
+  vault._adminInitialized = true;
 
-  target.role = newRank;
+  target.role = normalizedNewRank;
   saveMembersVault(vault);
 
   // Sync to Supabase cloud if connected
@@ -515,20 +535,28 @@ async function updateMemberRank(targetClubId, newRank) {
     try {
       const client = window.SupabaseEngine.getClient();
       if (client) {
-        await client.from('members').update({ role: newRank }).eq('tech_club_id', targetClubId);
+        await client.from('members').update({ role: normalizedNewRank }).eq('tech_club_id', targetClubId);
       }
     } catch (e) {
       console.warn('[AuthEngine] Cloud rank update notice:', e.message);
     }
   }
 
-  // If the target is the active session itself, update the active session
+  // If the target is the active session itself (self-demotion or self-change), update active session
   if (activeSession.techClubId === targetClubId) {
-    activeSession.role = newRank;
+    activeSession.role = normalizedNewRank;
     setActiveSession(activeSession);
   }
 
   return target;
+}
+
+async function demoteMember(targetClubId, newRank) {
+  return updateMemberRank(targetClubId, newRank);
+}
+
+async function promoteMember(targetClubId, newRank) {
+  return updateMemberRank(targetClubId, newRank);
 }
 
 // Export for browser
@@ -546,8 +574,11 @@ window.AuthEngine = {
   checkLockout,
   syncWithCloud,
   isUserAdmin,
+  isLeadAdmin,
   isRootArchitect,
   isMaintainer,
   isStaffContributor,
-  updateMemberRank
+  updateMemberRank,
+  demoteMember,
+  promoteMember
 };

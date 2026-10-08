@@ -77,7 +77,7 @@ function checkAuthNavbarState() {
     const firstName = (session.name || 'Member').split(' ')[0];
 
     if (role === 'Root Architect') {
-      navText.textContent = `Root Architect • ${firstName}`;
+      navText.textContent = `Lead Admin • ${firstName}`;
       navLink.className = 'holographic-id-badge inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-white transition shadow-md border border-amber-300/60 ring-2 ring-amber-400/20';
     } else if (role === 'Core Maintainer') {
       navText.textContent = `Maintainer • ${firstName}`;

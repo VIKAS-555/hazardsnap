@@ -381,22 +381,22 @@
         </div>
       </div>
 
-      <!-- ROOT ARCHITECT COMMAND SUITE (ONLY SHOWN FOR ROOT ARCHITECT) -->
+      <!-- LEAD ADMINISTRATOR COMMAND SUITE (ONLY SHOWN FOR LEAD ADMIN) -->
       <div id="admin-suite-card" class="hidden academic-card p-6 rounded-2xl shadow-sm border-2 border-amber-500/60 bg-gradient-to-br from-amber-50/50 via-white to-amber-50/20 dark:from-amber-950/20 dark:via-slate-900 dark:to-amber-950/10">
         <div class="flex items-start justify-between gap-3 mb-4">
           <div>
             <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-amber-600 dark:text-amber-400">
-              <i data-lucide="terminal" class="w-4 h-4 text-amber-500"></i> Root Architect Operations [UID 0]
+              <i data-lucide="terminal" class="w-4 h-4 text-amber-500"></i> Lead Administrator Operations [UID 0]
             </div>
             <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">
-              Technical Lead Administration & Domain Track Governance
+              Technical Lead Administration & Member Governance
             </h3>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              root / UID 0. System initialization, repository governance, and domain lead appointments. Coordinate technical tracks, review student membership roster, and manage domain tracks.
+              root / UID 0. Head of platform infrastructure and club governance. Coordinate technical tracks, review student membership roster, promote members, and manage rank demotions.
             </p>
           </div>
           <span class="px-2.5 py-1 rounded-lg bg-amber-500 text-slate-950 text-xs font-mono font-extrabold uppercase shadow-sm flex items-center gap-1">
-            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> ROOT [UID 0]
+            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> LEAD ADMIN [UID 0]
           </span>
         </div>
 
@@ -680,23 +680,23 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <!-- Role 4: Root Architect (Founder) -->
+          <!-- Role 4: Lead Administrator -->
           <div class="p-4 rounded-xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/40 dark:bg-amber-950/20 flex flex-col justify-between">
             <div>
               <div class="flex items-center justify-between mb-1.5">
                 <span class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-amber-800 dark:text-amber-300">
-                  <i data-lucide="terminal" class="w-3.5 h-3.5"></i> Root Architect (Founder)
+                  <i data-lucide="terminal" class="w-3.5 h-3.5"></i> Lead Administrator (Club Admin)
                 </span>
                 <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200 font-extrabold border border-amber-300/60">
-                  ROOT ARCHITECT PASS
+                  LEAD ADMIN PASS
                 </span>
               </div>
               <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                root / UID 0. Responsible for system initialization, club registry administration, and platform infrastructure. Founding technical lead.
+                root / UID 0. Head of platform infrastructure, club administration, and member governance. Exclusive authority to promote members, demote lower ranks, or step down.
               </p>
             </div>
             <div class="mt-2 text-[10px] font-mono font-bold text-amber-700 dark:text-amber-400">
-              Focus: Platform Infrastructure & Registry Administration
+              Focus: Platform Infrastructure & Role Governance
             </div>
           </div>
 
@@ -818,7 +818,7 @@
       <div class="px-4 py-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/60 flex items-center justify-between text-[10px] font-mono overflow-x-auto gap-2">
         <span class="text-slate-400 uppercase font-semibold shrink-0">Community Roles:</span>
         <div class="flex items-center gap-1.5 shrink-0">
-          <span class="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold border border-amber-300 dark:border-amber-700">Root Architect</span>
+          <span class="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold border border-amber-300 dark:border-amber-700">Lead Admin</span>
           <span class="px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300 font-bold border border-purple-300 dark:border-purple-700">Maintainer</span>
           <span class="px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold border border-emerald-300 dark:border-emerald-700">Staff</span>
           <span class="px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-semibold border border-blue-200 dark:border-blue-800">Active Dev</span>
@@ -1125,7 +1125,7 @@
 
       if (userRank === 'Root Architect') {
         if (rolePill) rolePill.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700 text-xs font-mono font-bold mb-1 shadow-sm';
-        if (roleTitle) roleTitle.textContent = 'Root Architect (Founder)';
+        if (roleTitle) roleTitle.textContent = 'Lead Administrator';
         if (roleIcon) roleIcon.setAttribute('data-lucide', 'terminal');
         if (idCard) idCard.className = 'ticket-pass p-6 sm:p-7 rounded-2xl bg-gradient-to-br from-amber-50/70 via-white to-amber-100/30 dark:from-slate-900 dark:via-slate-900 dark:to-amber-950/40 border-2 border-amber-500 shadow-xl shadow-amber-500/10 ring-2 ring-amber-400/20';
         if (cardAvatar) {
@@ -1133,13 +1133,13 @@
           cardAvatar.innerHTML = '<i data-lucide="terminal" class="w-5 h-5"></i>';
         }
         if (cardTypeLabel) {
-          cardTypeLabel.textContent = 'ROOT ARCHITECT PASS';
+          cardTypeLabel.textContent = 'LEAD ADMIN PASS';
           cardTypeLabel.className = 'text-xs font-mono font-extrabold tracking-wider uppercase text-amber-600 dark:text-amber-400 flex items-center gap-1.5';
         }
-        if (cardPassLabel) cardPassLabel.textContent = 'ROOT ARCHITECT PASS';
+        if (cardPassLabel) cardPassLabel.textContent = 'LEAD ADMIN PASS';
         if (cardStatusBadge) cardStatusBadge.className = 'font-mono font-extrabold text-amber-600 dark:text-amber-400 flex items-center gap-1';
         if (cardStatusDot) cardStatusDot.className = 'w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse';
-        if (cardStatusText) cardStatusText.textContent = 'ROOT ARCHITECT [UID 0]';
+        if (cardStatusText) cardStatusText.textContent = 'LEAD ADMINISTRATOR [UID 0]';
         if (adminSuite) {
           adminSuite.classList.remove('hidden');
           const adminCount = document.getElementById('admin-member-count-stat');
@@ -1440,15 +1440,83 @@
     }
 
     async function handleRankChange(clubId, newRank) {
+      const vault = window.AuthEngine ? window.AuthEngine.getMembersVault() : {};
+      const target = vault[clubId];
+      const active = window.AuthEngine ? window.AuthEngine.getActiveSession() : null;
+      if (!target || !active) return;
+
+      const currentRank = window.AuthEngine.normalizeMemberRank ? window.AuthEngine.normalizeMemberRank(target.role) : (target.role || 'Active Developer');
+      const normalizedNew = window.AuthEngine.normalizeMemberRank ? window.AuthEngine.normalizeMemberRank(newRank) : newRank;
+      
+      if (currentRank === normalizedNew) {
+        return;
+      }
+
+      const ranksOrder = { 'Active Developer': 1, 'Staff Contributor': 2, 'Core Maintainer': 3, 'Root Architect': 4 };
+      const currentLevel = ranksOrder[currentRank] || 1;
+      const newLevel = ranksOrder[normalizedNew] || 1;
+      const isTargetSelf = (active.techClubId === clubId);
+
+      // Confirm self-demotion
+      if (isTargetSelf && newLevel < currentLevel) {
+        const confirmed = confirm(
+          `⚠️ STEP DOWN AS LEAD ADMINISTRATOR?\n\n` +
+          `Are you sure you want to demote yourself from Lead Administrator to "${newRank}"?\n\n` +
+          `You will relinquish administrative governance privileges (managing roles, promotions, and demotions).`
+        );
+        if (!confirmed) {
+          renderDirectoryList();
+          return;
+        }
+      } else if (!isTargetSelf && normalizedNew === 'Root Architect') {
+        // Confirm promoting another to Lead Admin
+        const confirmed = confirm(
+          `⭐ PROMOTE TO LEAD ADMINISTRATOR?\n\n` +
+          `Are you sure you want to promote ${target.name} (${clubId}) to Lead Administrator [UID 0]?\n\n` +
+          `They will receive full administrative authority over club roles and member governance.`
+        );
+        if (!confirmed) {
+          renderDirectoryList();
+          return;
+        }
+      } else if (!isTargetSelf && newLevel < currentLevel) {
+        // Confirm demotion of another member
+        const confirmed = confirm(
+          `⬇️ CONFIRM DEMOTION:\n\n` +
+          `Are you sure you want to demote ${target.name} (${clubId}) from "${currentRank}" to "${newRank}"?`
+        );
+        if (!confirmed) {
+          renderDirectoryList();
+          return;
+        }
+      } else if (!isTargetSelf && newLevel > currentLevel) {
+        // Confirm promotion of another member
+        const confirmed = confirm(
+          `⬆️ CONFIRM PROMOTION:\n\n` +
+          `Promote ${target.name} (${clubId}) to "${newRank}"?`
+        );
+        if (!confirmed) {
+          renderDirectoryList();
+          return;
+        }
+      }
+
       try {
-        await window.AuthEngine.updateMemberRank(clubId, newRank);
-        showToast(`Updated ${clubId} to ${newRank}`, 'shield-check');
+        await window.AuthEngine.updateMemberRank(clubId, normalizedNew);
+        if (isTargetSelf) {
+          showToast(`You stepped down to ${newRank}`, 'shield-alert');
+        } else if (normalizedNew === 'Root Architect') {
+          showToast(`Promoted ${target.name} to Lead Administrator!`, 'shield-check');
+        } else if (newLevel < currentLevel) {
+          showToast(`Demoted ${target.name} to ${newRank}`, 'arrow-down-circle');
+        } else {
+          showToast(`Promoted ${target.name} to ${newRank}`, 'shield-check');
+        }
         renderDirectoryList();
-        const active = window.AuthEngine.getActiveSession();
-        if (active) {
-          const vault = window.AuthEngine.getMembersVault();
-          const refreshed = vault[active.techClubId] || active;
-          renderMemberDashboard(refreshed);
+        const updatedActive = window.AuthEngine.getActiveSession();
+        if (updatedActive) {
+          const updatedVault = window.AuthEngine.getMembersVault();
+          renderMemberDashboard(updatedVault[updatedActive.techClubId] || updatedActive);
         }
       } catch (e) {
         showToast(e.message, 'alert-circle');
@@ -1498,11 +1566,13 @@
 
       container.innerHTML = filtered.map((m, index) => {
         const mRank = window.AuthEngine.normalizeMemberRank ? window.AuthEngine.normalizeMemberRank(m.role) : (m.role || 'Active Developer');
-        const isTargetRoot = (mRank === 'Root Architect');
+        const ranksOrder = { 'Active Developer': 1, 'Staff Contributor': 2, 'Core Maintainer': 3, 'Root Architect': 4 };
+        const mRankLevel = ranksOrder[mRank] || 1;
+        const isTargetSelf = (activeSession && activeSession.techClubId === m.techClubId);
 
         let badgeHtml = '';
         if (mRank === 'Root Architect') {
-          badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-mono text-[9px] font-extrabold border border-amber-300 dark:border-amber-700 flex items-center gap-1 shadow-sm"><i data-lucide="terminal" class="w-3 h-3"></i> ROOT ARCHITECT</span>`;
+          badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-mono text-[9px] font-extrabold border border-amber-300 dark:border-amber-700 flex items-center gap-1 shadow-sm"><i data-lucide="terminal" class="w-3 h-3"></i> LEAD ADMIN</span>`;
         } else if (mRank === 'Core Maintainer') {
           badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/80 text-purple-800 dark:text-purple-300 font-mono text-[9px] font-extrabold border border-purple-300 dark:border-purple-700 flex items-center gap-1 shadow-sm"><i data-lucide="git-branch" class="w-3 h-3"></i> CORE MAINTAINER</span>`;
         } else if (mRank === 'Staff Contributor') {
@@ -1513,15 +1583,26 @@
 
         let adminControlHtml = '';
         if (isViewerRoot) {
-          if (isTargetRoot) {
-            adminControlHtml = `<span class="text-[10px] font-mono text-amber-600 dark:text-amber-400 flex items-center gap-1 font-bold px-2 py-1 bg-amber-50 dark:bg-amber-950/40 rounded-lg border border-amber-200 dark:border-amber-900/60" title="Immutable UID 0 Founder"><i data-lucide="shield-check" class="w-3 h-3"></i> UID 0</span>`;
+          if (isTargetSelf) {
+            adminControlHtml = `
+              <div class="flex items-center gap-1.5">
+                <span class="text-[9px] font-mono text-amber-700 dark:text-amber-300 font-extrabold uppercase bg-amber-100/80 dark:bg-amber-950/80 px-1.5 py-0.5 rounded border border-amber-300 dark:border-amber-700">YOU</span>
+                <select onchange="handleRankChange('${m.techClubId}', this.value)" title="Manage Your Role / Step Down" class="text-[10px] font-mono font-semibold py-1 px-1.5 rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50/70 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500 shadow-sm cursor-pointer">
+                  <option value="Root Architect" selected>Lead Admin (Current)</option>
+                  <option value="Core Maintainer">⬇️ Step Down: Maintainer</option>
+                  <option value="Staff Contributor">⬇️ Step Down: Staff</option>
+                  <option value="Active Developer">⬇️ Step Down: Active Dev</option>
+                </select>
+              </div>
+            `;
           } else {
             adminControlHtml = `
               <div class="flex items-center gap-1">
-                <select onchange="handleRankChange('${m.techClubId}', this.value)" title="Assign Community Role" class="text-[10px] font-mono font-semibold py-1 px-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500 shadow-sm cursor-pointer">
-                  <option value="Active Developer" ${mRank === 'Active Developer' ? 'selected' : ''}>Dev</option>
-                  <option value="Staff Contributor" ${mRank === 'Staff Contributor' ? 'selected' : ''}>Staff</option>
-                  <option value="Core Maintainer" ${mRank === 'Core Maintainer' ? 'selected' : ''}>Maintainer</option>
+                <select onchange="handleRankChange('${m.techClubId}', this.value)" title="Assign Role / Demote or Promote" class="text-[10px] font-mono font-semibold py-1 px-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500 shadow-sm cursor-pointer">
+                  <option value="Active Developer" ${mRank === 'Active Developer' ? 'selected' : ''}>${mRankLevel > 1 ? '⬇️ Demote: Active Dev' : 'Active Dev'}</option>
+                  <option value="Staff Contributor" ${mRank === 'Staff Contributor' ? 'selected' : ''}>${mRankLevel > 2 ? '⬇️ Demote: Staff' : (mRankLevel < 2 ? '⬆️ Promote: Staff' : 'Staff Contributor')}</option>
+                  <option value="Core Maintainer" ${mRank === 'Core Maintainer' ? 'selected' : ''}>${mRankLevel > 3 ? '⬇️ Demote: Maintainer' : (mRankLevel < 3 ? '⬆️ Promote: Maintainer' : 'Core Maintainer')}</option>
+                  <option value="Root Architect" ${mRank === 'Root Architect' ? 'selected' : ''}>${mRank === 'Root Architect' ? 'Lead Admin [UID 0]' : '⭐ Promote to Lead Admin'}</option>
                 </select>
               </div>
             `;
