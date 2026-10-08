@@ -112,6 +112,12 @@
    * Arranged in horizontal line-wise rows with subtle artistic layout (Section 5).
    * NO line numbers (Section 4 & 22).
    */
+  /**
+   * Generates a dense, continuous procedural code texture on an offscreen canvas.
+   * Fills 100% of the surface from edge to edge, row by row, with ZERO empty gaps.
+   * Uses all 55 exact snippets repeatedly in continuous horizontal streams.
+   * NO line numbers (Sections 4 & 22).
+   */
   function createCodeTexture() {
     const width = 2048;
     const height = 1024;
@@ -120,30 +126,23 @@
     canvas.height = height;
     const ctx = canvas.getContext('2d');
 
-    // Transparent clear
+    // Clean transparent clear
     ctx.clearRect(0, 0, width, height);
 
-    const rowHeight = 22;
+    // Tight row height for high vertical density (51 continuous rows)
+    const rowHeight = 20;
     const totalRows = Math.floor(height / rowHeight);
-    const col1X = 36;
-    const col2X = 1040;
 
     ctx.textBaseline = 'middle';
+    ctx.font = '500 13px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
 
     const KEYWORDS = new Set([
       'const', 'let', 'var', 'function', 'async', 'await', 'export', 'default',
       'return', 'if', 'else', 'while', 'for', 'import', 'from'
     ]);
 
-    function renderLine(snippet, startX, startY, depthTier, indentLevel) {
-      let curX = startX + indentLevel * 20;
-
-      // Depth Tier: Background (0.45), Midground (0.75), Foreground (0.95)
-      const baseAlpha = depthTier === 0 ? 0.45 : depthTier === 1 ? 0.75 : 0.95;
-
-      ctx.font = '500 13px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
-
-      // Tokenize for syntax coloring
+    function renderSnippetTokens(snippet, startX, startY, baseAlpha) {
+      let curX = startX;
       const tokens = snippet.match(/(['"`].*?['"`])|\b([a-zA-Z_]\w*)\b|([0-9]+)|([=><+\-*/&|!{}();:,.\[\]])|(\s+)/g) || [snippet];
 
       for (let i = 0; i < tokens.length; i++) {
@@ -157,45 +156,55 @@
         if (token.startsWith('//')) {
           ctx.fillStyle = `rgba(11, 111, 69, ${0.55 * baseAlpha})`;
         } else if (token.startsWith("'") || token.startsWith('"') || token.startsWith('`')) {
-          ctx.fillStyle = `rgba(25, 201, 121, ${0.9 * baseAlpha})`; // Secondary Green
+          ctx.fillStyle = `rgba(25, 201, 121, ${0.92 * baseAlpha})`; // Secondary Green
         } else if (KEYWORDS.has(token)) {
           ctx.fillStyle = `rgba(164, 255, 197, ${0.98 * baseAlpha})`; // Highlight Mint
         } else if (/^[0-9]+$/.test(token)) {
           ctx.fillStyle = `rgba(25, 201, 121, ${0.85 * baseAlpha})`;
         } else if (/^[=><+\-*/&|!{}();:,.\[\]]$/.test(token)) {
-          ctx.fillStyle = `rgba(57, 255, 136, ${0.65 * baseAlpha})`;
+          ctx.fillStyle = `rgba(57, 255, 136, ${0.68 * baseAlpha})`;
         } else {
-          ctx.fillStyle = `rgba(57, 255, 136, ${0.9 * baseAlpha})`; // Primary Green
+          ctx.fillStyle = `rgba(57, 255, 136, ${0.92 * baseAlpha})`; // Primary Green
         }
 
         ctx.fillText(token, curX, startY);
         curX += ctx.measureText(token).width;
       }
+
+      return curX - startX;
     }
 
-    // Distribute all 55 snippets across two columns in staggered rows
+    // CONTINUOUS ROW PACKING: Fills 100% of the box from edge to edge without any empty regions
     for (let row = 0; row < totalRows; row++) {
-      const y = row * rowHeight + rowHeight * 0.5 + 4;
+      const y = row * rowHeight + rowHeight * 0.5 + 2;
 
-      const idx1 = row % EXACT_CODE_SNIPPETS.length;
-      const idx2 = (row + 28) % EXACT_CODE_SNIPPETS.length;
+      // Depth tier variation (Background: 0.55, Midground: 0.8, Foreground: 1.0)
+      const depthTier = (row % 3);
+      const baseAlpha = depthTier === 0 ? 0.55 : depthTier === 1 ? 0.80 : 1.0;
 
-      const snippet1 = EXACT_CODE_SNIPPETS[idx1];
-      const snippet2 = EXACT_CODE_SNIPPETS[idx2];
+      // Staggered starting offset so snippet breaks are naturally varied across lines
+      let curX = -((row * 79) % 180);
+      let snippetIdx = (row * 7) % EXACT_CODE_SNIPPETS.length;
 
-      // Artistic depth and indent variations
-      const depth1 = (row % 3);
-      const depth2 = ((row + 1) % 3);
+      // Continuously pack snippets horizontally across the entire width and beyond
+      while (curX < width + 120) {
+        const snippet = EXACT_CODE_SNIPPETS[snippetIdx % EXACT_CODE_SNIPPETS.length];
+        
+        // Render snippet
+        const snippetWidth = renderSnippetTokens(snippet, curX, y, baseAlpha);
 
-      const indent1 = (snippet1.startsWith('return') || snippet1.startsWith('if')) ? 1 : 0;
-      const indent2 = (snippet2.startsWith('return') || snippet2.startsWith('if')) ? 1 : 0;
+        // Gap spacing between snippets (18px to 44px)
+        const gap = 20 + ((snippetIdx * 19) % 25);
+        curX += snippetWidth + gap;
 
-      // Slight start position stagger
-      const stagger1 = (row % 4) * 8;
-      const stagger2 = ((row + 2) % 4) * 8;
+        // Subtle ellipsis on some snippet gaps as illustrated in prompt Section 5
+        if ((snippetIdx % 5) === 0 && curX < width + 40) {
+          ctx.fillStyle = `rgba(11, 111, 69, ${0.45 * baseAlpha})`;
+          ctx.fillText('...', curX - gap + 4, y);
+        }
 
-      renderLine(snippet1, col1X + stagger1, y, depth1, indent1);
-      renderLine(snippet2, col2X + stagger2, y, depth2, indent2);
+        snippetIdx++;
+      }
     }
 
     const texture = new THREE.CanvasTexture(canvas);
@@ -365,8 +374,9 @@
       // Distort UV coordinates: THE CODE ITSELF MOVES WITH THE LIQUID
       vec2 distortedUv = uv + disp;
 
-      // Seamless sampling of code texture
-      vec2 codeUv = fract(distortedUv);
+      // Centered 115% coverage so code texture extends slightly beyond visible bounds without any gaps
+      vec2 centeredUv = (distortedUv - 0.5) * 1.15 + 0.5;
+      vec2 codeUv = fract(centeredUv);
       vec4 codeSample = texture2D(uCodeTexture, codeUv);
 
       // Finite difference normal estimation for liquid specular sheen
@@ -411,29 +421,29 @@
       // ============================================================
       // LIGHT REVEAL SYSTEM (Sections 6, 7, 8, 9, 29)
       // ============================================================
-      // 1. Base Submerged Visibility (at rest, ~15-28% faintly visible)
+      // 1. Base Submerged Visibility (at rest, ~18-28% faintly visible)
       float baseNoise = fbm(pAspect * 1.6 + uTime * 0.012);
-      float baseSubmerged = 0.16 + 0.12 * baseNoise;
+      float baseSubmerged = 0.18 + 0.10 * baseNoise;
 
       // 2. Soft Moving Light Field driven by pointer with fluid distortion
-      vec2 lightDelta = (pAspect - uLightPos * vec2(uAspect, 1.0)) - disp * 1.6;
+      vec2 lightDelta = (pAspect - uLightPos * vec2(uAspect, 1.0)) - disp * 1.5;
       float lightDist = length(lightDelta);
 
       // Light radius expands with cursor velocity
-      float lightRadius = 0.36 + uMouseVelocity * 0.14;
+      float lightRadius = 0.38 + uMouseVelocity * 0.16;
 
       // Soft feathered Gaussian light reveal (no hard circle, no spotlight edge)
-      float lightReveal = exp(-lightDist * lightDist / (lightRadius * lightRadius * 0.42));
+      float lightReveal = exp(-lightDist * lightDist / (lightRadius * lightRadius * 0.44));
       lightReveal = smoothstep(0.015, 0.95, lightReveal);
 
       // Trailing light wake behind moving hand
       vec2 trailLightDelta = (pAspect - uTrailLightPos * vec2(uAspect, 1.0)) - disp * 1.2;
       float trailLightDist = length(trailLightDelta);
-      float trailReveal = exp(-trailLightDist * trailLightDist / (lightRadius * lightRadius * 0.52)) * (uMouseVelocity * 0.42);
+      float trailReveal = exp(-trailLightDist * trailLightDist / (lightRadius * lightRadius * 0.54)) * (uMouseVelocity * 0.45);
 
       float activeLight = max(lightReveal, trailReveal) * uMouseActive;
 
-      // Effective reveal amount [0.16 .. 1.0]
+      // Effective reveal amount [0.18 .. 1.0]
       float totalReveal = mix(baseSubmerged, 1.0, activeLight);
 
       // ============================================================
@@ -463,24 +473,15 @@
       // Ambient light bloom
       vec3 ambientLightBloom = mix(uColorPrimary, uColorCyan, 0.25) * activeLight * (0.07 + uMouseVelocity * 0.08);
 
-      // UI Content Readability: Subtly calibrate luminance in the center card area
-      vec2 centerVec = (uv - vec2(0.5)) * vec2(1.2, 1.6);
-      float centerDist = length(centerVec);
-      float centerFade = smoothstep(0.12, 0.65, centerDist);
+      // 100% FULL-BOX CONTINUOUS CODE DENSITY: Zero center damping, zero corner cutoffs
+      float finalAlpha = codeSample.a * totalReveal;
 
-      float finalAlpha = codeSample.a * totalReveal * mix(0.78, 1.0, centerFade);
+      // Final compositing (extends 100% edge-to-edge, clipped by box rounded border)
+      vec3 finalColor = mix(bg, codeColor, finalAlpha * 0.96);
+      finalColor += ambientLightBloom;
+      finalColor += uColorHighlight * (dropletImpactGlow * 0.22);
 
-      // Soft container edge vignette (prevents harsh cutoff at borders)
-      float edgeX = smoothstep(0.0, 0.035, uv.x) * smoothstep(1.0, 0.965, uv.x);
-      float edgeY = smoothstep(0.0, 0.045, uv.y) * smoothstep(1.0, 0.955, uv.y);
-      float edgeMask = edgeX * edgeY;
-
-      // Final compositing
-      vec3 finalColor = mix(bg, codeColor, finalAlpha * 0.95);
-      finalColor += ambientLightBloom * edgeMask;
-      finalColor += uColorHighlight * (dropletImpactGlow * 0.22) * edgeMask;
-
-      gl_FragColor = vec4(finalColor, edgeMask);
+      gl_FragColor = vec4(finalColor, 1.0);
     }
   `;
 
