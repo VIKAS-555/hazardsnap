@@ -1,38 +1,26 @@
 /**
  * ============================================================
- * FULL-BOX LIQUID CODE SURFACE WITH DROPLET IMPACT & WAVE DYNAMICS
+ * FULL-BOX LIQUID CODE / LIGHT-REVEAL / WAKE / DROPLET ENGINE
  * ============================================================
- * Reusable WebGL Fluid Simulation powered by Three.js & Custom GLSL.
+ * Reusable GPU WebGL Fluid Surface powered by Three.js & Custom GLSL.
  * 
  * CORE MENTAL MODEL:
- * A rectangular pool filled not with water, but with thousands of
- * lines of programming code arranged in horizontal line-wise rows.
- * Moving the hand through it bends, stretches, and flows the code.
- * Dropping a droplet (clicking) creates expanding concentric ripples
- * that physically deform the code characters as the waves propagate.
+ * The entire box is a dark shallow pool filled with fine technical code.
+ * The writing is submerged and mostly hidden (15–30% faintly visible).
+ * When a soft moving light follows the mouse, it reveals the writing.
+ * As the light moves away, the characters gradually fade back.
+ * At the same time, the writing physically behaves like liquid:
+ * - Bends, stretches, ripples, flows, trails, swirls, carries momentum
+ * - Fast mouse movement produces a stronger fluid wake
+ * - Clicking creates a droplet impact with expanding concentric ripples
+ * - The CODE ITSELF IS THE LIQUID (distorted by the GPU displacement field)
  * 
- * FEATURES:
- * 1. Procedural High-Res Code Texture (Offscreen Canvas, 2048x1024)
- *    - Line numbers (01, 02, ... 45) in dim green
- *    - Modern syntax highlighting with green developer palette
- *    - Varied indentation, line lengths, and optical depth tiers
- * 2. GPU Fluid Displacement Simulation
- *    - Base organic FBM domain-warped movement (continuous, non-looping)
- *    - Inertial pointer velocity & directional wake trail (moving hand)
- *    - Droplet impact & expanding circular ripple waves (concentric rings)
- *    - Multi-click impulse history (up to 8 concurrent ripples)
- * 3. Unified Displacement Sampling
- *    - vec2 distortedUV = uv + totalDisplacement
- *    - Code characters themselves physically bend, ripple, and stretch
- * 4. Dimensional Specular Shading & Normal Estimation
- *    - Wave crest highlights (#9CFFC1), subtle cyan edge illumination
- *    - Deep dark navy developer background (#020617 / #050c1e)
- * 5. Full Preservation of Existing UI
- *    - WebGL canvas sits behind UI (pointer-events: none)
- *    - HTML content stays sharp, readable, and 100% interactive
- * 6. Responsive & Production-Ready
- *    - ResizeObserver, zero frame allocations, prefers-reduced-motion
- *    - Public API: setIntensity, addRipple, setPointer, destroy
+ * SPECIFICATION COMPLIANCE:
+ * - Full box coverage (100% width, 100% height, clipped to rounded corners)
+ * - Exactly the 55 specified code strings used
+ * - NO line numbers, NO fake editor/terminal framing
+ * - Existing UI is 100% preserved, sharp, and interactive above the canvas
+ * - Responsive via ResizeObserver, zero-frame allocation, prefers-reduced-motion
  */
 
 (function (root, factory) {
@@ -49,66 +37,81 @@
   // Maximum concurrent droplet ripples
   const MAX_RIPPLES = 8;
 
-  // Modern Futuristic Developer Green Palette
+  // Modern Futuristic Developer Green Palette (Section 6 & 38)
   const PALETTE = {
-    primary: [0.224, 1.0, 0.533],     // #39FF88 - Vibrant Developer Green
-    secondary: [0.094, 0.788, 0.475],  // #18C979 - Midtone Green
-    dim: [0.043, 0.435, 0.271],        // #0B6F45 - Deep Dim Green
-    highlight: [0.612, 1.0, 0.757],    // #9CFFC1 - Crest & Keyword Mint
-    cyan: [0.220, 0.741, 0.973],       // #38BDF8 - Subtle Liquid Glint
-    bg: [0.012, 0.027, 0.071]          // #030712 - Deep Dark Navy / Obsidian
+    primary: [0.224, 1.0, 0.533],       // #39FF88 - Primary Green
+    secondary: [0.098, 0.788, 0.475],   // #19C979 - Secondary Green
+    dim: [0.043, 0.435, 0.271],         // #0B6F45 - Dim Green
+    veryDim: [0.027, 0.227, 0.161],     // #073A29 - Very Dim Submerged Green
+    highlight: [0.643, 1.0, 0.773],     // #A4FFC5 - Highlight Mint
+    cyan: [0.220, 0.741, 0.973],        // #38BDF8 - Subtle Cyan Glint
+    bg: [0.008, 0.024, 0.090]           // #020617 - Deep Dark Navy / Obsidian
   };
 
-  // Realistic Programming Code Lines for Offscreen Texture
-  const CODE_LINES = [
-    { num: '01', indent: 0, text: "const data = await fetch('/api/projects');", depth: 1.0 },
-    { num: '02', indent: 0, text: "const response = await data.json();", depth: 0.9 },
-    { num: '03', indent: 0, text: "const result = response.map(item => item);", depth: 0.85 },
-    { num: '04', indent: 0, text: "function updateState(value) {", depth: 0.95 },
-    { num: '05', indent: 1, text: "setState(previous => ({ ...previous, value }));", depth: 0.8 },
-    { num: '06', indent: 0, text: "}", depth: 0.7 },
-    { num: '07', indent: 0, text: "async function initialize() {", depth: 0.95 },
-    { num: '08', indent: 1, text: "const result = await fetchData();", depth: 0.85 },
-    { num: '09', indent: 1, text: "return result.filter(r => r.verified);", depth: 0.9 },
-    { num: '10', indent: 0, text: "}", depth: 0.7 },
-    { num: '11', indent: 0, text: "const users = data.filter(user => user.active);", depth: 0.8 },
-    { num: '12', indent: 0, text: "export const App = () => {", depth: 1.0 },
-    { num: '13', indent: 1, text: "const state = createState(config);", depth: 0.85 },
-    { num: '14', indent: 1, text: "useEffect(() => subscribe(), []);", depth: 0.9 },
-    { num: '15', indent: 1, text: "return render(state);", depth: 0.8 },
-    { num: '16', indent: 0, text: "};", depth: 0.65 },
-    { num: '17', indent: 0, text: "def forward(self, q: Tensor, k: Tensor, v: Tensor):", depth: 0.95 },
-    { num: '18', indent: 1, text: "d_k = q.size(-1)", depth: 0.75 },
-    { num: '19', indent: 1, text: "scores = torch.matmul(q, k.transpose(-2, -1)) / math.sqrt(d_k)", depth: 0.9 },
-    { num: '20', indent: 1, text: "attn = F.softmax(scores, dim=-1)", depth: 0.85 },
-    { num: '21', indent: 1, text: "return torch.matmul(attn, v), attn", depth: 0.9 },
-    { num: '22', indent: 0, text: "export default function LiquidSurface({ tension = 0.85 }) {", depth: 1.0 },
-    { num: '23', indent: 1, text: "const [field, setField] = useState(initFluidGrid);", depth: 0.85 },
-    { num: '24', indent: 1, text: "const gl = canvas.getContext('webgl2', { alpha: true });", depth: 0.9 },
-    { num: '25', indent: 1, text: "requestAnimationFrame(renderLoop);", depth: 0.8 },
-    { num: '26', indent: 0, text: "}", depth: 0.7 },
-    { num: '27', indent: 0, text: "const pipeline = device.createComputePipeline({ layout });", depth: 0.85 },
-    { num: '28', indent: 0, text: "vector<int> dijkstra(int src, const vector<vector<pii>>& adj) {", depth: 0.95 },
-    { num: '29', indent: 1, text: "priority_queue<pii, vector<pii>, greater<pii>> pq;", depth: 0.85 },
-    { num: '30', indent: 1, text: "dist[src] = 0; pq.push({0, src});", depth: 0.9 },
-    { num: '31', indent: 1, text: "while (!pq.empty()) {", depth: 0.85 },
-    { num: '32', indent: 2, text: "auto [d, u] = pq.top(); pq.pop();", depth: 0.8 },
-    { num: '33', indent: 2, text: "if (d > dist[u]) continue;", depth: 0.75 },
-    { num: '34', indent: 1, text: "}", depth: 0.65 },
-    { num: '35', indent: 0, text: "}", depth: 0.6 },
-    { num: '36', indent: 0, text: "class AutonomousRoverNode : public rclcpp::Node {", depth: 0.95 },
-    { num: '37', indent: 1, text: "auto cmd = geometry_msgs::msg::Twist();", depth: 0.85 },
-    { num: '38', indent: 1, text: "cmd.linear.x = computeVelocity(obstacleDist);", depth: 0.85 },
-    { num: '39', indent: 1, text: "publisher_->publish(cmd);", depth: 0.8 },
-    { num: '40', indent: 0, text: "};", depth: 0.6 },
-    { num: '41', indent: 0, text: "const [uMouse, setMouse] = useSpring({ tension: 120 });", depth: 0.9 },
-    { num: '42', indent: 0, text: "vec2 distortedUV = uv + displacementField;", depth: 0.95 },
-    { num: '43', indent: 0, text: "vec4 fluidCode = texture2D(uCodeTexture, distortedUV);", depth: 1.0 },
-    { num: '44', indent: 0, text: "gl_FragColor = vec4(fluidCode.rgb, 1.0);", depth: 0.9 },
-    { num: '45', indent: 0, text: "// GPU fluid advection step completed with 60fps tension", depth: 0.55 }
+  // Exact 55 code snippets from Section 4 (Rendered without line numbers)
+  const EXACT_CODE_SNIPPETS = [
+    "const signal = observe(input);",
+    "const response = await fetch(url);",
+    "const data = await response.json();",
+    "function updateState(value) {",
+    "return state.map(transform);",
+    "const result = data.filter(Boolean);",
+    "const next = previous + delta;",
+    "async function initialize() {",
+    "const result = await fetchData();",
+    "return result;",
+    "const value = response?.payload;",
+    "if (value) render(value);",
+    "const pointer = normalize(cursor);",
+    "const field = domainWarp(uv);",
+    "const surface = liquid(displacement);",
+    "const intensity = clamp(level, 0, 1);",
+    "const velocity = smooth(pointerDelta);",
+    "requestAnimationFrame(frame);",
+    "const state = createState(config);",
+    "useEffect(() => subscribe(), []);",
+    "const users = data.filter(user => user.active);",
+    "return compose(surface, code);",
+    "const stream = createStream(source);",
+    "await process(stream);",
+    "const texture = createTexture(data);",
+    "shader.uniforms.uTime.value = time;",
+    "shader.uniforms.uMouse.value = mouse;",
+    "const displacement = fluidField(uv);",
+    "const target = calculate(input);",
+    "current += (target - current) * smoothing;",
+    "const result = await resolve(data);",
+    "export default function Surface() {",
+    "return <InteractiveLayer />;",
+    "}",
+    "function transform(value) {",
+    "return value * intensity;",
+    "}",
+    "const noise = fbm(domain);",
+    "const warped = uv + distortion;",
+    "const ripple = radialWave(position);",
+    "const force = pointerVelocity * strength;",
+    "const wake = advect(force);",
+    "const field = simulate(surface);",
+    "const rendered = composite(liquid, code);",
+    "await synchronize(state);",
+    "const output = render(result);",
+    "if (!active) return;",
+    "const delta = current - previous;",
+    "update(delta);",
+    "const system = initialize(config);",
+    "const payload = response.data;",
+    "const active = state?.status;",
+    "return process(payload);",
+    "const layer = createLayer(surface);",
+    "const signal = update(input);"
   ];
 
-  // Helper to generate a crisp procedural Code Texture on an offscreen canvas
+  /**
+   * Generates a high-resolution procedural code texture on an offscreen canvas.
+   * Arranged in horizontal line-wise rows with subtle artistic layout (Section 5).
+   * NO line numbers (Section 4 & 22).
+   */
   function createCodeTexture() {
     const width = 2048;
     const height = 1024;
@@ -117,38 +120,31 @@
     canvas.height = height;
     const ctx = canvas.getContext('2d');
 
-    // Clean transparent background
+    // Transparent clear
     ctx.clearRect(0, 0, width, height);
 
     const rowHeight = 22;
     const totalRows = Math.floor(height / rowHeight);
-    const numColX = 18;
-    const col1X = 64;
-    const col2X = 1060;
+    const col1X = 36;
+    const col2X = 1040;
 
-    // Font setup
     ctx.textBaseline = 'middle';
 
     const KEYWORDS = new Set([
       'const', 'let', 'var', 'function', 'async', 'await', 'export', 'default',
-      'return', 'def', 'class', 'if', 'else', 'while', 'for', 'import', 'from',
-      'auto', 'void', 'public', 'int', 'vector', 'priority_queue', 'new'
+      'return', 'if', 'else', 'while', 'for', 'import', 'from'
     ]);
 
-    function renderCodeLine(lineData, lineNum, startX, startY) {
-      const lineNumStr = String(lineNum).padStart(2, '0');
-      const depth = lineData.depth || 0.8;
+    function renderLine(snippet, startX, startY, depthTier, indentLevel) {
+      let curX = startX + indentLevel * 20;
 
-      // 1. Line Number in Dim Green
-      ctx.font = '500 12px "JetBrains Mono", "SF Mono", monospace';
-      ctx.fillStyle = `rgba(11, 111, 69, ${0.45 * depth})`;
-      ctx.fillText(lineNumStr, startX, startY);
+      // Depth Tier: Background (0.45), Midground (0.75), Foreground (0.95)
+      const baseAlpha = depthTier === 0 ? 0.45 : depthTier === 1 ? 0.75 : 0.95;
 
-      // 2. Code Line with Tokenized Syntax Colors
-      let curX = startX + 38 + (lineData.indent || 0) * 20;
-      ctx.font = '600 13px "JetBrains Mono", "SF Mono", "Courier New", monospace';
+      ctx.font = '500 13px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
 
-      const tokens = lineData.text.match(/(['"`].*?['"`])|\b([a-zA-Z_]\w*)\b|([0-9]+)|([=><+\-*/&|!{}();:,.\[\]])|(\s+)/g) || [lineData.text];
+      // Tokenize for syntax coloring
+      const tokens = snippet.match(/(['"`].*?['"`])|\b([a-zA-Z_]\w*)\b|([0-9]+)|([=><+\-*/&|!{}();:,.\[\]])|(\s+)/g) || [snippet];
 
       for (let i = 0; i < tokens.length; i++) {
         const token = tokens[i];
@@ -159,17 +155,17 @@
         }
 
         if (token.startsWith('//')) {
-          ctx.fillStyle = `rgba(11, 111, 69, ${0.65 * depth})`;
+          ctx.fillStyle = `rgba(11, 111, 69, ${0.55 * baseAlpha})`;
         } else if (token.startsWith("'") || token.startsWith('"') || token.startsWith('`')) {
-          ctx.fillStyle = `rgba(24, 201, 121, ${0.9 * depth})`; // Secondary Green
+          ctx.fillStyle = `rgba(25, 201, 121, ${0.9 * baseAlpha})`; // Secondary Green
         } else if (KEYWORDS.has(token)) {
-          ctx.fillStyle = `rgba(156, 255, 193, ${0.98 * depth})`; // Mint Highlight
+          ctx.fillStyle = `rgba(164, 255, 197, ${0.98 * baseAlpha})`; // Highlight Mint
         } else if (/^[0-9]+$/.test(token)) {
-          ctx.fillStyle = `rgba(24, 201, 121, ${0.85 * depth})`;
+          ctx.fillStyle = `rgba(25, 201, 121, ${0.85 * baseAlpha})`;
         } else if (/^[=><+\-*/&|!{}();:,.\[\]]$/.test(token)) {
-          ctx.fillStyle = `rgba(57, 255, 136, ${0.6 * depth})`;
+          ctx.fillStyle = `rgba(57, 255, 136, ${0.65 * baseAlpha})`;
         } else {
-          ctx.fillStyle = `rgba(57, 255, 136, ${0.9 * depth})`; // Primary Green
+          ctx.fillStyle = `rgba(57, 255, 136, ${0.9 * baseAlpha})`; // Primary Green
         }
 
         ctx.fillText(token, curX, startY);
@@ -177,14 +173,29 @@
       }
     }
 
-    // Render lines across both columns to fill the full horizontal pool
+    // Distribute all 55 snippets across two columns in staggered rows
     for (let row = 0; row < totalRows; row++) {
       const y = row * rowHeight + rowHeight * 0.5 + 4;
-      const lineData1 = CODE_LINES[row % CODE_LINES.length];
-      const lineData2 = CODE_LINES[(row + 17) % CODE_LINES.length];
 
-      renderCodeLine(lineData1, (row % 99) + 1, numColX, y);
-      renderCodeLine(lineData2, ((row + 45) % 99) + 1, col2X, y);
+      const idx1 = row % EXACT_CODE_SNIPPETS.length;
+      const idx2 = (row + 28) % EXACT_CODE_SNIPPETS.length;
+
+      const snippet1 = EXACT_CODE_SNIPPETS[idx1];
+      const snippet2 = EXACT_CODE_SNIPPETS[idx2];
+
+      // Artistic depth and indent variations
+      const depth1 = (row % 3);
+      const depth2 = ((row + 1) % 3);
+
+      const indent1 = (snippet1.startsWith('return') || snippet1.startsWith('if')) ? 1 : 0;
+      const indent2 = (snippet2.startsWith('return') || snippet2.startsWith('if')) ? 1 : 0;
+
+      // Slight start position stagger
+      const stagger1 = (row % 4) * 8;
+      const stagger2 = ((row + 2) % 4) * 8;
+
+      renderLine(snippet1, col1X + stagger1, y, depth1, indent1);
+      renderLine(snippet2, col2X + stagger2, y, depth2, indent2);
     }
 
     const texture = new THREE.CanvasTexture(canvas);
@@ -197,7 +208,7 @@
     return texture;
   }
 
-  // Vertex Shader: Fullscreen quad projection
+  // Fullscreen Quad Vertex Shader
   const VERTEX_SHADER = /* glsl */ `
     varying vec2 vUv;
     void main() {
@@ -206,7 +217,7 @@
     }
   `;
 
-  // Fragment Shader: Liquid Code Surface + Pointer Wake + Droplet Ripple Dynamics
+  // Fragment Shader: Light-Reveal, GPU Fluid Displacement, Hand Wake & Droplet Waves
   const FRAGMENT_SHADER = /* glsl */ `
     precision highp float;
 
@@ -215,11 +226,14 @@
     uniform vec2 uResolution;
     uniform float uAspect;
     uniform float uTime;
-    uniform vec2 uMouse;              // Pointer in UV [0, 1]
+    uniform vec2 uMouse;              // Pointer in UV space [0, 1]
     uniform vec2 uTrailMouse;         // Trailing pointer for momentum wake
-    uniform vec2 uMouseVelocityVec;   // Directional pointer velocity vector
+    uniform vec2 uLightPos;           // Soft moving light center (interpolated)
+    uniform vec2 uTrailLightPos;      // Trailing light center
+    uniform vec2 uMouseVelocityVec;   // Directional velocity vector
     uniform float uMouseVelocity;     // Smoothed velocity magnitude
-    uniform float uIntensity;         // Base fluid intensity
+    uniform float uMouseActive;       // 1.0 when pointer is active over surface, 0.0 when idle
+    uniform float uIntensity;         // Base fluid energy [0..1]
     uniform float uReducedMotion;     // prefers-reduced-motion flag
 
     // Active droplet ripples: vec4(normX, normY, ageInSeconds, strength)
@@ -228,10 +242,11 @@
 
     uniform sampler2D uCodeTexture;
 
-    // Theme Palette Uniforms
+    // Palette Uniforms
     uniform vec3 uColorPrimary;
     uniform vec3 uColorSecondary;
     uniform vec3 uColorDim;
+    uniform vec3 uColorVeryDim;
     uniform vec3 uColorHighlight;
     uniform vec3 uColorCyan;
     uniform vec3 uBgColor;
@@ -242,7 +257,7 @@
       return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
     }
 
-    // 2D Gradient Noise with Hermite interpolation
+    // 2D Gradient Noise
     float gnoise(vec2 p) {
       vec2 i = floor(p);
       vec2 f = fract(p);
@@ -256,7 +271,6 @@
       );
     }
 
-    // 2D Rotation matrix
     mat2 rot(float a) {
       float c = cos(a);
       float s = sin(a);
@@ -274,20 +288,20 @@
       return f;
     }
 
-    // Evaluates fluid displacement vector at any UV coordinate
+    // Evaluates the physical fluid displacement vector at any UV coordinate
     vec2 getFluidDisplacement(vec2 uv, float t) {
       vec2 disp = vec2(0.0);
-      float motionScale = mix(1.0, 0.18, uReducedMotion);
+      float motionScale = mix(1.0, 0.16, uReducedMotion);
       vec2 pAspect = uv * vec2(uAspect, 1.0);
 
-      // 1. BASE ORGANIC LIQUID MOTION (Continuous subtle fluid undulation)
-      float tSlow = t * 0.038 * motionScale;
-      float n1 = fbm(pAspect * 2.5 + vec2(tSlow, -tSlow * 0.85));
-      float n2 = fbm(pAspect * 4.4 - vec2(tSlow * 0.75, tSlow * 1.15));
-      vec2 baseOrganic = vec2(n1, n2) * 0.016 * uIntensity * motionScale;
+      // 1. BASE ORGANIC LIQUID MOTION (Continuous non-looping subtle undulation)
+      float tSlow = t * 0.036 * motionScale;
+      float n1 = fbm(pAspect * 2.4 + vec2(tSlow, -tSlow * 0.82));
+      float n2 = fbm(pAspect * 4.2 - vec2(tSlow * 0.72, tSlow * 1.12));
+      vec2 baseOrganic = vec2(n1, n2) * 0.015 * uIntensity * motionScale;
       disp += baseOrganic;
 
-      // 2. MOUSE MOVEMENT = LIQUID HAND INTERACTION & FLUID WAKE
+      // 2. MOUSE = HAND MOVING THROUGH LIQUID & DIRECTIONAL FLUID WAKE
       vec2 m0 = uTrailMouse * vec2(uAspect, 1.0);
       vec2 m1 = uMouse * vec2(uAspect, 1.0);
       vec2 vSeg = m1 - m0;
@@ -302,12 +316,12 @@
       }
 
       // Wake radius widens as pointer velocity increases
-      float wakeRadius = (0.24 + uMouseVelocity * 0.16) * motionScale;
+      float wakeRadius = (0.22 + uMouseVelocity * 0.16) * motionScale;
       float wakeFalloff = smoothstep(wakeRadius, 0.0, distToSeg);
 
-      // Directional drag in velocity direction + radial displacement
+      // Drag in motion direction + radial displacement
       vec2 radialDir = normalize(pAspect - m1 + vec2(0.0001));
-      vec2 wakeFlow = (uMouseVelocityVec * 0.38 + radialDir * (0.035 + uMouseVelocity * 0.045)) * wakeFalloff * uIntensity * motionScale;
+      vec2 wakeFlow = (uMouseVelocityVec * 0.36 + radialDir * (0.032 + uMouseVelocity * 0.045)) * wakeFalloff * uIntensity * motionScale;
       disp += wakeFlow;
 
       // 3. DROPLET IMPACT & EXPANDING WAVE RIPPLES
@@ -320,7 +334,7 @@
           vec2 rDiff = pAspect - rCenter;
           float rDist = length(rDiff);
 
-          float waveSpeed = 0.54; // Ripple propagation speed
+          float waveSpeed = 0.54;
           float waveFront = age * waveSpeed;
           float distFromFront = rDist - waveFront;
 
@@ -345,17 +359,17 @@
       vec2 uv = vUv;
       vec2 pAspect = uv * vec2(uAspect, 1.0);
 
-      // Compute total fluid displacement field
+      // Total fluid displacement field
       vec2 disp = getFluidDisplacement(uv, uTime);
 
-      // Distort UV coordinates: CODE MOVES WITH THE LIQUID
+      // Distort UV coordinates: THE CODE ITSELF MOVES WITH THE LIQUID
       vec2 distortedUv = uv + disp;
 
-      // Seamless tiling of code texture across the entire box
+      // Seamless sampling of code texture
       vec2 codeUv = fract(distortedUv);
       vec4 codeSample = texture2D(uCodeTexture, codeUv);
 
-      // Finite difference normal estimation for specular liquid sheen
+      // Finite difference normal estimation for liquid specular sheen
       float eps = 0.004;
       vec2 dispR = getFluidDisplacement(uv + vec2(eps, 0.0), uTime);
       vec2 dispU = getFluidDisplacement(uv + vec2(0.0, eps), uTime);
@@ -363,7 +377,7 @@
       float dHdy = (length(dispU) - length(disp)) / eps;
       vec3 normal = normalize(vec3(-dHdx * 3.2, -dHdy * 3.2, 1.0));
 
-      // Directional lighting
+      // Directional liquid reflection
       vec3 lightDir = normalize(vec3(-0.35, 0.55, 0.8));
       vec3 viewDir = vec3(0.0, 0.0, 1.0);
       vec3 halfVec = normalize(lightDir + viewDir);
@@ -381,56 +395,90 @@
           float rDist = length(pAspect - rCenter);
           float waveFront = age * 0.54;
 
-          // Splash flash at center right upon impact
+          // Center impact flash
           if (age < 0.42) {
             float flash = smoothstep(0.09, 0.0, rDist) * smoothstep(0.42, 0.0, age) * rip.w;
             dropletImpactGlow += flash;
           }
 
-          // Crest illumination along expanding concentric wave rings
+          // Crest illumination along concentric wave rings
           float ringDist = abs(rDist - waveFront);
           float ringGlow = exp(-ringDist * 22.0) * exp(-age * 1.35) * rip.w;
           waveCrestGlow += ringGlow;
         }
       }
 
-      // Restrained pointer interaction illumination
-      float distToMouse = length(pAspect - uMouse * vec2(uAspect, 1.0));
-      float mouseGlow = smoothstep(0.32, 0.0, distToMouse) * (0.06 + uMouseVelocity * 0.12);
+      // ============================================================
+      // LIGHT REVEAL SYSTEM (Sections 6, 7, 8, 9, 29)
+      // ============================================================
+      // 1. Base Submerged Visibility (at rest, ~15-28% faintly visible)
+      float baseNoise = fbm(pAspect * 1.6 + uTime * 0.012);
+      float baseSubmerged = 0.16 + 0.12 * baseNoise;
 
-      // Background: Deep dark navy developer surface
+      // 2. Soft Moving Light Field driven by pointer with fluid distortion
+      vec2 lightDelta = (pAspect - uLightPos * vec2(uAspect, 1.0)) - disp * 1.6;
+      float lightDist = length(lightDelta);
+
+      // Light radius expands with cursor velocity
+      float lightRadius = 0.36 + uMouseVelocity * 0.14;
+
+      // Soft feathered Gaussian light reveal (no hard circle, no spotlight edge)
+      float lightReveal = exp(-lightDist * lightDist / (lightRadius * lightRadius * 0.42));
+      lightReveal = smoothstep(0.015, 0.95, lightReveal);
+
+      // Trailing light wake behind moving hand
+      vec2 trailLightDelta = (pAspect - uTrailLightPos * vec2(uAspect, 1.0)) - disp * 1.2;
+      float trailLightDist = length(trailLightDelta);
+      float trailReveal = exp(-trailLightDist * trailLightDist / (lightRadius * lightRadius * 0.52)) * (uMouseVelocity * 0.42);
+
+      float activeLight = max(lightReveal, trailReveal) * uMouseActive;
+
+      // Effective reveal amount [0.16 .. 1.0]
+      float totalReveal = mix(baseSubmerged, 1.0, activeLight);
+
+      // ============================================================
+      // COLOR & SHADING COMPOSITING
+      // ============================================================
+      // Background: Deep dark navy / obsidian pool
       vec3 bg = uBgColor;
-      // Ambient atmospheric gradient depth
-      bg += vec3(0.012, 0.028, 0.065) * (1.0 - uv.y);
+      bg += vec3(0.010, 0.024, 0.055) * (1.0 - uv.y);
 
-      // Fluid code color compositing
-      vec3 fluidColor = codeSample.rgb;
+      // Submerged color (very dim green to dim green) vs. Illuminated color (primary green to highlight mint)
+      vec3 submergedColor = mix(uColorVeryDim, uColorDim, codeSample.a);
+      vec3 illuminatedColor = mix(uColorSecondary, uColorHighlight, codeSample.a * 0.65 + activeLight * 0.35);
+      illuminatedColor = mix(illuminatedColor, uColorPrimary, 0.5);
 
-      // Add wave crest mint highlights
-      fluidColor += uColorHighlight * (waveCrestGlow * 0.52);
-      fluidColor += uColorHighlight * (spec * 0.32);
+      vec3 codeColor = mix(submergedColor, illuminatedColor, totalReveal);
+
+      // Wave crest mint highlights
+      codeColor += uColorHighlight * (waveCrestGlow * 0.48);
+      codeColor += uColorHighlight * (spec * 0.30);
 
       // Droplet impact splash flash
-      fluidColor += uColorHighlight * (dropletImpactGlow * 0.85);
+      codeColor += uColorHighlight * (dropletImpactGlow * 0.85);
 
-      // Subtle cyan glint in wake
-      fluidColor += uColorCyan * (spec * 0.18 + mouseGlow * 0.25);
+      // Subtle cyan glint in moving wake
+      codeColor += uColorCyan * (spec * 0.16 + activeLight * 0.22);
+
+      // Ambient light bloom
+      vec3 ambientLightBloom = mix(uColorPrimary, uColorCyan, 0.25) * activeLight * (0.07 + uMouseVelocity * 0.08);
 
       // UI Content Readability: Subtly calibrate luminance in the center card area
       vec2 centerVec = (uv - vec2(0.5)) * vec2(1.2, 1.6);
       float centerDist = length(centerVec);
       float centerFade = smoothstep(0.12, 0.65, centerDist);
-      float adjustedAlpha = codeSample.a * mix(0.75, 1.0, centerFade);
+
+      float finalAlpha = codeSample.a * totalReveal * mix(0.78, 1.0, centerFade);
 
       // Soft container edge vignette (prevents harsh cutoff at borders)
       float edgeX = smoothstep(0.0, 0.035, uv.x) * smoothstep(1.0, 0.965, uv.x);
       float edgeY = smoothstep(0.0, 0.045, uv.y) * smoothstep(1.0, 0.955, uv.y);
       float edgeMask = edgeX * edgeY;
 
-      // Composite final color
-      vec3 finalColor = mix(bg, fluidColor, adjustedAlpha * 0.94);
-      finalColor += uColorPrimary * (mouseGlow * 0.06) * edgeMask;
-      finalColor += uColorHighlight * (dropletImpactGlow * 0.2) * edgeMask;
+      // Final compositing
+      vec3 finalColor = mix(bg, codeColor, finalAlpha * 0.95);
+      finalColor += ambientLightBloom * edgeMask;
+      finalColor += uColorHighlight * (dropletImpactGlow * 0.22) * edgeMask;
 
       gl_FragColor = vec4(finalColor, edgeMask);
     }
@@ -455,17 +503,25 @@
       this.trailMouse = { x: 0.5, y: 0.5 };
       this.prevMouse = { x: 0.5, y: 0.5 };
 
+      // Soft moving light positions (interpolated for physical feeling)
+      this.lightPos = { x: 0.5, y: 0.5 };
+      this.trailLightPos = { x: 0.5, y: 0.5 };
+
       this.currentVelocity = 0.0;
       this.targetVelocity = 0.0;
       this.currentVelocityVec = { x: 0.0, y: 0.0 };
       this.targetVelocityVec = { x: 0.0, y: 0.0 };
       this.lastTime = performance.now();
 
+      // Mouse active state (fades in when hovering, decays when idle)
+      this.mouseActive = 0.0;
+      this.targetMouseActive = 0.0;
+
       // Fluid intensity
       this.currentIntensity = this.options.intensity;
       this.targetIntensity = this.options.intensity;
 
-      // Droplet ripple impulse array
+      // Droplet ripple impulse array (up to 8 concurrent ripples)
       this.ripples = [];
       for (let i = 0; i < MAX_RIPPLES; i++) {
         this.ripples.push({
@@ -477,7 +533,7 @@
       }
       this.rippleUniforms = new Float32Array(MAX_RIPPLES * 4);
 
-      // Bound handlers
+      // Bound event listeners
       this._onResize = this._onResize.bind(this);
       this._onPointerMove = this._onPointerMove.bind(this);
       this._onPointerDown = this._onPointerDown.bind(this);
@@ -499,16 +555,13 @@
       this.width = Math.max(rect.width, 10);
       this.height = Math.max(rect.height, 10);
 
-      // Three.js Scene & Orthographic Camera for Fullscreen Quad
       this.scene = new THREE.Scene();
       this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-
       this.geometry = new THREE.PlaneGeometry(2, 2);
 
-      // Procedural Code Texture Generation
+      // Procedural code texture (exact 55 strings, no line numbers)
       this.codeTexture = createCodeTexture();
 
-      // Check prefers-reduced-motion
       const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       // Shader Uniforms
@@ -518,8 +571,11 @@
         uTime: { value: 0.0 },
         uMouse: { value: new THREE.Vector2(0.5, 0.5) },
         uTrailMouse: { value: new THREE.Vector2(0.5, 0.5) },
+        uLightPos: { value: new THREE.Vector2(0.5, 0.5) },
+        uTrailLightPos: { value: new THREE.Vector2(0.5, 0.5) },
         uMouseVelocityVec: { value: new THREE.Vector2(0.0, 0.0) },
         uMouseVelocity: { value: 0.0 },
+        uMouseActive: { value: 0.0 },
         uIntensity: { value: this.currentIntensity },
         uReducedMotion: { value: prefersReduced ? 1.0 : 0.0 },
         uRipples: { value: this.rippleUniforms },
@@ -527,6 +583,7 @@
         uColorPrimary: { value: new THREE.Vector3(...PALETTE.primary) },
         uColorSecondary: { value: new THREE.Vector3(...PALETTE.secondary) },
         uColorDim: { value: new THREE.Vector3(...PALETTE.dim) },
+        uColorVeryDim: { value: new THREE.Vector3(...PALETTE.veryDim) },
         uColorHighlight: { value: new THREE.Vector3(...PALETTE.highlight) },
         uColorCyan: { value: new THREE.Vector3(...PALETTE.cyan) },
         uBgColor: { value: new THREE.Vector3(...PALETTE.bg) }
@@ -575,9 +632,8 @@
         window.addEventListener('resize', this._onResize, { passive: true });
       }
 
-      // Attach Pointer & Droplet Interaction Listeners
+      // Attach Interaction Listeners on parent card
       if (this.options.interactive) {
-        // Listen on parent card so the entire box is the interactive fluid surface
         const target = this.container.closest('.academic-card') || this.container.parentElement || this.container;
         this.interactionTarget = target;
 
@@ -633,6 +689,8 @@
       this.targetVelocityVec.y = Math.max(-3.0, Math.min(3.0, dy / dt));
       this.targetVelocity = Math.min(speed, 3.5);
 
+      this.targetMouseActive = 1.0;
+
       this.prevMouse.x = nx;
       this.prevMouse.y = ny;
       this.lastTime = now;
@@ -646,6 +704,7 @@
 
       // Trigger Droplet Impact Ripple Wave
       this.addRipple(nx, ny, 1.0);
+      this.targetMouseActive = 1.0;
     }
 
     _onTouchStart(e) {
@@ -661,10 +720,11 @@
     }
 
     _onPointerLeave() {
-      // Natural friction settling
+      // Natural friction settling & gradual light fade
       this.targetVelocity = 0.0;
       this.targetVelocityVec.x = 0.0;
       this.targetVelocityVec.y = 0.0;
+      this.targetMouseActive = 0.0;
     }
 
     /**
@@ -676,7 +736,6 @@
     addRipple(normX, normY, strength = 1.0) {
       if (!this.clock) return;
 
-      // Find oldest ripple or unused slot
       let oldestIdx = 0;
       let oldestTime = Infinity;
       for (let i = 0; i < MAX_RIPPLES; i++) {
@@ -711,6 +770,7 @@
     setPointer(normX, normY) {
       this.targetMouse.x = Math.max(0.0, Math.min(1.0, normX));
       this.targetMouse.y = Math.max(0.0, Math.min(1.0, normY));
+      this.targetMouseActive = 1.0;
     }
 
     /**
@@ -728,12 +788,19 @@
       const elapsed = this.clock.getElapsedTime();
 
       // Fluid Viscosity: Smooth pointer interpolation
-      this.currentMouse.x += (this.targetMouse.x - this.currentMouse.x) * 0.14;
-      this.currentMouse.y += (this.targetMouse.y - this.currentMouse.y) * 0.14;
+      this.currentMouse.x += (this.targetMouse.x - this.currentMouse.x) * 0.12;
+      this.currentMouse.y += (this.targetMouse.y - this.currentMouse.y) * 0.12;
 
-      // Delayed Trail Pointer for Physical Wake Momentum
-      this.trailMouse.x += (this.currentMouse.x - this.trailMouse.x) * 0.065;
-      this.trailMouse.y += (this.currentMouse.y - this.trailMouse.y) * 0.065;
+      // Soft moving light follows pointer smoothly with slight lag (Section 8)
+      this.lightPos.x += (this.targetMouse.x - this.lightPos.x) * 0.10;
+      this.lightPos.y += (this.targetMouse.y - this.lightPos.y) * 0.10;
+
+      // Delayed Trail Pointer & Trail Light for physical fluid wake momentum
+      this.trailMouse.x += (this.currentMouse.x - this.trailMouse.x) * 0.06;
+      this.trailMouse.y += (this.currentMouse.y - this.trailMouse.y) * 0.06;
+
+      this.trailLightPos.x += (this.lightPos.x - this.trailLightPos.x) * 0.055;
+      this.trailLightPos.y += (this.lightPos.y - this.trailLightPos.y) * 0.055;
 
       // Velocity interpolation & friction decay
       this.currentVelocityVec.x += (this.targetVelocityVec.x - this.currentVelocityVec.x) * 0.12;
@@ -743,6 +810,9 @@
       this.targetVelocityVec.x *= 0.88;
       this.targetVelocityVec.y *= 0.88;
       this.targetVelocity *= 0.88;
+
+      // Active state smoothing (smooth light fade in/out)
+      this.mouseActive += (this.targetMouseActive - this.mouseActive) * 0.08;
 
       // Intensity smoothing
       this.currentIntensity += (this.targetIntensity - this.currentIntensity) * 0.06;
@@ -758,12 +828,15 @@
         this.rippleUniforms[offset + 3] = r.strength;
       }
 
-      // Update Shader Uniforms in-place (Zero GC allocation per frame)
+      // Update Shader Uniforms in-place (Zero heap allocations per frame)
       this.uniforms.uTime.value = elapsed;
       this.uniforms.uMouse.value.set(this.currentMouse.x, this.currentMouse.y);
       this.uniforms.uTrailMouse.value.set(this.trailMouse.x, this.trailMouse.y);
+      this.uniforms.uLightPos.value.set(this.lightPos.x, this.lightPos.y);
+      this.uniforms.uTrailLightPos.value.set(this.trailLightPos.x, this.trailLightPos.y);
       this.uniforms.uMouseVelocityVec.value.set(this.currentVelocityVec.x, this.currentVelocityVec.y);
       this.uniforms.uMouseVelocity.value = this.currentVelocity;
+      this.uniforms.uMouseActive.value = this.mouseActive;
       this.uniforms.uIntensity.value = this.currentIntensity;
 
       // Render GPU Pass
