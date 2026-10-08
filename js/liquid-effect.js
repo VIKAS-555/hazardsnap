@@ -37,15 +37,15 @@
   // Maximum concurrent droplet ripples
   const MAX_RIPPLES = 8;
 
-  // Modern Futuristic Developer Green Palette (Section 6 & 38)
+  // Official Web App Brand Theme Palette (Electric Blue, Sky Cyan, Ice Highlight, Deep Obsidian)
   const PALETTE = {
-    primary: [0.224, 1.0, 0.533],       // #39FF88 - Primary Green
-    secondary: [0.098, 0.788, 0.475],   // #19C979 - Secondary Green
-    dim: [0.043, 0.435, 0.271],         // #0B6F45 - Dim Green
-    veryDim: [0.027, 0.227, 0.161],     // #073A29 - Very Dim Submerged Green
-    highlight: [0.643, 1.0, 0.773],     // #A4FFC5 - Highlight Mint
-    cyan: [0.220, 0.741, 0.973],        // #38BDF8 - Subtle Cyan Glint
-    bg: [0.008, 0.024, 0.090]           // #020617 - Deep Dark Navy / Obsidian
+    primary: [0.231, 0.510, 0.965],     // #3B82F6 - Brand Electric Blue
+    secondary: [0.220, 0.741, 0.973],   // #38BDF8 - Sky Cyan
+    dim: [0.114, 0.306, 0.847],         // #1D4ED8 - Deep Brand Blue
+    veryDim: [0.075, 0.192, 0.541],     // #13318A - Submerged Dark Navy
+    highlight: [0.729, 0.902, 0.992],   // #BAE6FD - Ice Electric Blue Highlight
+    cyan: [0.388, 0.400, 0.945],        // #6366F1 - Indigo Accent
+    bg: [0.008, 0.024, 0.090]           // #020617 - Deep Dark Obsidian Slate-950
   };
 
   // Exact 55 code snippets from Section 4 (Rendered without line numbers)
@@ -129,12 +129,12 @@
     // Clean transparent clear
     ctx.clearRect(0, 0, width, height);
 
-    // Tight row height for high vertical density (51 continuous rows)
-    const rowHeight = 20;
+    // Generous row height and large font for crystal-clear readability
+    const rowHeight = 36;
     const totalRows = Math.floor(height / rowHeight);
 
     ctx.textBaseline = 'middle';
-    ctx.font = '500 13px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
+    ctx.font = '600 22px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
 
     const KEYWORDS = new Set([
       'const', 'let', 'var', 'function', 'async', 'await', 'export', 'default',
@@ -153,18 +153,19 @@
           continue;
         }
 
+        // Web App Brand Theme Syntax Highlighting (Electric Blue, Sky Cyan, Ice Highlight, Indigo)
         if (token.startsWith('//')) {
-          ctx.fillStyle = `rgba(11, 111, 69, ${0.55 * baseAlpha})`;
+          ctx.fillStyle = `rgba(100, 116, 139, ${0.70 * baseAlpha})`; // Muted Slate
         } else if (token.startsWith("'") || token.startsWith('"') || token.startsWith('`')) {
-          ctx.fillStyle = `rgba(25, 201, 121, ${0.92 * baseAlpha})`; // Secondary Green
+          ctx.fillStyle = `rgba(56, 189, 248, ${0.98 * baseAlpha})`; // Sky Cyan String
         } else if (KEYWORDS.has(token)) {
-          ctx.fillStyle = `rgba(164, 255, 197, ${0.98 * baseAlpha})`; // Highlight Mint
+          ctx.fillStyle = `rgba(186, 230, 253, ${1.00 * baseAlpha})`; // Ice Electric Blue Keyword
         } else if (/^[0-9]+$/.test(token)) {
-          ctx.fillStyle = `rgba(25, 201, 121, ${0.85 * baseAlpha})`;
+          ctx.fillStyle = `rgba(165, 180, 252, ${0.95 * baseAlpha})`; // Indigo / Violet Number
         } else if (/^[=><+\-*/&|!{}();:,.\[\]]$/.test(token)) {
-          ctx.fillStyle = `rgba(57, 255, 136, ${0.68 * baseAlpha})`;
+          ctx.fillStyle = `rgba(96, 165, 250, ${0.85 * baseAlpha})`; // Brand Blue Operator
         } else {
-          ctx.fillStyle = `rgba(57, 255, 136, ${0.92 * baseAlpha})`; // Primary Green
+          ctx.fillStyle = `rgba(59, 130, 246, ${0.98 * baseAlpha})`; // Brand Electric Blue Identifier
         }
 
         ctx.fillText(token, curX, startY);
@@ -178,29 +179,29 @@
     for (let row = 0; row < totalRows; row++) {
       const y = row * rowHeight + rowHeight * 0.5 + 2;
 
-      // Depth tier variation (Background: 0.55, Midground: 0.8, Foreground: 1.0)
+      // Depth tier variation (Background: 0.60, Midground: 0.82, Foreground: 1.0)
       const depthTier = (row % 3);
-      const baseAlpha = depthTier === 0 ? 0.55 : depthTier === 1 ? 0.80 : 1.0;
+      const baseAlpha = depthTier === 0 ? 0.60 : depthTier === 1 ? 0.82 : 1.0;
 
       // Staggered starting offset so snippet breaks are naturally varied across lines
-      let curX = -((row * 79) % 180);
+      let curX = -((row * 137) % 260);
       let snippetIdx = (row * 7) % EXACT_CODE_SNIPPETS.length;
 
       // Continuously pack snippets horizontally across the entire width and beyond
-      while (curX < width + 120) {
+      while (curX < width + 140) {
         const snippet = EXACT_CODE_SNIPPETS[snippetIdx % EXACT_CODE_SNIPPETS.length];
         
         // Render snippet
         const snippetWidth = renderSnippetTokens(snippet, curX, y, baseAlpha);
 
-        // Gap spacing between snippets (18px to 44px)
-        const gap = 20 + ((snippetIdx * 19) % 25);
+        // Gap spacing between snippets
+        const gap = 28 + ((snippetIdx * 23) % 28);
         curX += snippetWidth + gap;
 
-        // Subtle ellipsis on some snippet gaps as illustrated in prompt Section 5
-        if ((snippetIdx % 5) === 0 && curX < width + 40) {
-          ctx.fillStyle = `rgba(11, 111, 69, ${0.45 * baseAlpha})`;
-          ctx.fillText('...', curX - gap + 4, y);
+        // Subtle ellipsis on some snippet gaps
+        if ((snippetIdx % 5) === 0 && curX < width + 60) {
+          ctx.fillStyle = `rgba(59, 130, 246, ${0.45 * baseAlpha})`;
+          ctx.fillText('...', curX - gap + 6, y);
         }
 
         snippetIdx++;
@@ -419,56 +420,101 @@
       }
 
       // ============================================================
-      // TORCH REVEAL SYSTEM: Code is 100% invisible until torch illuminates it
+      // AQUATIC SWIMMING TORCH (Compact Focused Head + Waving Tail Wake)
       // ============================================================
-      
-      // Pointer torch position with fluid distortion
-      vec2 lightDelta = (pAspect - uLightPos * vec2(uAspect, 1.0)) - disp * 1.4;
-      float lightDist = length(lightDelta);
+      vec2 headPos = uLightPos * vec2(uAspect, 1.0);
+      vec2 velAspect = uMouseVelocityVec * vec2(uAspect, 1.0);
+      float velSpeed = length(velAspect);
 
-      // Dynamic torch radius expanding gently with cursor speed
-      float lightRadius = 0.35 + uMouseVelocity * 0.15;
-      float normDist = lightDist / lightRadius;
+      // Relative displacement with fluid turbulence
+      vec2 d = (pAspect - headPos) - disp * 1.25;
 
-      // Primary torch reveal: Smooth Hermite curve that hits EXACTLY 0.0 at the perimeter
-      float lightReveal = 0.0;
-      if (normDist < 1.0) {
-        float f = 1.0 - normDist;
-        // Smooth cubic falloff (zero derivative at boundary = perfectly seamless edge)
-        float smoothFalloff = f * f * (3.0 - 2.0 * f);
-        // Bright radiant center core
-        lightReveal = pow(smoothFalloff, 1.15);
+      // Focused compact head radius (smaller torch range)
+      float headRadius = 0.16;
+
+      float torchReveal = 0.0;
+
+      // 1. Stationary Organic Droplet (active when speed is near zero)
+      float angle = atan(d.y, d.x);
+      float organicRadius = headRadius * (1.0 + 0.06 * sin(angle * 3.0 + uTime * 2.2));
+      float statNorm = length(d) / organicRadius;
+      float statReveal = 0.0;
+      if (statNorm < 1.0) {
+        float fStat = 1.0 - statNorm;
+        statReveal = fStat * fStat * (3.0 - 2.0 * fStat);
       }
 
-      // Secondary trailing wake: momentum light behind moving pointer
-      vec2 trailLightDelta = (pAspect - uTrailLightPos * vec2(uAspect, 1.0)) - disp * 1.2;
-      float trailLightDist = length(trailLightDelta);
-      float trailRadius = lightRadius * 1.05;
-      float normTrailDist = trailLightDist / trailRadius;
+      // 2. Dynamic Swimming Tadpole / Hydrodynamic Wake Shape (active when moving)
+      float moveReveal = 0.0;
+      if (velSpeed > 0.02) {
+        vec2 vDir = velAspect / velSpeed;
+        vec2 nDir = vec2(-vDir.y, vDir.x); // Perpendicular normal
 
-      float trailReveal = 0.0;
-      if (normTrailDist < 1.0) {
-        float fTrail = 1.0 - normTrailDist;
-        float smoothTrailFalloff = fTrail * fTrail * (3.0 - 2.0 * fTrail);
-        trailReveal = smoothTrailFalloff * clamp(uMouseVelocity * 0.55, 0.0, 0.85);
+        // Longitudinal & transverse projections
+        float tLong = dot(d, vDir);
+        float tLat = dot(d, nDir);
+
+        // Hydrodynamic tail stretches behind the head along -velocity
+        float tailLength = headRadius * (1.3 + min(velSpeed * 2.4, 4.5));
+
+        if (tLong >= 0.0) {
+          // Front hemisphere: bulbous head slightly streamlined in motion
+          float forwardSquash = 1.0 + min(velSpeed * 0.15, 0.35);
+          float headDist = length(vec2(tLong * forwardSquash, tLat));
+          float normHead = headDist / headRadius;
+          if (normHead < 1.0) {
+            float fHead = 1.0 - normHead;
+            moveReveal = fHead * fHead * (3.0 - 2.0 * fHead);
+          }
+        } else {
+          // Tail region (behind head)
+          float s = -tLong; // Distance along tail [0 .. tailLength]
+          if (s <= tailLength) {
+            float sNorm = s / tailLength; // [0.0 at neck .. 1.0 at tip]
+
+            // Undulating aquatic wave along the tail (swimming like in water!)
+            float wavePhase = s * 24.0 - uTime * 16.0;
+            float waveAmp = 0.024 * sNorm * min(velSpeed * 0.9, 1.2);
+            float tailWiggle = sin(wavePhase) * waveAmp;
+
+            // Tail width tapers smoothly from head down to a fine tip
+            float tailWidth = headRadius * pow(1.0 - sNorm, 0.85) * (0.95 - 0.55 * sNorm);
+            tailWidth = max(tailWidth, 0.003);
+
+            // Lateral distance to the waving tail spine
+            float lateralDist = abs(tLat - tailWiggle);
+            float latNorm = lateralDist / tailWidth;
+
+            if (latNorm < 1.0) {
+              float fLat = 1.0 - latNorm;
+              float lateralFactor = fLat * fLat * (3.0 - 2.0 * fLat);
+              // Longitudinal fading along the tail towards the tip
+              float longFactor = pow(1.0 - sNorm, 0.55);
+              moveReveal = lateralFactor * longFactor;
+            }
+          }
+        }
       }
 
-      // Active torch illumination: strictly 0.0 outside radius or when cursor is inactive
-      float activeLight = max(lightReveal, trailReveal) * uMouseActive;
+      // Seamless blend between stationary organic droplet and swimming aquatic shape
+      float moveWeight = smoothstep(0.03, 0.14, velSpeed);
+      torchReveal = mix(statReveal, moveReveal, moveWeight);
 
-      // TOTAL REVEAL: Strictly 0.0 everywhere unless illuminated under the moving torch!
+      // Radiant center core, strictly multiplied by mouse active state
+      torchReveal = pow(torchReveal, 1.15) * uMouseActive;
+      float activeLight = torchReveal;
       float totalReveal = activeLight;
 
       // ============================================================
-      // COLOR & SHADING COMPOSITING
+      // COLOR & SHADING COMPOSITING (Web App Brand Blue / Cyan Theme)
       // ============================================================
-      // Background: Deep dark navy / obsidian pool
+      // Background: Deep dark obsidian / slate-950 pool
       vec3 bg = uBgColor;
       bg += vec3(0.010, 0.024, 0.055) * (1.0 - uv.y);
 
-      // When illuminated, high contrast vibrant developer green & highlight mint
-      vec3 codeColor = mix(uColorSecondary, uColorHighlight, codeSample.a * 0.6 + activeLight * 0.4);
-      codeColor = mix(codeColor, uColorPrimary, 0.4);
+      // When illuminated, high contrast vibrant Electric Brand Blue & Sky Cyan
+      vec3 codeColor = mix(uColorSecondary, uColorHighlight, codeSample.a * 0.55 + activeLight * 0.45);
+      codeColor = mix(codeColor, uColorPrimary, 0.40);
 
       // Specular sheen and wave crest highlights (strictly confined to illuminated zone)
       codeColor += uColorHighlight * (waveCrestGlow * 0.45 * activeLight);
@@ -477,11 +523,11 @@
       // Droplet impact flash at cursor
       codeColor += uColorHighlight * (dropletImpactGlow * 0.80 * activeLight);
 
-      // Cyan glint under torch
-      codeColor += uColorCyan * (activeLight * 0.30);
+      // Electric Blue & Indigo glint under torch
+      codeColor += uColorCyan * (activeLight * 0.28);
 
-      // Ambient soft bloom around the torch
-      vec3 ambientLightBloom = mix(uColorPrimary, uColorCyan, 0.30) * activeLight * (0.09 + uMouseVelocity * 0.08);
+      // Ambient soft blue bloom around the torch
+      vec3 ambientLightBloom = mix(uColorPrimary, uColorSecondary, 0.40) * activeLight * (0.09 + uMouseVelocity * 0.08);
 
       // FINAL CODE ALPHA: Exactly 0.0 outside torch, up to 1.0 under torch
       float finalAlpha = codeSample.a * totalReveal;
