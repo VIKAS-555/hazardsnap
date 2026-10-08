@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateRsvpBadges();
   initDetectiveLens();
   initLiquidCanvas();
+  initSpotlightCards();
   
   if (window.lucide) {
     window.lucide.createIcons();
@@ -1743,20 +1744,174 @@ function initLiquidCanvas() {
 window.initLiquidCanvas = initLiquidCanvas;
 
 /**
- * Copy GLSL fluid kernel code from the floating glass terminal
+ * Multi-Track CSE Interactive IDE Engine (GLSL, PyTorch AI, C++ Algo, Go Systems)
  */
-function copyShaderSnippet() {
-  const code = `// Domain-Warped FBM Fluid Kernel (Dept. of CSE)
+let currentActiveTrack = 'glsl';
+
+const TRACK_SNIPPETS = {
+  glsl: {
+    filename: 'fluid_kernel.frag',
+    tag: '[GLSL ES]',
+    telemetryText: 'GPU 60 FPS',
+    watermarkLeft: '<span class="text-emerald-500/80 font-bold">01000011 01010011 01000101</span> <span class="text-slate-600">[ASCII: "CSE"]</span> <span class="text-blue-400/80 hidden sm:inline">• WebGL 2.0 Core</span>',
+    watermarkRight: 'TRACK: GRAPHICS &amp; SHADERS',
+    liquidIntensity: 0.55,
+    codeHtml: `
+      <div class="table w-full">
+        <div class="table-row"><span class="table-cell pr-3 text-right text-slate-600 select-none">1</span><span class="table-cell"><span class="text-slate-500">// Domain-Warped FBM Fluid Kernel (Dept. of CSE)</span></span></div>
+        <div class="table-row"><span class="table-cell pr-3 text-right text-slate-600 select-none">2</span><span class="table-cell"><span class="text-purple-400">vec2</span> <span class="text-blue-300">q</span> = <span class="text-purple-400">vec2</span>(fbm(p + uTime * <span class="text-emerald-300">0.05</span>), fbm(p + <span class="text-purple-400">vec2</span>(<span class="text-emerald-300">5.2</span>, <span class="text-emerald-300">1.3</span>)));</span></div>
+        <div class="table-row"><span class="table-cell pr-3 text-right text-slate-600 select-none">3</span><span class="table-cell"><span class="text-purple-400">vec2</span> <span class="text-blue-300">r</span> = <span class="text-purple-400">vec2</span>(fbm(p + <span class="text-emerald-300">2.2</span> * q + uTime * <span class="text-emerald-300">0.08</span>), fbm(p + <span class="text-emerald-300">2.2</span> * q));</span></div>
+        <div class="table-row"><span class="table-cell pr-3 text-right text-slate-600 select-none">4</span><span class="table-cell"><span class="text-amber-300">float</span> <span class="text-blue-300">f</span> = fbm(p + <span class="text-emerald-300">2.0</span> * r + uTime * <span class="text-emerald-300">0.03</span>); <span class="text-slate-500">// Warped Heightfield</span></span></div>
+        <div class="table-row"><span class="table-cell pr-3 text-right text-slate-600 select-none">5</span><span class="table-cell"><span class="text-purple-400">vec3</span> <span class="text-blue-300">norm</span> = normalize(<span class="text-purple-400">vec3</span>((f - hR) * <span class="text-emerald-300">3.8</span>, (f - hU) * <span class="text-emerald-300">3.8</span>, <span class="text-emerald-300">0.28</span>));</span></div>
+        <div class="table-row"><span class="table-cell pr-3 text-right text-slate-600 select-none">6</span><span class="table-cell"><span class="text-amber-300">float</span> <span class="text-blue-300">spec</span> = pow(max(dot(norm, halfDir), <span class="text-emerald-300">0.0</span>), <span class="text-emerald-300">22.0</span>);</span></div>
+        <div class="table-row"><span class="table-cell pr-3 text-right text-slate-600 select-none">7</span><span class="table-cell"><span class="text-cyan-400">gl_FragColor</span> = <span class="text-purple-400">vec4</span>(mix(uBgColor, col + spec, mask), <span class="text-emerald-300">1.0</span>);<span class="inline-block w-1.5 h-3.5 bg-blue-400 ml-1 translate-y-0.5 animate-pulse"></span></span></div>
+      </div>
+    `,
+    rawCode: `// Domain-Warped FBM Fluid Kernel (Dept. of CSE)
 vec2 q = vec2(fbm(p + uTime * 0.05), fbm(p + vec2(5.2, 1.3)));
 vec2 r = vec2(fbm(p + 2.2 * q + uTime * 0.08), fbm(p + 2.2 * q));
 float f = fbm(p + 2.0 * r + uTime * 0.03); // Warped Heightfield
 vec3 norm = normalize(vec3((f - hR) * 3.8, (f - hU) * 3.8, 0.28));
 float spec = pow(max(dot(norm, halfDir), 0.0), 22.0);
-gl_FragColor = vec4(mix(uBgColor, col + spec, mask), 1.0);`;
+gl_FragColor = vec4(mix(uBgColor, col + spec, mask), 1.0);`
+  },
+
+  ai: {
+    filename: 'attention.py',
+    tag: '[PyTorch 2.4]',
+    telemetryText: '14ms INFERENCE',
+    watermarkLeft: '<span class="text-indigo-400 font-bold">TENSORS • CUDA 12.4</span> <span class="text-slate-600">[Weights: FP16]</span> <span class="text-purple-400/80 hidden sm:inline">• 124M Params</span>',
+    watermarkRight: 'TRACK: AI &amp; DEEP LEARNING',
+    liquidIntensity: 0.82,
+    codeHtml: `
+      <div class="table w-full">
+        <div class="table-row"><span class="table-cell pr-3 text-right text-slate-600 select-none">1</span><span class="table-cell"><span class="text-slate-500"># Scaled Dot-Product Attention — Dept. of CSE (AI &amp; ML)</span></span></div>
+        <div class="table-row"><span class="table-cell pr-3 text-right text-slate-600 select-none">2</span><span class="table-cell"><span class="text-purple-400">def</span> <span class="text-blue-300">forward</span>(self, q: torch.Tensor, k: torch.Tensor, v: torch.Tensor):</span></div>
+        <div class="table-row"><span class="table-cell pr-3 text-right text-slate-600 select-none">3</span><span class="table-cell">    d_k = q.size(-<span class="text-emerald-300">1</span>)</span></div>
+        <div class="table-row"><span class="table-cell pr-3 text-right text-slate-600 select-none">4</span><span class="table-cell">    scores = torch.matmul(q, k.transpose(-<span class="text-emerald-300">2</span>, -<span class="text-emerald-300">1</span>)) / math.sqrt(d_k)</span></div>
+        <div class="table-row"><span class="table-cell pr-3 text-right text-slate-600 select-none">5</span><span class="table-cell">    attn_weights = F.softmax(scores, dim=-<span class="text-emerald-300">1</span>)</span></div>
+        <div class="table-row"><span class="table-cell pr-3 text-right text-slate-600 select-none">6</span><span class="table-cell">    <span class="text-purple-400">return</span> torch.matmul(attn_weights, v), attn_weights<span class="inline-block w-1.5 h-3.5 bg-indigo-400 ml-1 translate-y-0.5 animate-pulse"></span></span></div>
+      </div>
+    `,
+    rawCode: `# Scaled Dot-Product Attention — Dept. of CSE (AI & ML)
+def forward(self, q: torch.Tensor, k: torch.Tensor, v: torch.Tensor):
+    d_k = q.size(-1)
+    scores = torch.matmul(q, k.transpose(-2, -1)) / math.sqrt(d_k)
+    attn_weights = F.softmax(scores, dim=-1)
+    return torch.matmul(attn_weights, v), attn_weights`
+  },
+
+  algo: {
+    filename: 'tree.cpp',
+    tag: '[C++20 GCC]',
+    telemetryText: 'O(log N) TIME',
+    watermarkLeft: '<span class="text-emerald-400 font-bold">SEG_TREE • LAZY_PROP</span> <span class="text-slate-600">[DSA 300+]</span> <span class="text-cyan-400/80 hidden sm:inline">• ICPC Regionals</span>',
+    watermarkRight: 'TRACK: ALGORITHMS &amp; CP',
+    liquidIntensity: 0.70,
+    codeHtml: `
+      <div class="table w-full">
+        <div class="table-row"><span class="table-cell pr-3 text-right text-slate-600 select-none">1</span><span class="table-cell"><span class="text-slate-500">// Segment Tree Range Query with Lazy Propagation</span></span></div>
+        <div class="table-row"><span class="table-cell pr-3 text-right text-slate-600 select-none">2</span><span class="table-cell"><span class="text-purple-400">void</span> <span class="text-blue-300">update</span>(<span class="text-amber-300">int</span> node, <span class="text-amber-300">int</span> l, <span class="text-amber-300">int</span> r, <span class="text-amber-300">int</span> ql, <span class="text-amber-300">int</span> qr, <span class="text-amber-300">long long</span> val) {</span></div>
+        <div class="table-row"><span class="table-cell pr-3 text-right text-slate-600 select-none">3</span><span class="table-cell">    push(node, l, r); <span class="text-purple-400">if</span> (r &lt; ql || l &gt; qr) <span class="text-purple-400">return</span>;</span></div>
+        <div class="table-row"><span class="table-cell pr-3 text-right text-slate-600 select-none">4</span><span class="table-cell">    <span class="text-purple-400">if</span> (ql &lt;= l &amp;&amp; r &lt;= qr) { lazy[node] += val; push(node, l, r); <span class="text-purple-400">return</span>; }</span></div>
+        <div class="table-row"><span class="table-cell pr-3 text-right text-slate-600 select-none">5</span><span class="table-cell">    <span class="text-amber-300">int</span> mid = (l + r) &gt;&gt; <span class="text-emerald-300">1</span>; update(node&lt;&lt;<span class="text-emerald-300">1</span>, l, mid, ql, qr, val);</span></div>
+        <div class="table-row"><span class="table-cell pr-3 text-right text-slate-600 select-none">6</span><span class="table-cell">    tree[node] = tree[node&lt;&lt;<span class="text-emerald-300">1</span>] + tree[node&lt;&lt;<span class="text-emerald-300">1</span>|<span class="text-emerald-300">1</span>];<span class="inline-block w-1.5 h-3.5 bg-emerald-400 ml-1 translate-y-0.5 animate-pulse"></span></span></div>
+      </div>
+    `,
+    rawCode: `// Segment Tree Range Query with Lazy Propagation
+void update(int node, int l, int r, int ql, int qr, long long val) {
+    push(node, l, r); if (r < ql || l > qr) return;
+    if (ql <= l && r <= qr) { lazy[node] += val; push(node, l, r); return; }
+    int mid = (l + r) >> 1; update(node<<1, l, mid, ql, qr, val);
+    tree[node] = tree[node<<1] + tree[node<<1|1];
+}`
+  },
+
+  sys: {
+    filename: 'raft.go',
+    tag: '[Go 1.22]',
+    telemetryText: '3/5 QUORUM',
+    watermarkLeft: '<span class="text-cyan-400 font-bold">RAFT_CLUSTER • RPC</span> <span class="text-slate-600">[Consensus]</span> <span class="text-blue-400/80 hidden sm:inline">• Edge Nodes: 5</span>',
+    watermarkRight: 'TRACK: DISTRIBUTED SYSTEMS',
+    liquidIntensity: 0.78,
+    codeHtml: `
+      <div class="table w-full">
+        <div class="table-row"><span class="table-cell pr-3 text-right text-slate-600 select-none">1</span><span class="table-cell"><span class="text-slate-500">// Raft Consensus — Leader Election &amp; Heartbeat RPC</span></span></div>
+        <div class="table-row"><span class="table-cell pr-3 text-right text-slate-600 select-none">2</span><span class="table-cell"><span class="text-purple-400">func</span> (rf *Raft) <span class="text-blue-300">StartElection</span>() {</span></div>
+        <div class="table-row"><span class="table-cell pr-3 text-right text-slate-600 select-none">3</span><span class="table-cell">    rf.currentTerm++ ; rf.votedFor = rf.me ; votes := <span class="text-emerald-300">1</span></span></div>
+        <div class="table-row"><span class="table-cell pr-3 text-right text-slate-600 select-none">4</span><span class="table-cell">    <span class="text-purple-400">for</span> peer := <span class="text-purple-400">range</span> rf.peers {</span></div>
+        <div class="table-row"><span class="table-cell pr-3 text-right text-slate-600 select-none">5</span><span class="table-cell">        <span class="text-purple-400">go</span> rf.sendRequestVote(peer, &amp;RequestVoteArgs{Term: rf.currentTerm})</span></div>
+        <div class="table-row"><span class="table-cell pr-3 text-right text-slate-600 select-none">6</span><span class="table-cell">    }<span class="inline-block w-1.5 h-3.5 bg-cyan-400 ml-1 translate-y-0.5 animate-pulse"></span></span></div>
+      </div>
+    `,
+    rawCode: `// Raft Consensus — Leader Election & Heartbeat RPC
+func (rf *Raft) StartElection() {
+    rf.currentTerm++ ; rf.votedFor = rf.me ; votes := 1
+    for peer := range rf.peers {
+        go rf.sendRequestVote(peer, &RequestVoteArgs{Term: rf.currentTerm})
+    }
+}`
+  }
+};
+
+/**
+ * Switch active track in the floating glass terminal
+ * @param {'glsl'|'ai'|'algo'|'sys'} trackKey
+ */
+function switchTerminalTrack(trackKey) {
+  if (!TRACK_SNIPPETS[trackKey]) return;
+  currentActiveTrack = trackKey;
+  const track = TRACK_SNIPPETS[trackKey];
+
+  // Update tabs active state
+  document.querySelectorAll('.track-tab-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  const activeBtn = document.getElementById(`tab-btn-${trackKey}`);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  // Fade transition code body
+  const codeBody = document.getElementById('terminal-code-body');
+  if (codeBody) {
+    codeBody.style.opacity = '0';
+    setTimeout(() => {
+      codeBody.innerHTML = track.codeHtml;
+      codeBody.style.opacity = '1';
+    }, 110);
+  }
+
+  // Update telemetry badge
+  const badgeText = document.getElementById('telemetry-badge-text');
+  if (badgeText) badgeText.textContent = track.telemetryText;
+
+  // Update watermarks
+  const wmLeft = document.getElementById('terminal-watermark-left');
+  if (wmLeft) wmLeft.innerHTML = track.watermarkLeft;
+  const wmRight = document.getElementById('terminal-watermark-right');
+  if (wmRight) wmRight.innerHTML = track.watermarkRight;
+
+  // Elevate fluid intensity for tactile physical reaction
+  if (window.liquidEffect) {
+    window.liquidEffect.setIntensity(track.liquidIntensity);
+  }
+
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+}
+
+window.switchTerminalTrack = switchTerminalTrack;
+
+/**
+ * Copy active code snippet from the floating glass terminal
+ */
+function copyShaderSnippet() {
+  const track = TRACK_SNIPPETS[currentActiveTrack] || TRACK_SNIPPETS.glsl;
+  const code = track.rawCode;
 
   function notifyCopied() {
     if (window.showToast) {
-      showToast('GLSL fluid shader kernel copied to clipboard!', 'code');
+      showToast(`${track.filename} snippet copied to clipboard!`, 'code');
     }
   }
 
@@ -1786,5 +1941,23 @@ gl_FragColor = vec4(mix(uBgColor, col + spec, mask), 1.0);`;
 }
 
 window.copyShaderSnippet = copyShaderSnippet;
+
+/**
+ * Vercel / Linear Spotlight Cursor Border Glow on Cards
+ */
+function initSpotlightCards() {
+  const cards = document.querySelectorAll('.academic-card, .glass-code-terminal');
+  cards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      card.style.setProperty('--mouse-x', `${x}px`);
+      card.style.setProperty('--mouse-y', `${y}px`);
+    }, { passive: true });
+  });
+}
+
+window.initSpotlightCards = initSpotlightCards;
 
 

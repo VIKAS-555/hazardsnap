@@ -499,4 +499,46 @@ html.dark ::-webkit-scrollbar-thumb {
   border-radius: 4px;
 }
 
+/* Track Tab Buttons */
+.track-tab-btn {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.track-tab-btn.active {
+  background: rgba(37, 99, 235, 0.22) !important;
+  color: #93c5fd !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.25);
+}
+
+/* ============================================================
+   VERCEL / LINEAR RADIAL SPOTLIGHT CURSOR BORDER GLOW
+   ============================================================ */
+.academic-card,
+.glass-code-terminal {
+  position: relative;
+}
+
+.academic-card::before,
+.glass-code-terminal::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(350px circle at var(--mouse-x, -500px) var(--mouse-y, -500px), rgba(59, 130, 246, 0.4), transparent 70%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 2;
+}
+
+.academic-card:hover::before,
+.glass-code-terminal:hover::before {
+  opacity: 1;
+}
+
 
