@@ -6,9 +6,23 @@
   <title>Member Portal & Secure Access | BST Tech Club</title>
   <meta name="description" content="Secure login and student onboarding for BST Tech Club, Department of CSE (AI & ML). Access your digital member ID card, register for hackathons, and invite peers.">
 
+  <script>
+    // Automatic Canonicalization: If user lands on a Vercel preview branch deployment (-git-*.vercel.app),
+    // smoothly redirect to the 100% public production domain so no one encounters Vercel SSO protection
+    (function() {
+      try {
+        var h = window.location.hostname || '';
+        if (h.indexOf('-git-') !== -1 && h.indexOf('.vercel.app') !== -1) {
+          var cleanOrigin = 'https://bst-tech-club-2gvj.vercel.app';
+          window.location.replace(cleanOrigin + window.location.pathname + window.location.search + window.location.hash);
+        }
+      } catch(e) {}
+    })();
+  </script>
+
   <!-- Open Graph / WhatsApp Rich Link Preview -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://bst-club-portal.vercel.app/login.html">
+  <meta property="og:url" content="https://bst-tech-club-2gvj.vercel.app/login">
   <meta property="og:title" content="BST Tech Club | Student Member Portal">
   <meta property="og:description" content="Official technical society for Department of CSE (AI & ML), Cohort 2026. Register your Tech Club ID, RSVP for hackathons, and collaborate.">
   <meta property="og:image" content="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80&w=1200">
@@ -573,9 +587,9 @@
         <!-- Live Domain Verification Badge -->
         <div class="mt-3 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-mono">
           <span class="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-medium">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Live Link: https://bst-club-portal.vercel.app
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Live Link: https://bst-tech-club-2gvj.vercel.app
           </span>
-          <span class="text-[10px] text-slate-400 font-sans">Official HTTPS URL</span>
+          <span class="text-[10px] text-slate-400 font-sans">Official Public URL</span>
         </div>
       </div>
 
@@ -1216,16 +1230,25 @@
       if (window.lucide) window.lucide.createIcons();
     }
 
-    const VERCEL_PRODUCTION_URL = 'https://bst-club-portal.vercel.app';
+    const VERCEL_PRODUCTION_URL = 'https://bst-tech-club-2gvj.vercel.app';
 
     function getLiveReferralUrl(clubId) {
       try { localStorage.removeItem('bst_custom_host'); } catch (e) {}
-      const host = window.location.hostname;
+      const host = (window.location.hostname || '').toLowerCase();
       const isLocal = host === 'localhost' || host === '127.0.0.1' || window.location.protocol === 'file:';
 
-      // Always produce the authentic, clean HTTPS Vercel production URL
-      const baseOrigin = isLocal ? VERCEL_PRODUCTION_URL : window.location.origin;
-      return `${baseOrigin}/login.html?ref=${encodeURIComponent(clubId)}`;
+      // Crucial: Vercel protects preview branch deployments (e.g. *-git-*.vercel.app) with Vercel Authentication ("You Need Access").
+      // We guarantee that every referral link and QR code ALWAYS uses the 100% public canonical production domain.
+      let baseOrigin = VERCEL_PRODUCTION_URL;
+      if (!isLocal) {
+        if (host.includes('-git-') || (host.endsWith('.vercel.app') && host !== 'bst-tech-club-2gvj.vercel.app' && host !== 'bst-tech-club.vercel.app')) {
+          baseOrigin = 'https://bst-tech-club-2gvj.vercel.app';
+        } else {
+          baseOrigin = window.location.origin;
+        }
+      }
+
+      return `${baseOrigin}/login?ref=${encodeURIComponent(clubId)}`;
     }
 
     function renderSmoothQrCode(containerId, url, size = 112) {

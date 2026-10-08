@@ -6,9 +6,23 @@
   <title>BST Tech Club | Department of CSE (AI & ML)</title>
   <meta name="description" content="Official technical society portal for Department of Computer Science & Engineering (AI & ML). Focus domains: Competitive Programming, Robotics, Open Source, and Hackathons.">
 
+  <script>
+    // Automatic Canonicalization: If user lands on a Vercel preview branch deployment (-git-*.vercel.app),
+    // smoothly redirect to the 100% public production domain so no one encounters Vercel SSO protection
+    (function() {
+      try {
+        var h = window.location.hostname || '';
+        if (h.indexOf('-git-') !== -1 && h.indexOf('.vercel.app') !== -1) {
+          var cleanOrigin = 'https://bst-tech-club-2gvj.vercel.app';
+          window.location.replace(cleanOrigin + window.location.pathname + window.location.search + window.location.hash);
+        }
+      } catch(e) {}
+    })();
+  </script>
+
   <!-- Open Graph / WhatsApp Rich Link Preview -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://bst-club-portal.vercel.app">
+  <meta property="og:url" content="https://bst-tech-club-2gvj.vercel.app">
   <meta property="og:title" content="BST Tech Club | Department of CSE (AI & ML)">
   <meta property="og:description" content="Official technical society portal for Department of Computer Science & Engineering (AI & ML), Cohort 2026. Explore domains, workshops, hackathons, and projects.">
   <meta property="og:image" content="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80&w=1200">

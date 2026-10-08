@@ -1219,10 +1219,11 @@ function renderTicketQr(text) {
   const qrBox = document.getElementById('pass-qr-box');
   if (!qrBox) return;
 
-  const baseOrigin = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? 'https://bst-club-portal.vercel.app'
+  const host = (window.location.hostname || '').toLowerCase();
+  const baseOrigin = (host === 'localhost' || host === '127.0.0.1' || host.includes('-git-') || (host.endsWith('.vercel.app') && host !== 'bst-tech-club-2gvj.vercel.app' && host !== 'bst-tech-club.vercel.app'))
+    ? 'https://bst-tech-club-2gvj.vercel.app'
     : window.location.origin;
-  const verifyUrl = `${baseOrigin}/login.html?verify=${encodeURIComponent(text)}`;
+  const verifyUrl = `${baseOrigin}/login?verify=${encodeURIComponent(text)}`;
 
   qrBox.innerHTML = `
     <div class="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col items-center">
