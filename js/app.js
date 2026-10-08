@@ -1718,8 +1718,8 @@ function initLiquidCanvas() {
       theme: isDark ? 'dark' : 'light'
     });
 
-    // Subtle physical reactivity on developer canvas controls
-    const interactiveElements = document.querySelectorAll('.pillar-interactive-badge, .cta-liquid-hover');
+    // Subtle physical reactivity on developer canvas controls & floating terminal
+    const interactiveElements = document.querySelectorAll('.pillar-interactive-badge, .cta-liquid-hover, #shader-code-terminal');
     interactiveElements.forEach(el => {
       el.addEventListener('mouseenter', () => {
         if (window.liquidEffect) window.liquidEffect.setIntensity(0.78);
@@ -1741,5 +1741,50 @@ function initLiquidCanvas() {
 }
 
 window.initLiquidCanvas = initLiquidCanvas;
+
+/**
+ * Copy GLSL fluid kernel code from the floating glass terminal
+ */
+function copyShaderSnippet() {
+  const code = `// Domain-Warped FBM Fluid Kernel (Dept. of CSE)
+vec2 q = vec2(fbm(p + uTime * 0.05), fbm(p + vec2(5.2, 1.3)));
+vec2 r = vec2(fbm(p + 2.2 * q + uTime * 0.08), fbm(p + 2.2 * q));
+float f = fbm(p + 2.0 * r + uTime * 0.03); // Warped Heightfield
+vec3 norm = normalize(vec3((f - hR) * 3.8, (f - hU) * 3.8, 0.28));
+float spec = pow(max(dot(norm, halfDir), 0.0), 22.0);
+gl_FragColor = vec4(mix(uBgColor, col + spec, mask), 1.0);`;
+
+  function notifyCopied() {
+    if (window.showToast) {
+      showToast('GLSL fluid shader kernel copied to clipboard!', 'code');
+    }
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code).then(notifyCopied).catch(() => {
+      fallbackCopy(code);
+    });
+  } else {
+    fallbackCopy(code);
+  }
+
+  function fallbackCopy(text) {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      notifyCopied();
+    } catch (e) {
+      console.warn('Clipboard write failed:', e);
+    }
+  }
+}
+
+window.copyShaderSnippet = copyShaderSnippet;
 
 

@@ -460,4 +460,43 @@ html.dark ::-webkit-scrollbar-thumb {
   }
 }
 
+/* ============================================================
+   FLOATING GLASS CODE TERMINAL (GLSL Fluid Showcase)
+   ============================================================ */
+.glass-code-terminal {
+  box-shadow: 0 20px 45px -15px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.glass-code-terminal:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 25px 50px -12px rgba(37, 99, 235, 0.2), 0 0 0 1px rgba(59, 130, 246, 0.35);
+}
+
+.glass-code-terminal pre,
+.glass-code-terminal code,
+.glass-code-terminal .table {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+/* Subtle sleek scrollbar for code terminal on compact viewports */
+.glass-code-terminal::-webkit-scrollbar,
+.glass-code-terminal *::-webkit-scrollbar {
+  height: 4px;
+  width: 4px;
+}
+
+.glass-code-terminal::-webkit-scrollbar-track,
+.glass-code-terminal *::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.4);
+}
+
+.glass-code-terminal::-webkit-scrollbar-thumb,
+.glass-code-terminal *::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.3);
+  border-radius: 4px;
+}
+
 

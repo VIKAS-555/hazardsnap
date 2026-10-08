@@ -258,6 +258,10 @@
       this._animate = this._animate.bind(this);
       this._onThemeMutation = this._onThemeMutation.bind(this);
 
+      // Terminal Telemetry Sync
+      this._telemetryTick = 0;
+      this._telemetryEl = null;
+
       this.init();
     }
 
@@ -476,6 +480,14 @@
 
       // Render single GPU pass
       this.renderer.render(this.scene, this.camera);
+
+      // Real-time telemetry update for floating code terminal
+      if (!this._telemetryEl) {
+        this._telemetryEl = document.getElementById('telemetry-time');
+      }
+      if (this._telemetryEl && (++this._telemetryTick % 6 === 0)) {
+        this._telemetryEl.textContent = `t: ${this.uniforms.uTime.value.toFixed(1)}s`;
+      }
 
       this.animationFrameId = requestAnimationFrame(this._animate);
     }
