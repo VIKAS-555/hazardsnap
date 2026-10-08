@@ -243,6 +243,7 @@
     uniform vec2 uMouseVelocityVec;   // Directional velocity vector
     uniform float uMouseVelocity;     // Smoothed velocity magnitude
     uniform float uMouseActive;       // 1.0 when pointer is active over surface, 0.0 when idle
+    uniform float uKineticEnergy;     // Movement-generated kinetic electricity [0..1]
     uniform float uIntensity;         // Base fluid energy [0..1]
     uniform float uReducedMotion;     // prefers-reduced-motion flag
 
@@ -420,15 +421,15 @@
       }
 
       // ============================================================
-      // TORCH REVEAL SYSTEM: Code is 100% invisible until torch illuminates it
+      // TORCH REVEAL SYSTEM: Movement generates electricity to produce light
       // ============================================================
       
       // Pointer torch position with fluid distortion
       vec2 lightDelta = (pAspect - uLightPos * vec2(uAspect, 1.0)) - disp * 1.4;
       float lightDist = length(lightDelta);
 
-      // Focused compact torch radius (calibrated smaller range)
-      float lightRadius = 0.24 + uMouseVelocity * 0.10;
+      // Focused compact torch radius (dynamically breathes with kinetic electricity)
+      float lightRadius = (0.23 + uMouseVelocity * 0.08) * (0.85 + 0.15 * uKineticEnergy);
       float normDist = lightDist / lightRadius;
 
       // Primary torch reveal: Smooth Hermite curve that hits EXACTLY 0.0 at the perimeter
@@ -454,10 +455,15 @@
         trailReveal = smoothTrailFalloff * clamp(uMouseVelocity * 0.55, 0.0, 0.85);
       }
 
-      // Active torch illumination: strictly 0.0 outside radius or when cursor is inactive
-      float activeLight = max(lightReveal, trailReveal) * uMouseActive;
+      // Movement generates electricity: light is directly powered by kinetic charge
+      // When cursor stays still, uKineticEnergy decays to 0.0 and light disappears
+      float activeLight = max(lightReveal, trailReveal) * uMouseActive * uKineticEnergy;
 
-      // TOTAL REVEAL: Strictly 0.0 everywhere unless illuminated under the moving torch!
+      // Subtle electric kinetic shimmer when actively moving
+      float electricPulse = 1.0 + 0.06 * sin(uTime * 28.0 + pAspect.x * 24.0) * min(uMouseVelocity * 0.6, 1.0);
+      activeLight *= electricPulse;
+
+      // TOTAL REVEAL: Strictly 0.0 when still / unpowered!
       float totalReveal = activeLight;
 
       // ============================================================
@@ -529,6 +535,10 @@
       this.mouseActive = 0.0;
       this.targetMouseActive = 0.0;
 
+      // Kinetic electricity dynamo: movement generates electricity to produce light
+      this.kineticEnergy = 0.0;
+      this.lastMoveTime = 0;
+
       // Fluid intensity
       this.currentIntensity = this.options.intensity;
       this.targetIntensity = this.options.intensity;
@@ -588,6 +598,7 @@
         uMouseVelocityVec: { value: new THREE.Vector2(0.0, 0.0) },
         uMouseVelocity: { value: 0.0 },
         uMouseActive: { value: 0.0 },
+        uKineticEnergy: { value: 0.0 },
         uIntensity: { value: this.currentIntensity },
         uReducedMotion: { value: prefersReduced ? 1.0 : 0.0 },
         uRipples: { value: this.rippleUniforms },
@@ -704,6 +715,10 @@
       this.targetVelocity = Math.min(speed, 3.5);
 
       this.targetMouseActive = 1.0;
+      this.lastMoveTime = now;
+
+      // Kinetic Generator: Movement generates electricity to power light
+      this.kineticEnergy = Math.min(1.0, this.kineticEnergy + Math.max(0.25, dist * 14.0));
 
       this.prevMouse.x = nx;
       this.prevMouse.y = ny;
@@ -716,9 +731,11 @@
       const nx = Math.max(0.0, Math.min(1.0, (e.clientX - rect.left) / rect.width));
       const ny = Math.max(0.0, Math.min(1.0, 1.0 - (e.clientY - rect.top) / rect.height));
 
-      // Trigger Droplet Impact Ripple Wave
+      // Trigger Droplet Impact Ripple Wave & Full Kinetic Charge
       this.addRipple(nx, ny, 1.0);
       this.targetMouseActive = 1.0;
+      this.lastMoveTime = performance.now();
+      this.kineticEnergy = 1.0;
     }
 
     _onTouchStart(e) {
@@ -828,6 +845,29 @@
       // Active state smoothing (smooth light fade in/out)
       this.mouseActive += (this.targetMouseActive - this.mouseActive) * 0.08;
 
+      // ============================================================
+      // KINETIC DYNAMO / ELECTRICITY DISCHARGE
+      // Movement generates electricity to produce light.
+      // When cursor stays still, electricity discharges and light smoothly fades away to darkness.
+      // ============================================================
+      const now = performance.now();
+      const stillDuration = (now - this.lastMoveTime) / 1000;
+
+      if (this.targetMouseActive > 0.0) {
+        if (stillDuration < 0.22) {
+          // Actively moving: maintain/generate full electrical charge
+          this.kineticEnergy += (1.0 - this.kineticEnergy) * 0.22;
+        } else {
+          // Cursor is staying still: electricity discharges and light smoothly disappears
+          // Natural smooth decay over ~0.8s
+          const dischargeRate = 1.25;
+          this.kineticEnergy = Math.max(0.0, this.kineticEnergy - delta * dischargeRate);
+        }
+      } else {
+        // Pointer left the card: rapid discharge to complete darkness
+        this.kineticEnergy = Math.max(0.0, this.kineticEnergy - delta * 2.5);
+      }
+
       // Intensity smoothing
       this.currentIntensity += (this.targetIntensity - this.currentIntensity) * 0.06;
 
@@ -851,6 +891,7 @@
       this.uniforms.uMouseVelocityVec.value.set(this.currentVelocityVec.x, this.currentVelocityVec.y);
       this.uniforms.uMouseVelocity.value = this.currentVelocity;
       this.uniforms.uMouseActive.value = this.mouseActive;
+      this.uniforms.uKineticEnergy.value = this.kineticEnergy;
       this.uniforms.uIntensity.value = this.currentIntensity;
 
       // Render GPU Pass
