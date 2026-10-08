@@ -1712,11 +1712,9 @@ function initLiquidCanvas() {
 
   // Check if LiquidEffect class is loaded
   if (typeof window.LiquidEffect !== 'undefined') {
-    const isDark = document.documentElement.classList.contains('dark');
     window.liquidEffect = new window.LiquidEffect(container, {
-      intensity: 0.48,
-      interactive: true,
-      theme: isDark ? 'dark' : 'light'
+      intensity: 0.55,
+      interactive: true
     });
 
     // Subtle physical reactivity on developer canvas controls
@@ -1726,10 +1724,16 @@ function initLiquidCanvas() {
         if (window.liquidEffect) window.liquidEffect.setIntensity(0.78);
       });
       el.addEventListener('mouseleave', () => {
-        if (window.liquidEffect) window.liquidEffect.setIntensity(0.48);
+        if (window.liquidEffect) window.liquidEffect.setIntensity(0.55);
       });
-      el.addEventListener('mousedown', () => {
-        if (window.liquidEffect) window.liquidEffect.setIntensity(0.95);
+      el.addEventListener('mousedown', (e) => {
+        if (window.liquidEffect) {
+          window.liquidEffect.setIntensity(0.95);
+          const rect = container.getBoundingClientRect();
+          const u = (e.clientX - rect.left) / rect.width;
+          const v = 1.0 - (e.clientY - rect.top) / rect.height;
+          window.liquidEffect.addRipple(u, v, 1.2);
+        }
       });
       el.addEventListener('mouseup', () => {
         if (window.liquidEffect) window.liquidEffect.setIntensity(0.65);
