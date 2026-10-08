@@ -727,6 +727,17 @@
 
     _onPointerDown(e) {
       if (!this.container) return;
+
+      // Prevent accidental browser text selection during ripple clicks
+      if (e.target && !e.target.closest('a, button, input, textarea')) {
+        if (e.preventDefault && e.cancelable) {
+          e.preventDefault();
+        }
+      }
+      if (window.getSelection) {
+        window.getSelection().removeAllRanges();
+      }
+
       const rect = this.container.getBoundingClientRect();
       const nx = Math.max(0.0, Math.min(1.0, (e.clientX - rect.left) / rect.width));
       const ny = Math.max(0.0, Math.min(1.0, 1.0 - (e.clientY - rect.top) / rect.height));
