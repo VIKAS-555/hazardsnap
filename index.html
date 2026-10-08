@@ -39,7 +39,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="css/styles.css?v=3.2">
+  <link rel="stylesheet" href="css/styles.css?v=3.3">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polygon points='12 2 2 7 12 12 22 7 12 2'/><polyline points='2 17 12 22 22 17'/><polyline points='2 12 12 17 22 12'/></svg>">
 </head>
 <body class="academic-grid-pattern min-h-screen text-slate-800 dark:text-slate-100 antialiased selection:bg-blue-500 selection:text-white">
@@ -330,14 +330,12 @@
 
       <div class="max-w-2xl mx-auto relative z-10">
         
-        <!-- Live Status Pill with Edge Telemetry -->
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-blue-200 dark:border-blue-900/60 bg-blue-50/80 dark:bg-blue-950/50 backdrop-blur-sm text-[11px] font-mono font-medium text-blue-700 dark:text-blue-300 mb-6 shadow-sm">
+        <!-- Live Status Pill -->
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-900/60 bg-blue-50/80 dark:bg-blue-950/50 backdrop-blur-sm text-[11px] font-mono font-medium text-blue-700 dark:text-blue-300 mb-6 shadow-sm">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span>CSE (AI & ML)</span>
+          <span>CSE (AI & ML) COHORT • 2026</span>
           <span class="text-blue-300 dark:text-blue-700">•</span>
-          <span class="text-slate-600 dark:text-slate-300 flex items-center gap-1"><i data-lucide="zap" class="w-3 h-3 text-amber-500"></i> EDGE BOM1</span>
-          <span class="text-blue-300 dark:text-blue-700">•</span>
-          <span class="text-emerald-600 dark:text-emerald-400 font-bold">14ms LATENCY</span>
+          <span class="text-slate-500 dark:text-slate-400">DEV PROTOCOL</span>
         </div>
 
         <!-- 3-Pillar Micro Badges -->
@@ -355,103 +353,9 @@
           </span>
         </div>
 
-        <!-- Floating Glass Code Terminal (CSE / WebGL Liquid Kernel & Multi-Track IDE) -->
-        <div id="shader-code-terminal" class="glass-code-terminal relative text-left rounded-2xl border border-slate-700/60 dark:border-slate-800/80 bg-slate-950/85 backdrop-blur-xl shadow-2xl p-4 sm:p-5 mb-6 max-w-xl mx-auto overflow-hidden transition-all duration-300 group hover:border-blue-500/50 hover:shadow-blue-500/10 hover:shadow-2xl">
-          <!-- Terminal Header Bar (Multi-Track Tabs) -->
-          <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800/80 text-xs">
-            <!-- macOS Window Controls & Track File Tabs -->
-            <div class="flex items-center gap-2 min-w-0">
-              <div class="flex items-center gap-1.5 flex-shrink-0">
-                <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block"></span>
-                <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
-                <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
-              </div>
-              <div class="flex items-center gap-1 ml-1 sm:ml-2 overflow-x-auto no-scrollbar py-0.5">
-                <button type="button" onclick="switchTerminalTrack('glsl')" id="tab-btn-glsl" class="track-tab-btn active px-2.5 py-1 rounded-md text-[11px] font-mono transition flex items-center gap-1.5 bg-blue-500/20 text-blue-300 border border-blue-500/30 whitespace-nowrap cursor-pointer">
-                  <i data-lucide="sparkles" class="w-3 h-3 text-blue-400"></i>
-                  <span>fluid_kernel.frag</span>
-                </button>
-                <button type="button" onclick="switchTerminalTrack('ai')" id="tab-btn-ai" class="track-tab-btn px-2.5 py-1 rounded-md text-[11px] font-mono transition flex items-center gap-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent whitespace-nowrap cursor-pointer">
-                  <i data-lucide="brain" class="w-3 h-3 text-indigo-400"></i>
-                  <span>attention.py</span>
-                </button>
-                <button type="button" onclick="switchTerminalTrack('algo')" id="tab-btn-algo" class="track-tab-btn px-2.5 py-1 rounded-md text-[11px] font-mono transition flex items-center gap-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent whitespace-nowrap cursor-pointer">
-                  <i data-lucide="binary" class="w-3 h-3 text-emerald-400"></i>
-                  <span>tree.cpp</span>
-                </button>
-                <button type="button" onclick="switchTerminalTrack('sys')" id="tab-btn-sys" class="track-tab-btn px-2.5 py-1 rounded-md text-[11px] font-mono transition items-center gap-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent whitespace-nowrap cursor-pointer hidden sm:flex">
-                  <i data-lucide="server" class="w-3 h-3 text-cyan-400"></i>
-                  <span>raft.go</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Telemetry Badges & Copy Action -->
-            <div class="flex items-center gap-2 flex-shrink-0 ml-2">
-              <span id="telemetry-badge" class="hidden sm:inline-flex items-center gap-1 text-[10px] font-mono text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/30">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span id="telemetry-badge-text">GPU 60 FPS</span>
-              </span>
-              <span id="telemetry-time" class="inline-flex items-center text-[10px] font-mono text-blue-400 bg-blue-950/40 px-2 py-0.5 rounded border border-blue-500/30">
-                t: 0.0s
-              </span>
-              <button type="button" onclick="copyShaderSnippet()" title="Copy active code snippet" class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[10px] font-mono transition border border-slate-700/80 cursor-pointer">
-                <i data-lucide="copy" class="w-3 h-3"></i>
-                <span class="hidden sm:inline">Copy</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Code Content with Syntax Highlighting & Line Numbers -->
-          <div id="terminal-code-body" class="font-mono text-[11px] sm:text-[12px] leading-relaxed text-slate-300 overflow-x-auto pb-1 select-text transition-opacity duration-150">
-            <div class="table w-full">
-              <div class="table-row">
-                <span class="table-cell pr-3 text-right text-slate-600 select-none">1</span>
-                <span class="table-cell"><span class="text-slate-500">// Domain-Warped FBM Fluid Kernel (Dept. of CSE)</span></span>
-              </div>
-              <div class="table-row">
-                <span class="table-cell pr-3 text-right text-slate-600 select-none">2</span>
-                <span class="table-cell"><span class="text-purple-400">vec2</span> <span class="text-blue-300">q</span> = <span class="text-purple-400">vec2</span>(fbm(p + uTime * <span class="text-emerald-300">0.05</span>), fbm(p + <span class="text-purple-400">vec2</span>(<span class="text-emerald-300">5.2</span>, <span class="text-emerald-300">1.3</span>)));</span>
-              </div>
-              <div class="table-row">
-                <span class="table-cell pr-3 text-right text-slate-600 select-none">3</span>
-                <span class="table-cell"><span class="text-purple-400">vec2</span> <span class="text-blue-300">r</span> = <span class="text-purple-400">vec2</span>(fbm(p + <span class="text-emerald-300">2.2</span> * q + uTime * <span class="text-emerald-300">0.08</span>), fbm(p + <span class="text-emerald-300">2.2</span> * q));</span>
-              </div>
-              <div class="table-row">
-                <span class="table-cell pr-3 text-right text-slate-600 select-none">4</span>
-                <span class="table-cell"><span class="text-amber-300">float</span> <span class="text-blue-300">f</span> = fbm(p + <span class="text-emerald-300">2.0</span> * r + uTime * <span class="text-emerald-300">0.03</span>); <span class="text-slate-500">// Warped Heightfield</span></span>
-              </div>
-              <div class="table-row">
-                <span class="table-cell pr-3 text-right text-slate-600 select-none">5</span>
-                <span class="table-cell"><span class="text-purple-400">vec3</span> <span class="text-blue-300">norm</span> = normalize(<span class="text-purple-400">vec3</span>((f - hR) * <span class="text-emerald-300">3.8</span>, (f - hU) * <span class="text-emerald-300">3.8</span>, <span class="text-emerald-300">0.28</span>));</span>
-              </div>
-              <div class="table-row">
-                <span class="table-cell pr-3 text-right text-slate-600 select-none">6</span>
-                <span class="table-cell"><span class="text-amber-300">float</span> <span class="text-blue-300">spec</span> = pow(max(dot(norm, halfDir), <span class="text-emerald-300">0.0</span>), <span class="text-emerald-300">22.0</span>);</span>
-              </div>
-              <div class="table-row">
-                <span class="table-cell pr-3 text-right text-slate-600 select-none">7</span>
-                <span class="table-cell"><span class="text-cyan-400">gl_FragColor</span> = <span class="text-purple-400">vec4</span>(mix(uBgColor, col + spec, mask), <span class="text-emerald-300">1.0</span>);<span class="inline-block w-1.5 h-3.5 bg-blue-400 ml-1 translate-y-0.5 animate-pulse"></span></span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Bottom Footer Bar: Binary Stream & Track Info -->
-          <div class="mt-3 pt-2.5 border-t border-slate-800/60 flex items-center justify-between text-[10px] font-mono text-slate-500">
-            <span id="terminal-watermark-left" class="flex items-center gap-1.5 tracking-wider truncate">
-              <span class="text-emerald-500/80 font-bold">01000011 01010011 01000101</span>
-              <span class="text-slate-600">[ASCII: "CSE"]</span>
-              <span class="text-blue-400/80 hidden sm:inline">• WebGL 2.0 Core</span>
-            </span>
-            <span id="terminal-watermark-right" class="text-blue-400/90 font-mono text-[10px] uppercase tracking-wider">
-              TRACK: GRAPHICS &amp; SHADERS
-            </span>
-          </div>
-        </div>
-
-        <!-- Engineering Subtext -->
-        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-mono mb-8 max-w-lg mx-auto">
-          Work with fellow student engineers on real-world systems, AI architectures & open-source projects.
+        <!-- Description -->
+        <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed mb-10 max-w-xl mx-auto">
+          Work with fellow students on real-world projects, explore new technologies, participate in technical events, and turn your ideas into something people can actually use.
         </p>
 
         <!-- Magnetic Glowing CTA Buttons -->
@@ -942,11 +846,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="js/liquid-effect.js?v=1.1"></script>
+  <script src="js/liquid-effect.js?v=1.2"></script>
   <script src="js/supabase-config.js"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/config.js"></script>
   <script src="js/auth.js"></script>
-  <script src="js/app.js?v=3.3"></script>
+  <script src="js/app.js?v=3.4"></script>
 </body>
 </html>
