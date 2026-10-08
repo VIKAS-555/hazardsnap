@@ -419,32 +419,45 @@
       }
 
       // ============================================================
-      // LIGHT REVEAL SYSTEM (Sections 6, 7, 8, 9, 29)
+      // TORCH REVEAL SYSTEM: Code is 100% invisible until torch illuminates it
       // ============================================================
-      // 1. Base Submerged Visibility (at rest, ~18-28% faintly visible)
-      float baseNoise = fbm(pAspect * 1.6 + uTime * 0.012);
-      float baseSubmerged = 0.18 + 0.10 * baseNoise;
-
-      // 2. Soft Moving Light Field driven by pointer with fluid distortion
-      vec2 lightDelta = (pAspect - uLightPos * vec2(uAspect, 1.0)) - disp * 1.5;
+      
+      // Pointer torch position with fluid distortion
+      vec2 lightDelta = (pAspect - uLightPos * vec2(uAspect, 1.0)) - disp * 1.4;
       float lightDist = length(lightDelta);
 
-      // Light radius expands with cursor velocity
-      float lightRadius = 0.38 + uMouseVelocity * 0.16;
+      // Dynamic torch radius expanding gently with cursor speed
+      float lightRadius = 0.35 + uMouseVelocity * 0.15;
+      float normDist = lightDist / lightRadius;
 
-      // Soft feathered Gaussian light reveal (no hard circle, no spotlight edge)
-      float lightReveal = exp(-lightDist * lightDist / (lightRadius * lightRadius * 0.44));
-      lightReveal = smoothstep(0.015, 0.95, lightReveal);
+      // Primary torch reveal: Smooth Hermite curve that hits EXACTLY 0.0 at the perimeter
+      float lightReveal = 0.0;
+      if (normDist < 1.0) {
+        float f = 1.0 - normDist;
+        // Smooth cubic falloff (zero derivative at boundary = perfectly seamless edge)
+        float smoothFalloff = f * f * (3.0 - 2.0 * f);
+        // Bright radiant center core
+        lightReveal = pow(smoothFalloff, 1.15);
+      }
 
-      // Trailing light wake behind moving hand
+      // Secondary trailing wake: momentum light behind moving pointer
       vec2 trailLightDelta = (pAspect - uTrailLightPos * vec2(uAspect, 1.0)) - disp * 1.2;
       float trailLightDist = length(trailLightDelta);
-      float trailReveal = exp(-trailLightDist * trailLightDist / (lightRadius * lightRadius * 0.54)) * (uMouseVelocity * 0.45);
+      float trailRadius = lightRadius * 1.05;
+      float normTrailDist = trailLightDist / trailRadius;
 
+      float trailReveal = 0.0;
+      if (normTrailDist < 1.0) {
+        float fTrail = 1.0 - normTrailDist;
+        float smoothTrailFalloff = fTrail * fTrail * (3.0 - 2.0 * fTrail);
+        trailReveal = smoothTrailFalloff * clamp(uMouseVelocity * 0.55, 0.0, 0.85);
+      }
+
+      // Active torch illumination: strictly 0.0 outside radius or when cursor is inactive
       float activeLight = max(lightReveal, trailReveal) * uMouseActive;
 
-      // Effective reveal amount [0.18 .. 1.0]
-      float totalReveal = mix(baseSubmerged, 1.0, activeLight);
+      // TOTAL REVEAL: Strictly 0.0 everywhere unless illuminated under the moving torch!
+      float totalReveal = activeLight;
 
       // ============================================================
       // COLOR & SHADING COMPOSITING
@@ -453,33 +466,30 @@
       vec3 bg = uBgColor;
       bg += vec3(0.010, 0.024, 0.055) * (1.0 - uv.y);
 
-      // Submerged color (very dim green to dim green) vs. Illuminated color (primary green to highlight mint)
-      vec3 submergedColor = mix(uColorVeryDim, uColorDim, codeSample.a);
-      vec3 illuminatedColor = mix(uColorSecondary, uColorHighlight, codeSample.a * 0.65 + activeLight * 0.35);
-      illuminatedColor = mix(illuminatedColor, uColorPrimary, 0.5);
+      // When illuminated, high contrast vibrant developer green & highlight mint
+      vec3 codeColor = mix(uColorSecondary, uColorHighlight, codeSample.a * 0.6 + activeLight * 0.4);
+      codeColor = mix(codeColor, uColorPrimary, 0.4);
 
-      vec3 codeColor = mix(submergedColor, illuminatedColor, totalReveal);
+      // Specular sheen and wave crest highlights (strictly confined to illuminated zone)
+      codeColor += uColorHighlight * (waveCrestGlow * 0.45 * activeLight);
+      codeColor += uColorHighlight * (spec * 0.35 * activeLight);
 
-      // Wave crest mint highlights
-      codeColor += uColorHighlight * (waveCrestGlow * 0.48);
-      codeColor += uColorHighlight * (spec * 0.30);
+      // Droplet impact flash at cursor
+      codeColor += uColorHighlight * (dropletImpactGlow * 0.80 * activeLight);
 
-      // Droplet impact splash flash
-      codeColor += uColorHighlight * (dropletImpactGlow * 0.85);
+      // Cyan glint under torch
+      codeColor += uColorCyan * (activeLight * 0.30);
 
-      // Subtle cyan glint in moving wake
-      codeColor += uColorCyan * (spec * 0.16 + activeLight * 0.22);
+      // Ambient soft bloom around the torch
+      vec3 ambientLightBloom = mix(uColorPrimary, uColorCyan, 0.30) * activeLight * (0.09 + uMouseVelocity * 0.08);
 
-      // Ambient light bloom
-      vec3 ambientLightBloom = mix(uColorPrimary, uColorCyan, 0.25) * activeLight * (0.07 + uMouseVelocity * 0.08);
-
-      // 100% FULL-BOX CONTINUOUS CODE DENSITY: Zero center damping, zero corner cutoffs
+      // FINAL CODE ALPHA: Exactly 0.0 outside torch, up to 1.0 under torch
       float finalAlpha = codeSample.a * totalReveal;
 
-      // Final compositing (extends 100% edge-to-edge, clipped by box rounded border)
-      vec3 finalColor = mix(bg, codeColor, finalAlpha * 0.96);
+      // Final compositing: when totalReveal is 0.0, finalColor is 100% pure bg!
+      vec3 finalColor = mix(bg, codeColor, finalAlpha);
       finalColor += ambientLightBloom;
-      finalColor += uColorHighlight * (dropletImpactGlow * 0.22);
+      finalColor += uColorHighlight * (dropletImpactGlow * 0.22 * activeLight);
 
       gl_FragColor = vec4(finalColor, 1.0);
     }
@@ -643,6 +653,8 @@
         target.addEventListener('pointerleave', this._onPointerLeave, { passive: true });
         target.addEventListener('touchstart', this._onTouchStart, { passive: true });
         target.addEventListener('touchmove', this._onTouchMove, { passive: true });
+        target.addEventListener('touchend', this._onPointerLeave, { passive: true });
+        target.addEventListener('touchcancel', this._onPointerLeave, { passive: true });
       }
 
       // Start Animation Loop
@@ -867,6 +879,8 @@
         this.interactionTarget.removeEventListener('pointerleave', this._onPointerLeave);
         this.interactionTarget.removeEventListener('touchstart', this._onTouchStart);
         this.interactionTarget.removeEventListener('touchmove', this._onTouchMove);
+        this.interactionTarget.removeEventListener('touchend', this._onPointerLeave);
+        this.interactionTarget.removeEventListener('touchcancel', this._onPointerLeave);
       }
 
       if (this.codeTexture) this.codeTexture.dispose();
