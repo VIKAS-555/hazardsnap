@@ -142,7 +142,7 @@ export default function SafeRoutePlanner({
         <button
           onClick={handleComputeRoute}
           disabled={isCalculating}
-          className="flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-950/40"
+          className="flex-1 py-2.5 px-3 rounded-xl bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-md"
         >
           {isCalculating ? (
             <span>Analyzing Danger Zones...</span>

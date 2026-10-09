@@ -542,17 +542,17 @@ export default function ReportHazardModal({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-bold text-sm shadow-xl shadow-red-950/60 flex items-center justify-center gap-2 transition-all active:scale-[0.99] disabled:opacity-50"
+              className="w-full py-3.5 px-4 rounded-2xl bg-white hover:bg-zinc-200 text-zinc-950 font-bold text-sm shadow-xl flex items-center justify-center gap-2 transition-all active:scale-[0.99] disabled:opacity-50"
             >
               {isSubmitting ? (
                 <>
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Broadcasting Hazard...</span>
+                  <RefreshCw className="w-4 h-4 animate-spin text-zinc-950" />
+                  <span>Submitting Hazard Alert...</span>
                 </>
               ) : (
                 <>
-                  <AlertTriangle className="w-4 h-4" />
-                  <span>Log Hazard Now (Instant Alert)</span>
+                  <AlertTriangle className="w-4 h-4 text-zinc-950" />
+                  <span>Log Hazard Now (Instant Broadcast)</span>
                 </>
               )}
             </button>
