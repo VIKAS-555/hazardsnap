@@ -1,17 +1,13 @@
 'use client';
 
 import React from 'react';
-import InteractiveCanvas from './InteractiveCanvas';
+import AntigravityCanvas from './AntigravityCanvas';
 import {
-  ArrowRight,
+  ChevronDown,
   Camera,
   ShieldCheck,
-  CheckCircle2,
-  Clock,
-  Compass,
-  ChevronDown,
   User,
-  LogIn,
+  ArrowRight,
   AlertTriangle,
 } from 'lucide-react';
 
@@ -21,11 +17,9 @@ interface LandingHeroProps {
   onOpenMunicipal: () => void;
   onOpenLogin: () => void;
   onOpenSignup: () => void;
+  onScrollToEmergencyLog: () => void;
   currentUser: { name: string; role: 'citizen' | 'official' } | null;
   onLogout: () => void;
-  totalHazards: number;
-  criticalCount: number;
-  fixedCount: number;
 }
 
 export default function LandingHero({
@@ -34,185 +28,179 @@ export default function LandingHero({
   onOpenMunicipal,
   onOpenLogin,
   onOpenSignup,
+  onScrollToEmergencyLog,
   currentUser,
   onLogout,
-  totalHazards,
-  criticalCount,
-  fixedCount,
 }: LandingHeroProps) {
   return (
-    <div className="relative min-h-[92vh] flex flex-col justify-between overflow-hidden bg-[#07090e] border-b border-white/[0.08]">
-      {/* 1. INTERACTIVE MOUSE & TOUCH CANVAS BACKGROUND */}
-      <InteractiveCanvas />
+    <div className="relative min-h-[92vh] flex flex-col justify-between overflow-hidden bg-[#ffffff] text-[#111827]">
+      {/* 1. INTERACTIVE VORTEX PARTICLE CANVAS (MATCHING IMAGE 2) */}
+      <AntigravityCanvas />
 
-      {/* Subtle radial ambient gradient (non-distracting, dark obsidian) */}
-      <div className="absolute inset-0 bg-radial-gradient from-transparent via-[#07090e]/70 to-[#07090e] pointer-events-none z-0" />
-
-      {/* 2. TOP HERO NAVIGATION BAR */}
-      <header className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center justify-between gap-4">
-        {/* Brand */}
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-white text-zinc-950 flex items-center justify-center font-black shadow-md">
-            <AlertTriangle className="w-4 h-4 text-zinc-950" />
+      {/* 2. TOP NAVIGATION BAR (MATCHING GOOGLE ANTIGRAVITY COMPOSITION) */}
+      <header className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-12 py-5 flex items-center justify-between gap-6">
+        {/* Brand Logo Left */}
+        <div className="flex items-center gap-2 cursor-pointer" onClick={onEnterGrid}>
+          {/* Multi-color Google-style geometric accent */}
+          <div className="w-6 h-6 flex items-center justify-center">
+            <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
+              <path d="M12 2L3 21h18L12 2z" stroke="currentColor" strokeWidth="2.2" strokeLinejoin="round" />
+              <path d="M12 7l-5 11h10l-5-11z" fill="url(#brandGrad)" />
+              <defs>
+                <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#4338ca" />
+                  <stop offset="50%" stopColor="#8b5cf6" />
+                  <stop offset="100%" stopColor="#3b82f6" />
+                </linearGradient>
+              </defs>
+            </svg>
           </div>
-          <div>
-            <span className="font-bold text-base tracking-tight text-white">HazardSnap</span>
-            <span className="text-[10px] text-zinc-400 block font-mono">Civic Intelligence Grid</span>
-          </div>
+          <span className="font-bold text-lg tracking-tight text-slate-900">
+            HazardSnap
+          </span>
         </div>
 
-        {/* Navigation Anchor Links */}
-        <nav className="hidden md:flex items-center gap-6 text-xs text-zinc-400 font-medium">
+        {/* Center Navigation Links with Dropdown Carats (As in Image 2) */}
+        <nav className="hidden lg:flex items-center gap-8 text-[13px] font-medium text-slate-700">
           <button
             onClick={onEnterGrid}
-            className="hover:text-white transition"
+            className="flex items-center gap-1 hover:text-black transition"
           >
-            Safety Grid
+            <span>Safety Grid</span>
+            <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
           </button>
+
+          <button
+            onClick={onScrollToEmergencyLog}
+            className="flex items-center gap-1 hover:text-black transition font-semibold text-slate-900"
+          >
+            <span>Emergency Logs</span>
+            <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+          </button>
+
           <a
             href="#how-it-works"
-            className="hover:text-white transition"
+            className="hover:text-black transition"
           >
             How It Works
           </a>
+
           <button
             onClick={onOpenMunicipal}
-            className="hover:text-white transition"
+            className="hover:text-black transition"
           >
             Municipal Triage
           </button>
+
+          <a
+            href="#emergency-log"
+            className="flex items-center gap-1 hover:text-black transition"
+          >
+            <span>Helplines</span>
+            <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+          </a>
         </nav>
 
-        {/* Auth Buttons */}
-        <div className="flex items-center gap-2.5">
+        {/* Right Auth Controls: Log In, Sign In, Sign Up */}
+        <div className="flex items-center gap-3">
+          <span className="text-sm">🚨</span>
+
           {currentUser ? (
             <div className="flex items-center gap-2">
-              <div className="px-3 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-xs text-white flex items-center gap-1.5 font-medium">
-                <User className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="text-xs font-semibold text-slate-800 bg-slate-100 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5 text-emerald-600" />
                 <span>{currentUser.name}</span>
-                <span className="text-[10px] text-zinc-400 capitalize">({currentUser.role})</span>
-              </div>
+              </span>
               <button
                 onClick={onLogout}
-                className="text-xs text-zinc-400 hover:text-white transition"
+                className="text-xs text-slate-500 hover:text-slate-900 transition"
               >
-                Sign out
+                Sign Out
               </button>
             </div>
           ) : (
             <>
+              {/* Sign In & Log In links */}
               <button
                 onClick={onOpenLogin}
-                className="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-zinc-300 hover:text-white transition hover:bg-white/[0.05]"
+                className="text-xs sm:text-[13px] font-medium text-slate-700 hover:text-black transition px-2 py-1"
+              >
+                Sign In
+              </button>
+
+              <button
+                onClick={onOpenLogin}
+                className="text-xs sm:text-[13px] font-medium text-slate-700 hover:text-black transition px-2 py-1 hidden sm:inline"
               >
                 Log In
               </button>
+
+              {/* Black Rounded Pill Button (Exact match for Download button in Image 2) */}
               <button
                 onClick={onOpenSignup}
-                className="px-4 py-1.5 rounded-xl bg-white hover:bg-zinc-200 text-zinc-950 font-semibold text-xs transition shadow-sm"
+                className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-[#111827] hover:bg-black text-white text-xs sm:text-[13px] font-medium transition shadow-sm active:scale-95 flex items-center gap-1.5"
               >
-                Sign Up
+                <span>Sign Up</span>
+                <span className="text-xs">→</span>
               </button>
             </>
           )}
         </div>
       </header>
 
-      {/* 3. HERO BODY CONTENT */}
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 text-center flex flex-col items-center space-y-7 my-auto">
-        {/* Eyebrow Status Badge */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] backdrop-blur-md text-[11px] text-zinc-300 font-medium shadow-sm">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>Real-time Civic Grid Active</span>
-          <span className="text-zinc-600">|</span>
-          <span className="text-zinc-400">14 Municipal Wards Online</span>
+      {/* 3. HERO CENTER CONTENT (MATCHING GOOGLE ANTIGRAVITY HERO TYPOGRAPHY & LAYOUT) */}
+      <div className="relative z-10 w-full max-w-4xl mx-auto px-6 py-12 sm:py-20 text-center flex flex-col items-center space-y-6 my-auto">
+        {/* Top Centered Brand Badge (Matching the Google Antigravity logo in Image 2) */}
+        <div className="flex items-center gap-2 text-slate-800 mb-1">
+          <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
+            <path d="M12 3L4 20h16L12 3z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+            <path d="M12 7l-5 11h10l-5-11z" fill="url(#heroGrad)" />
+            <defs>
+              <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#4338ca" />
+                <stop offset="50%" stopColor="#8b5cf6" />
+                <stop offset="100%" stopColor="#3b82f6" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <span className="font-bold text-base tracking-tight text-slate-900">
+            HazardSnap Civic Grid
+          </span>
         </div>
 
-        {/* Main Title */}
-        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.08] max-w-4xl">
-          Urban hazards resolved{' '}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-100 via-zinc-300 to-zinc-400">
-            before accidents occur.
-          </span>
+        {/* Huge Modern Headline (Exact Font Style from Image 2: "Experience liftoff with the next-gen agent platform") */}
+        <h1 className="text-4xl sm:text-6xl lg:text-[68px] font-semibold text-slate-950 tracking-[-0.035em] leading-[1.12] max-w-3xl">
+          Experience rapid response with the next-gen civic safety grid
         </h1>
 
         {/* Subtitle */}
-        <p className="text-sm sm:text-base lg:text-lg text-zinc-400 max-w-2xl leading-relaxed font-normal">
-          A hyper-local civic infrastructure network. Capture open manholes, live wires, and waterlogging in 5 seconds to power live public safety navigation and verified municipal dispatch.
+        <p className="text-sm sm:text-base text-slate-600 max-w-xl font-normal leading-relaxed">
+          A hyper-local civic infrastructure network. Log open manholes, live wires, and waterlogging in 5 seconds to feed real-time public safety navigation and verified municipal dispatch.
         </p>
 
-        {/* Primary Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center gap-3 pt-3 w-full sm:w-auto">
-          {/* Main: Enter Grid */}
+        {/* Centered Black Pill Button (Exact Match for Image 2 "Download" Button) */}
+        <div className="pt-3 flex flex-wrap items-center justify-center gap-3">
+          <button
+            onClick={onScrollToEmergencyLog}
+            className="px-8 py-3 rounded-full bg-[#111827] hover:bg-black text-white text-sm font-medium transition-all shadow-md active:scale-95 flex items-center gap-2"
+          >
+            <span>Emergency Complaints Log</span>
+            <span className="text-xs">⤓</span>
+          </button>
+
           <button
             onClick={onEnterGrid}
-            className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-white hover:bg-zinc-200 text-zinc-950 font-bold text-sm shadow-xl transition active:scale-[0.98] flex items-center justify-center gap-2 group"
+            className="px-6 py-3 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-900 text-sm font-medium transition active:scale-95 flex items-center gap-1.5"
           >
-            <span>Launch Safety Grid</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
-          </button>
-
-          {/* Quick Snap */}
-          <button
-            onClick={onOpenReport}
-            className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-white/[0.05] hover:bg-white/[0.1] text-zinc-100 border border-white/[0.1] font-semibold text-sm transition active:scale-[0.98] flex items-center justify-center gap-2 backdrop-blur-md"
-          >
-            <Camera className="w-4 h-4 text-zinc-300" />
-            <span>Log Hazard in 5 Seconds</span>
-          </button>
-
-          {/* Municipal Direct */}
-          <button
-            onClick={onOpenMunicipal}
-            className="w-full sm:w-auto px-5 py-3.5 rounded-2xl text-zinc-400 hover:text-white text-xs font-semibold transition flex items-center justify-center gap-1.5"
-          >
-            <ShieldCheck className="w-4 h-4 text-zinc-400" />
-            <span>Municipal Dispatch Portal</span>
+            <span>Launch Live Safety Grid</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
-      {/* 4. KEY METRICS STRIP & SCROLL PROMPT */}
-      <div className="relative z-10 w-full border-t border-white/[0.06] bg-[#07090e]/80 backdrop-blur-md">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <div>
-              <span className="text-[11px] text-zinc-400 uppercase tracking-wider block font-medium">
-                Active Incidents
-              </span>
-              <span className="text-2xl font-bold text-white tabular-nums mt-0.5 block">
-                {totalHazards}
-              </span>
-            </div>
-
-            <div>
-              <span className="text-[11px] text-zinc-400 uppercase tracking-wider block font-medium">
-                Critical Threats
-              </span>
-              <span className="text-2xl font-bold text-red-400 tabular-nums mt-0.5 block">
-                {criticalCount}
-              </span>
-            </div>
-
-            <div>
-              <span className="text-[11px] text-zinc-400 uppercase tracking-wider block font-medium">
-                Photo-Verified Fixes
-              </span>
-              <span className="text-2xl font-bold text-emerald-400 tabular-nums mt-0.5 block">
-                {fixedCount}
-              </span>
-            </div>
-
-            <div>
-              <span className="text-[11px] text-zinc-400 uppercase tracking-wider block font-medium">
-                Avg. Dispatch Time
-              </span>
-              <span className="text-2xl font-bold text-zinc-200 tabular-nums mt-0.5 block">
-                38 mins
-              </span>
-            </div>
-          </div>
-        </div>
+      {/* 4. BOTTOM SUBTLE TICKER */}
+      <div className="relative z-10 w-full py-4 text-center border-t border-slate-100 text-xs text-slate-500 font-medium">
+        <span>Ward 112–126 Real-Time Emergency Monitoring Active • Sub-Meter GPS Auto-Lock</span>
       </div>
     </div>
   );
