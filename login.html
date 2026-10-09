@@ -588,63 +588,7 @@
         <div id="dash-contrib-advancement-box" class="mt-2"></div>
       </div>
 
-      <!-- MEMBER ACTIONS: 2. SHARE REFERRAL LINK & QR -->
-      <div id="referral-share-card" class="academic-card p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
-        <div class="flex items-start justify-between gap-3 mb-4">
-          <div>
-            <div id="referral-tag-badge" class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-blue-600 dark:text-blue-400">
-              <i data-lucide="share-2" class="w-3.5 h-3.5"></i> Peer Referral & Sign-Up Share
-            </div>
-            <h3 id="referral-box-title" class="text-base font-bold text-slate-900 dark:text-white mt-1">
-              Invite Peers to Join BST Tech Club
-            </h3>
-            <p id="referral-box-desc" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
-              Share your personal invite link or show your QR code. Earn <b>+20 points</b> for every peer who joins. <b>Reaching 100 points unlocks Staff Contributor rank!</b>
-            </p>
-          </div>
-          
-          <div class="text-right shrink-0">
-            <span id="referral-stat-label" class="text-[10px] uppercase font-mono text-slate-400 block font-semibold">PEERS REFERRED</span>
-            <div id="card-referral-count" class="text-lg font-mono font-extrabold text-emerald-600 dark:text-emerald-400">0</div>
-          </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-          <div class="relative flex-1">
-            <i data-lucide="link" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-            <input 
-              type="text" 
-              id="referral-link-input" 
-              readonly 
-              class="w-full pl-10 pr-4 py-2 text-xs font-mono rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-300 focus:outline-none">
-          </div>
-          <button 
-            onclick="copyReferralLink()" 
-            class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-xs font-bold flex items-center justify-center gap-1.5 transition">
-            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Link
-          </button>
-          <button 
-            onclick="shareViaWhatsApp()" 
-            class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-sm">
-            <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WhatsApp Invite
-          </button>
-          <button 
-            onclick="shareViaNative()" 
-            class="px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-center gap-1.5 transition">
-            <i data-lucide="share-2" class="w-3.5 h-3.5"></i> Share
-          </button>
-        </div>
-
-        <!-- Live Domain Verification Badge -->
-        <div class="mt-3 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-mono">
-          <span class="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-medium">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Live Link: https://bst-tech-club-2gvj.vercel.app
-          </span>
-          <span class="text-[10px] text-slate-400 font-sans">Official Public URL</span>
-        </div>
-      </div>
-
-      <!-- MEMBER ACTIONS: 3. REGISTERED MEMBERS ROSTER & DIRECTORY -->
+      <!-- MEMBER ACTIONS: 2. REGISTERED MEMBERS ROSTER & DIRECTORY -->
       <div class="academic-card p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
@@ -667,7 +611,7 @@
         </div>
       </div>
 
-      <!-- MEMBER ACTIONS: 4. TECHNICAL CONTRIBUTION TRACKS & COMMUNITY ROLES -->
+      <!-- MEMBER ACTIONS: 3. TECHNICAL CONTRIBUTION TRACKS & COMMUNITY ROLES -->
       <div class="academic-card p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
         <div class="flex items-start justify-between gap-3 mb-4">
           <div>
@@ -817,7 +761,7 @@
         </div>
       </div>
 
-      <!-- MEMBER ACTIONS: 5. EDIT PASSWORD (SECURITY SETTINGS - PLACED AT BOTTOM) -->
+      <!-- MEMBER ACTIONS: 4. EDIT PASSWORD (SECURITY SETTINGS) -->
       <div class="academic-card p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
         <div class="mb-4">
           <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-blue-600 dark:text-blue-400">
@@ -873,6 +817,62 @@
             </button>
           </div>
         </form>
+      </div>
+
+      <!-- MEMBER ACTIONS: 5. SHARE REFERRAL LINK & QR -->
+      <div id="referral-share-card" class="academic-card p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+        <div class="flex items-start justify-between gap-3 mb-4">
+          <div>
+            <div id="referral-tag-badge" class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-blue-600 dark:text-blue-400">
+              <i data-lucide="share-2" class="w-3.5 h-3.5"></i> Peer Referral & Sign-Up Share
+            </div>
+            <h3 id="referral-box-title" class="text-base font-bold text-slate-900 dark:text-white mt-1">
+              Invite Peers to Join BST Tech Club
+            </h3>
+            <p id="referral-box-desc" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+              Share your personal invite link or show your QR code. Earn <b>+20 points</b> for every peer who joins. <b>Reaching 100 points unlocks Staff Contributor rank!</b>
+            </p>
+          </div>
+          
+          <div class="text-right shrink-0">
+            <span id="referral-stat-label" class="text-[10px] uppercase font-mono text-slate-400 block font-semibold">PEERS REFERRED</span>
+            <div id="card-referral-count" class="text-lg font-mono font-extrabold text-emerald-600 dark:text-emerald-400">0</div>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <div class="relative flex-1">
+            <i data-lucide="link" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <input 
+              type="text" 
+              id="referral-link-input" 
+              readonly 
+              class="w-full pl-10 pr-4 py-2 text-xs font-mono rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-300 focus:outline-none">
+          </div>
+          <button 
+            onclick="copyReferralLink()" 
+            class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-xs font-bold flex items-center justify-center gap-1.5 transition">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Link
+          </button>
+          <button 
+            onclick="shareViaWhatsApp()" 
+            class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-sm">
+            <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WhatsApp Invite
+          </button>
+          <button 
+            onclick="shareViaNative()" 
+            class="px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-center gap-1.5 transition">
+            <i data-lucide="share-2" class="w-3.5 h-3.5"></i> Share
+          </button>
+        </div>
+
+        <!-- Live Domain Verification Badge -->
+        <div class="mt-3 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+          <span class="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-medium">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Live Link: https://bst-tech-club-2gvj.vercel.app
+          </span>
+          <span class="text-[10px] text-slate-400 font-sans">Official Public URL</span>
+        </div>
       </div>
 
     </div>

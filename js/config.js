@@ -88,7 +88,11 @@ const clubConfig = {
     },
     {
       question: "How can I add my project or propose a workshop?",
-      answer: "Members can add their student projects directly in the Projects Gallery and coordinate with domain leads to schedule hands-on labs in Competitive Programming, Robotics, Open Source, or Hackathons."
+      answer: "Student project showcases and workshop sessions are curated and published by Core Maintainers and Lead Administrators. Active members can submit their projects or workshop proposals to domain leads or maintainers for review and inclusion."
+    },
+    {
+      question: "How does the tiered open-source governance & point system work?",
+      answer: "The club features a 4-tier meritocracy: Active Developers automatically advance to Staff Contributor upon earning 100 contribution points (+20 pts/referral, +15 pts/RSVP, +25 pts/project showcase) and maintain rank with ≥60 points. Core Maintainers and Lead Administrators manage club governance, workshops, and project showcases."
     }
   ]
 };
