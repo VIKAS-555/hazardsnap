@@ -40,18 +40,7 @@
   <meta name="theme-color" content="#2563eb">
 
   <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com">
-    window.switchProfileTab = switchProfileTab;
-    window.openAvatarModal = openAvatarModal;
-    window.closeAvatarModal = closeAvatarModal;
-    window.selectPresetAvatar = selectPresetAvatar;
-    window.handleAvatarFileUpload = handleAvatarFileUpload;
-    window.applyAvatarUrl = applyAvatarUrl;
-    window.removeProfileAvatar = removeProfileAvatar;
-    window.saveAvatarSelection = saveAvatarSelection;
-    window.handleProfileDetailsSubmit = handleProfileDetailsSubmit;
-
-  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -69,38 +58,19 @@
         }
       }
     }
-  
-    window.switchProfileTab = switchProfileTab;
-    window.openAvatarModal = openAvatarModal;
-    window.closeAvatarModal = closeAvatarModal;
-    window.selectPresetAvatar = selectPresetAvatar;
-    window.handleAvatarFileUpload = handleAvatarFileUpload;
-    window.applyAvatarUrl = applyAvatarUrl;
-    window.removeProfileAvatar = removeProfileAvatar;
-    window.saveAvatarSelection = saveAvatarSelection;
-    window.handleProfileDetailsSubmit = handleProfileDetailsSubmit;
-
   </script>
 
   <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest">
-    window.switchProfileTab = switchProfileTab;
-    window.openAvatarModal = openAvatarModal;
-    window.closeAvatarModal = closeAvatarModal;
-    window.selectPresetAvatar = selectPresetAvatar;
-    window.handleAvatarFileUpload = handleAvatarFileUpload;
-    window.applyAvatarUrl = applyAvatarUrl;
-    window.removeProfileAvatar = removeProfileAvatar;
-    window.saveAvatarSelection = saveAvatarSelection;
-    window.handleProfileDetailsSubmit = handleProfileDetailsSubmit;
-
-  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- Custom Stylesheet -->
   <link rel="stylesheet" href="css/styles.css">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect width='18' height='11' x='3' y='11' rx='2' ry='2'/><path d='M7 11V7a5 5 0 0 1 10 0v4'/></svg>">
 </head>
 <body class="academic-grid-pattern min-h-screen text-slate-800 dark:text-slate-100 antialiased flex flex-col justify-between selection:bg-blue-500 selection:text-white">
+  <!-- Live Aesthetic & Interactive Background Canvas (Responds to Touch & Mouse) -->
+  <canvas id="welcome-interactive-canvas" class="fixed inset-0 pointer-events-none z-0 opacity-80 dark:opacity-90"></canvas>
+
 
   <!-- ============================================================
        TOP MINIMALIST HEADER
@@ -141,7 +111,146 @@
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 flex flex-col justify-center">
 
     <!-- VIEW A: AUTHENTICATION TABS (Shown when logged out) -->
-    <div id="auth-forms-container" class="w-full max-w-xl mx-auto">
+        <!-- ============================================================
+         VIEW 0: WELCOME LANDING GATEWAY (First Impression for Guests & Invites)
+         ============================================================ -->
+    <div id="welcome-portal-view" class="w-full max-w-4xl mx-auto py-6 sm:py-12 px-2 sm:px-4 text-center space-y-7 relative z-10 animate-fade-in">
+      
+      <!-- Academic Collegiate Tag -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-slate-200/80 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md text-xs font-mono font-medium text-slate-700 dark:text-slate-300 shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-blue-600 dark:bg-blue-400 animate-pulse"></span>
+        <span>Department of Computer Science & Engineering (AI & ML)</span>
+        <span class="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
+        <span class="text-blue-600 dark:text-blue-400 font-bold hidden sm:inline">Cohort 2026</span>
+      </div>
+
+      <!-- Glowing Tech Club Crest / Emblem -->
+      <div class="flex justify-center">
+        <div class="relative group">
+          <div class="absolute -inset-1 rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 opacity-60 blur-lg group-hover:opacity-90 transition duration-500 animate-pulse"></div>
+          <div class="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-slate-900 text-white dark:bg-slate-900 flex items-center justify-center font-mono font-extrabold text-3xl shadow-2xl border border-white/20">
+            <i data-lucide="terminal" class="w-10 h-10 sm:w-12 sm:h-12 text-blue-400"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero Typography -->
+      <div class="max-w-2xl mx-auto space-y-2">
+        <h1 class="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+          Welcome to <span class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">BST Tech Club</span>
+        </h1>
+        <p class="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-300">
+          The Official Collegiate Technical Ecosystem & Developer Vault
+        </p>
+        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed pt-1">
+          A student-driven collective advancing Competitive Programming, Robotics, Open Source, and Hackathon engineering. Claim your verified digital ID pass, collaborate on technical sessions, review student projects, and advance through merit ranks.
+        </p>
+      </div>
+
+      <!-- Dynamic Peer Referral Invitation Banner (Shown when arriving via invite link) -->
+      <div id="welcome-referral-banner" class="hidden max-w-xl mx-auto p-4 rounded-2xl border border-indigo-200 dark:border-indigo-900/60 bg-gradient-to-r from-blue-50/90 via-indigo-50/90 to-purple-50/90 dark:from-blue-950/40 dark:via-indigo-950/40 dark:to-purple-950/40 shadow-sm text-left">
+        <div class="flex items-start gap-3">
+          <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+            <i data-lucide="gift" class="w-5 h-5"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <span class="text-[10px] font-mono font-bold uppercase text-indigo-600 dark:text-indigo-400 block">PEER INVITATION DETECTED</span>
+            <div id="welcome-referral-text" class="text-xs font-semibold text-slate-800 dark:text-slate-200 mt-0.5">
+              You were invited by a verified BST Tech Club Member!
+            </div>
+            <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-1">
+              Join today to mint your official Tech Club ID and activate your <b>+20 merit points</b> peer welcome bonus.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2 Main Action Gateway Cards (Side by side on desktop, stacked on mobile) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto pt-2">
+        
+        <!-- Card 1: Existing Member Sign In -->
+        <button 
+          type="button" 
+          onclick="openAuthView('signin')" 
+          class="p-6 rounded-2xl border-2 border-slate-200/90 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-xl transition-all duration-200 text-left group cursor-pointer flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              <i data-lucide="log-in" class="w-6 h-6"></i>
+            </div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center justify-between">
+              <span>Member Sign-In</span>
+              <i data-lucide="arrow-right" class="w-4 h-4 text-slate-400 group-hover:text-blue-500 group-hover:translate-x-1 transition-all"></i>
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
+              Already have a Tech Club ID or registered college email? Access your ID card, merit scores, and domain tracks.
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-[11px] font-mono font-bold text-blue-600 dark:text-blue-400">
+            Sign In to Vault →
+          </div>
+        </button>
+
+        <!-- Card 2: New Member Join -->
+        <button 
+          type="button" 
+          onclick="openAuthView('register')" 
+          class="p-6 rounded-2xl border-2 border-blue-500/60 dark:border-blue-500/60 bg-gradient-to-br from-blue-50/50 via-white to-blue-50/20 dark:from-blue-950/30 dark:via-slate-900/80 dark:to-blue-950/10 backdrop-blur-md hover:border-blue-600 hover:shadow-xl transition-all duration-200 text-left group cursor-pointer flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center mb-4 shadow-md group-hover:scale-110 transition-transform">
+              <i data-lucide="sparkles" class="w-6 h-6"></i>
+            </div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center justify-between">
+              <span>Join Tech Club / Mint ID</span>
+              <i data-lucide="arrow-right" class="w-4 h-4 text-blue-500 group-hover:translate-x-1 transition-all"></i>
+            </h3>
+            <p class="text-xs text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">
+              Undergraduate in CSE (AI & ML) or Faculty Evaluator? Provide your details to mint your official Tech Club ID pass.
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-blue-100 dark:border-blue-900/60 text-[11px] font-mono font-bold text-blue-600 dark:text-blue-400">
+            Mint New Member ID →
+          </div>
+        </button>
+      </div>
+
+      <!-- Quick Action Utilities (Forgot Password & Back to Site) -->
+      <div class="flex flex-wrap items-center justify-center gap-4 text-xs pt-2">
+        <button 
+          type="button" 
+          onclick="openForgotPasswordModal()" 
+          class="text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1.5 transition cursor-pointer font-medium">
+          <i data-lucide="key-round" class="w-3.5 h-3.5"></i> Forgot Password / Recovery
+        </button>
+        <span class="text-slate-300 dark:text-slate-700">•</span>
+        <a 
+          href="index.html" 
+          class="text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-1.5 transition font-medium">
+          <i data-lucide="compass" class="w-3.5 h-3.5"></i> Explore Public Events & Showcase
+        </a>
+      </div>
+
+      <!-- Live Registered Members Pill -->
+      <div class="pt-2 flex items-center justify-center">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-white/80 dark:bg-slate-900/80 text-blue-700 dark:text-blue-300 border border-blue-200/80 dark:border-blue-800/80 shadow-xs">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="welcome-member-count-badge">0 Registered Members</span>
+        </span>
+      </div>
+
+    </div>
+
+    <div id="auth-forms-container" class="hidden w-full max-w-xl mx-auto relative z-10 animate-fade-in">
+      
+      <!-- Back to Welcome Page Bar -->
+      <div class="mb-4 flex items-center justify-between">
+        <button 
+          type="button" 
+          onclick="showWelcomeView()" 
+          class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition cursor-pointer px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-900">
+          <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back to Welcome
+        </button>
+        <span class="text-[11px] font-mono text-slate-400">BST Tech Club Portal</span>
+      </div>
       
       <!-- Referral Alert Banner (If accessed via ?ref=DS-XXXX) -->
       <div id="referral-banner" class="hidden mb-6 p-4 rounded-xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/80 dark:bg-blue-950/40 text-blue-900 dark:text-blue-200 flex items-start gap-3 shadow-sm animate-fade-in">
@@ -3400,5 +3509,63 @@
     </div>
   </div>
 
+  <!-- ============================================================
+       FORGOT PASSWORD & ACCOUNT RECOVERY MODAL
+       ============================================================ -->
+  <div id="forgot-password-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 max-w-md w-full p-6 shadow-2xl relative">
+      <button onclick="closeForgotPasswordModal()" aria-label="Close" class="w-8 h-8 rounded-lg flex items-center justify-center absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+          <i data-lucide="key-round" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">Account Recovery & Reset</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Cryptographic Vault Security Protocol</p>
+        </div>
+      </div>
+
+      <div class="space-y-3 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-1.5">
+          <div class="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500"></i> Zero-Knowledge Vault Encryption
+          </div>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400">
+            For collegiate security, passwords are cryptographically salted (16-byte random salt) and hashed using SHA-256 before saving to client vaults.
+          </p>
+        </div>
+
+        <div class="space-y-2 pt-1">
+          <div class="font-bold text-slate-800 dark:text-slate-200">How to reset your account password:</div>
+          <div class="flex items-start gap-2">
+            <span class="w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-400 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">1</span>
+            <span>Contact your Lead Administrator (<b class="text-slate-800 dark:text-slate-200">Arnav Patel</b> or <b class="text-slate-800 dark:text-slate-200">Vikas N</b>) with your verified college USN.</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-400 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">2</span>
+            <span>Faculty Evaluators can also re-authorize student credentials directly through department governance.</span>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+          <button 
+            type="button" 
+            onclick="copyAdminSupportContact()" 
+            class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-xs flex items-center gap-1.5 transition cursor-pointer">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Support Details
+          </button>
+          <button 
+            type="button" 
+            onclick="closeForgotPasswordModal(); openAuthView('signin');" 
+            class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer shadow-sm">
+            Back to Sign In
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
