@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { HazardReport } from './types';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://vltpqzsonqqxxzysaxdv.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsdHBxenNvbnFxeHh6eXNheGR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzODkxMjgsImV4cCI6MjEwNjk2NTEyOH0.nO1PEvIb3DH_gDstueJE9zOxvIEF8ozntRrU82E7IUg';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://scewuadxgpnggpypzubu.supabase.co';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_26zYJPkGrZA5OzhDLyjO3Q_dQ7OExG6';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
