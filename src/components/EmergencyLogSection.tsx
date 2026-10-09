@@ -15,6 +15,10 @@ import {
   Radio,
   Eye,
   ThumbsUp,
+  Phone,
+  Copy,
+  Check,
+  X,
 } from 'lucide-react';
 import { HazardReport, CATEGORY_METADATA } from '../lib/types';
 
@@ -32,6 +36,20 @@ export default function EmergencyLogSection({
   onUpvote,
 }: EmergencyLogSectionProps) {
   const [filterSeverity, setFilterSeverity] = useState<'all' | 'critical' | 'in_progress'>('all');
+  const [activeHotline, setActiveHotline] = useState<{
+    title: string;
+    number: string;
+    description: string;
+  } | null>(null);
+  const [copied, setCopied] = useState<boolean>(false);
+
+  const handleCopy = (num: string) => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(num);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   // Filter emergency items
   const emergencyItems = hazards.filter((h) => {
@@ -72,41 +90,77 @@ export default function EmergencyLogSection({
 
         {/* Emergency Hotline Banner */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="p-4 rounded-2xl bg-[#0D131F]/90 border border-white/[0.08] flex items-center gap-3.5 shadow-sm">
-            <div className="w-9 h-9 rounded-xl bg-red-950/50 text-red-400 border border-red-500/30 flex items-center justify-center text-sm font-bold">
+          <button
+            onClick={() =>
+              setActiveHotline({
+                title: 'Live Electric Wires / Snapped Cable',
+                number: '1912',
+                description: '24/7 BESCOM Electricity Hotline for live wire sparking, fallen poles, and power emergency dispatch.',
+              })
+            }
+            className="p-4 rounded-2xl bg-[#0D131F]/90 border border-white/[0.08] hover:border-red-500/40 hover:bg-red-500/[0.04] active:scale-[0.98] transition flex items-center gap-3.5 shadow-sm text-left group cursor-pointer"
+            title="Click to Call or Copy 1912"
+          >
+            <div className="w-9 h-9 rounded-xl bg-red-950/50 text-red-400 border border-red-500/30 flex items-center justify-center text-sm font-bold group-hover:scale-105 transition">
               ⚡
             </div>
             <div>
-              <span className="text-[10px] font-mono font-bold uppercase text-slate-500 block">
+              <span className="text-[10px] font-mono font-bold uppercase text-slate-500 block group-hover:text-red-400 transition">
                 Live Electric Wires / Snapped Cable
               </span>
-              <span className="text-sm font-bold text-slate-100">BESCOM Hotline: 1912</span>
+              <span className="text-sm font-bold text-slate-100 group-hover:text-white transition">
+                BESCOM Hotline: 1912
+              </span>
             </div>
-          </div>
+          </button>
 
-          <div className="p-4 rounded-2xl bg-[#0D131F]/90 border border-white/[0.08] flex items-center gap-3.5 shadow-sm">
-            <div className="w-9 h-9 rounded-xl bg-amber-950/50 text-amber-400 border border-amber-500/30 flex items-center justify-center text-sm font-bold">
+          <button
+            onClick={() =>
+              setActiveHotline({
+                title: 'Open Sewers / Drain Collapse',
+                number: '1533',
+                description: 'City Municipal Corporation emergency control room for open manholes, caved-in roads, and flash flooding.',
+              })
+            }
+            className="p-4 rounded-2xl bg-[#0D131F]/90 border border-white/[0.08] hover:border-amber-500/40 hover:bg-amber-500/[0.04] active:scale-[0.98] transition flex items-center gap-3.5 shadow-sm text-left group cursor-pointer"
+            title="Click to Call or Copy 1533"
+          >
+            <div className="w-9 h-9 rounded-xl bg-amber-950/50 text-amber-400 border border-amber-500/30 flex items-center justify-center text-sm font-bold group-hover:scale-105 transition">
               🕳️
             </div>
             <div>
-              <span className="text-[10px] font-mono font-bold uppercase text-slate-500 block">
+              <span className="text-[10px] font-mono font-bold uppercase text-slate-500 block group-hover:text-amber-400 transition">
                 Open Sewers / Drain Collapse
               </span>
-              <span className="text-sm font-bold text-slate-100">Control Room: 1533</span>
+              <span className="text-sm font-bold text-slate-100 group-hover:text-white transition">
+                Control Room: 1533
+              </span>
             </div>
-          </div>
+          </button>
 
-          <div className="p-4 rounded-2xl bg-[#0D131F]/90 border border-white/[0.08] flex items-center gap-3.5 shadow-sm">
-            <div className="w-9 h-9 rounded-xl bg-blue-950/50 text-blue-400 border border-blue-500/30 flex items-center justify-center text-sm font-bold">
+          <button
+            onClick={() =>
+              setActiveHotline({
+                title: 'Immediate Road Rescue / Ambulance',
+                number: '112',
+                description: 'Unified National Emergency Number for road accidents, police assistance, and immediate medical rescue.',
+              })
+            }
+            className="p-4 rounded-2xl bg-[#0D131F]/90 border border-white/[0.08] hover:border-blue-500/40 hover:bg-blue-500/[0.04] active:scale-[0.98] transition flex items-center gap-3.5 shadow-sm text-left group cursor-pointer"
+            title="Click to Call or Copy 112"
+          >
+            <div className="w-9 h-9 rounded-xl bg-blue-950/50 text-blue-400 border border-blue-500/30 flex items-center justify-center text-sm font-bold group-hover:scale-105 transition">
               🚨
             </div>
             <div>
-              <span className="text-[10px] font-mono font-bold uppercase text-slate-500 block">
+              <span className="text-[10px] font-mono font-bold uppercase text-slate-500 block group-hover:text-blue-400 transition">
                 Immediate Road Rescue / Ambulance
               </span>
-              <span className="text-sm font-bold text-slate-100">National Emergency: 112</span>
+              <span className="text-sm font-bold text-slate-100 group-hover:text-white transition">
+                National Emergency: 112
+              </span>
             </div>
-          </div>
+          </button>
         </div>
 
         {/* Filter Pills */}
@@ -258,6 +312,86 @@ export default function EmergencyLogSection({
           })}
         </div>
       </div>
+
+      {/* CALL / COPY INTERACTIVE MODAL */}
+      {activeHotline && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={() => {
+            setActiveHotline(null);
+            setCopied(false);
+          }}
+        >
+          <div
+            className="relative w-full max-w-sm rounded-3xl bg-[#0B0F19] border border-white/10 p-6 shadow-2xl text-center space-y-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => {
+                setActiveHotline(null);
+                setCopied(false);
+              }}
+              className="absolute top-4 right-4 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition"
+              aria-label="Close dialog"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-rose-500/20 to-indigo-500/20 border border-white/10 flex items-center justify-center text-rose-400 shadow-inner">
+              <PhoneCall className="w-7 h-7" />
+            </div>
+
+            <div>
+              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 block font-semibold">
+                {activeHotline.title}
+              </span>
+              <div className="text-3xl font-extrabold text-white tracking-tight mt-1 font-mono">
+                {activeHotline.number}
+              </div>
+              <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+                {activeHotline.description}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 pt-2">
+              <a
+                href={`tel:${activeHotline.number}`}
+                className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 transition active:scale-95"
+              >
+                <Phone className="w-4 h-4" />
+                <span>Call Now</span>
+              </a>
+
+              <button
+                onClick={() => handleCopy(activeHotline.number)}
+                className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-white font-bold text-sm transition active:scale-95"
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-4 h-4 text-emerald-400" />
+                    <span className="text-emerald-400">Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4 text-slate-300" />
+                    <span>Copy</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            <button
+              onClick={() => {
+                setActiveHotline(null);
+                setCopied(false);
+              }}
+              className="w-full py-2 text-xs text-slate-400 hover:text-white transition font-semibold"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
