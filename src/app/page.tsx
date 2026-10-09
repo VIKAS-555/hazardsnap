@@ -47,25 +47,16 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   // Dark Mode State
-  const [isDark, setIsDark] = useState<boolean>(false);
-
   // Auth State
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const [currentUser, setCurrentUser] = useState<{ name: string; role: 'citizen' | 'official' } | null>(null);
 
-  // Sync dark mode
+  // Permanently enforce Dark Mode
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('hazardsnap_theme');
-      if (savedTheme) {
-        const dark = savedTheme === 'dark';
-        setIsDark(dark);
-        document.documentElement.classList.toggle('dark', dark);
-      } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        setIsDark(true);
-        document.documentElement.classList.add('dark');
-      }
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('hazardsnap_theme', 'dark');
 
       // Check saved user session
       const savedUser = localStorage.getItem('hazardsnap_user');
@@ -78,61 +69,8 @@ export default function Home() {
           // ignore
         }
       }
-
-      // Check active Supabase Google session
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (session?.user) {
-          const userMeta = session.user.user_metadata;
-          const googleName =
-            userMeta?.full_name ||
-            userMeta?.name ||
-            session.user.email?.split('@')[0] ||
-            'Google Citizen';
-          const userObj = { name: googleName, role: 'citizen' as const };
-          setCurrentUser(userObj);
-          localStorage.setItem('hazardsnap_user', JSON.stringify(userObj));
-          setActiveTab('grid');
-        }
-      });
-
-      const {
-        data: { subscription },
-      } = supabase.auth.onAuthStateChange((_event, session) => {
-        if (session?.user) {
-          const userMeta = session.user.user_metadata;
-          const googleName =
-            userMeta?.full_name ||
-            userMeta?.name ||
-            session.user.email?.split('@')[0] ||
-            'Google Citizen';
-          const userObj = { name: googleName, role: 'citizen' as const };
-          setCurrentUser(userObj);
-          localStorage.setItem('hazardsnap_user', JSON.stringify(userObj));
-          setActiveTab('grid');
-        }
-      });
-
-      return () => {
-        subscription.unsubscribe();
-      };
     }
   }, []);
-
-  const handleToggleTheme = () => {
-    setIsDark((prev) => {
-      const next = !prev;
-      if (typeof window !== 'undefined') {
-        if (next) {
-          document.documentElement.classList.add('dark');
-          localStorage.setItem('hazardsnap_theme', 'dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-          localStorage.setItem('hazardsnap_theme', 'light');
-        }
-      }
-      return next;
-    });
-  };
 
   const handleAuthSuccess = (user: { name: string; role: 'citizen' | 'official' }) => {
     setCurrentUser(user);
@@ -207,7 +145,7 @@ export default function Home() {
   ).length;
 
   return (
-    <main className="min-h-screen bg-white dark:bg-[#080c14] text-slate-900 dark:text-slate-100 flex flex-col selection:bg-slate-800 selection:text-white transition-colors">
+    <main className="min-h-screen bg-[#080C14] text-slate-100 flex flex-col selection:bg-rose-500 selection:text-white">
       {/* 1. TOP PERSISTENT NAVIGATION */}
       <MainNavigation
         activeTab={activeTab}
@@ -227,8 +165,6 @@ export default function Home() {
         currentUser={currentUser}
         onLogout={handleLogout}
         criticalCount={criticalCount}
-        isDark={isDark}
-        onToggleTheme={handleToggleTheme}
       />
 
       {/* 2. AUTH-GATED VIEW: IF NOT LOGGED IN, RENDER ONLY THE STANDALONE LANDING PAGE */}

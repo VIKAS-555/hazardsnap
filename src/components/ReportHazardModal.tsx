@@ -281,27 +281,27 @@ export default function ReportHazardModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl p-5 sm:p-7 text-slate-900 dark:text-white my-auto transition-colors">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
+      <div className="relative w-full max-w-lg bg-[#0B111E] border border-white/[0.12] rounded-3xl shadow-2xl p-5 sm:p-7 text-white my-auto transition-colors">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-2xl bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 flex items-center justify-center border border-red-200 dark:border-red-900/50">
-              <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
+            <div className="w-10 h-10 rounded-2xl bg-rose-950/50 text-rose-400 flex items-center justify-center border border-rose-500/30">
+              <AlertTriangle className="w-5 h-5 text-rose-400" />
             </div>
             <div>
-              <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+              <h2 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
                 Report Hazard
-                <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 font-semibold">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-950/60 text-emerald-400 border border-emerald-500/30 font-semibold">
                   ⚡ 5s Quick Snap
                 </span>
               </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Save lives by logging hazards before accidents happen</p>
+              <p className="text-xs text-slate-400">Save lives by logging hazards before accidents happen</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition"
+            className="p-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-slate-400 hover:text-white transition"
             aria-label="Close"
           >
             <X className="w-5 h-5" />
@@ -310,29 +310,29 @@ export default function ReportHazardModal({
 
         {submitSuccess ? (
           <div className="py-12 flex flex-col items-center justify-center text-center space-y-3">
-            <div className="w-16 h-16 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center animate-bounce">
+            <div className="w-16 h-16 rounded-full bg-emerald-950/60 text-emerald-400 border border-emerald-500/50 flex items-center justify-center animate-bounce shadow-lg shadow-emerald-500/20">
               <CheckCircle2 className="w-8 h-8" />
             </div>
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white">Hazard Logged Successfully!</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs">
+            <h3 className="text-xl font-bold text-white">Hazard Logged Successfully!</h3>
+            <p className="text-sm text-slate-400 max-w-xs">
               Live broadcasted to public safety map & added to the Municipal Triage Queue.
             </p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="mt-5 space-y-5">
+          <form onSubmit={handleSubmit} className="mt-5 space-y-4">
             {/* 1. PHOTO-FIRST SNAPPER */}
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2 flex items-center justify-between">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2 flex items-center justify-between">
                 <span>1. Hazard Photo (Instant Capture)</span>
                 {isAnalyzingPhoto && (
-                  <span className="text-amber-600 flex items-center gap-1 text-[11px] font-normal animate-pulse">
+                  <span className="text-amber-400 flex items-center gap-1 text-[11px] font-normal animate-pulse">
                     <Sparkles className="w-3.5 h-3.5" /> AI Scanning...
                   </span>
                 )}
               </label>
 
               {securityError && (
-                <div className="mb-2 p-3 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 text-xs flex items-start gap-2">
+                <div className="mb-2 p-3 rounded-xl bg-red-950/40 border border-red-500/40 text-red-300 text-xs flex items-start gap-2">
                   <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold block">Malware Protection Alert:</span>
@@ -351,13 +351,13 @@ export default function ReportHazardModal({
               />
 
               {photoPreview ? (
-                <div className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 group aspect-video">
+                <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-[#080C14] group aspect-video">
                   <img
                     src={photoPreview}
                     alt="Hazard Snapshot"
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end justify-between p-3">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end justify-between p-3">
                     <span className="text-xs font-medium text-emerald-300 flex items-center gap-1 bg-black/60 px-2.5 py-1 rounded-lg backdrop-blur">
                       <CheckCircle2 className="w-3.5 h-3.5" /> Photo Attached
                     </span>
@@ -373,23 +373,23 @@ export default function ReportHazardModal({
               ) : (
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="cursor-pointer border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-slate-500 dark:hover:border-slate-500 bg-slate-50 dark:bg-slate-850 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl p-6 flex flex-col items-center justify-center transition-all group text-center"
+                  className="cursor-pointer border-2 border-dashed border-white/10 hover:border-white/20 bg-[#080C14] hover:bg-[#0F172A] rounded-2xl p-6 flex flex-col items-center justify-center transition-all group text-center"
                 >
-                  <div className="w-14 h-14 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white flex items-center justify-center transition mb-2">
+                  <div className="w-14 h-14 rounded-2xl bg-[#0F172A] border border-white/10 shadow-sm text-slate-400 group-hover:text-white flex items-center justify-center transition mb-2">
                     <Camera className="w-7 h-7" />
                   </div>
-                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 group-hover:text-black dark:group-hover:text-white">
+                  <span className="text-sm font-semibold text-slate-200 group-hover:text-white">
                     Tap to Snap or Upload Photo
                   </span>
-                  <span className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  <span className="text-xs text-slate-500 mt-1">
                     Auto-opens camera on mobile phones
                   </span>
                 </div>
               )}
 
               {aiAnalysisFeedback && (
-                <div className="mt-2 text-xs bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 text-amber-800 dark:text-amber-300 p-2.5 rounded-xl flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                <div className="mt-2 text-xs bg-amber-950/40 border border-amber-500/30 text-amber-300 p-2.5 rounded-xl flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
                   <span>{aiAnalysisFeedback}</span>
                 </div>
               )}
@@ -398,31 +398,31 @@ export default function ReportHazardModal({
             {/* 2. INSTANT GEOLOCATION PIN */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-red-500" />
+                <label className="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-1">
+                  <MapPin className="w-3.5 h-3.5 text-rose-500" />
                   2. GPS Location Pin
                 </label>
                 <button
                   type="button"
                   onClick={fetchCurrentLocation}
                   disabled={isLocating}
-                  className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex items-center gap-1 transition font-medium"
+                  className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition font-medium"
                 >
                   <RefreshCw className={`w-3 h-3 ${isLocating ? 'animate-spin' : ''}`} />
                   {isLocating ? 'Pinpointing...' : 'Refresh GPS'}
                 </button>
               </div>
 
-              <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-3 flex items-start gap-3">
-                <div className="w-8 h-8 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0 mt-0.5">
+              <div className="bg-[#0F172A] border border-white/[0.08] rounded-2xl p-3 flex items-start gap-3">
+                <div className="w-8 h-8 rounded-xl bg-rose-950/50 border border-rose-500/30 text-rose-400 flex items-center justify-center shrink-0 mt-0.5">
                   <MapPin className="w-4 h-4" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{address}</p>
-                  <div className="flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  <p className="text-sm font-medium text-white truncate">{address}</p>
+                  <div className="flex items-center gap-3 text-[11px] text-slate-400 mt-0.5 font-mono">
                     <span>Lat: {coords.lat.toFixed(5)}</span>
                     <span>Lng: {coords.lng.toFixed(5)}</span>
-                    <span className="text-emerald-700 dark:text-emerald-400 font-mono font-medium">{locationAccuracy}</span>
+                    <span className="text-emerald-400 font-medium">{locationAccuracy}</span>
                   </div>
                 </div>
               </div>
@@ -430,7 +430,7 @@ export default function ReportHazardModal({
 
             {/* 3. QUICK HAZARD CATEGORY PILLS */}
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
                 3. Quick Hazard Category
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -444,8 +444,8 @@ export default function ReportHazardModal({
                       onClick={() => setSelectedCategory(cat)}
                       className={`text-left p-2.5 rounded-xl border text-xs font-medium transition flex items-center gap-2 ${
                         isSelected
-                          ? 'bg-slate-900 dark:bg-white border-slate-900 dark:border-white text-white dark:text-slate-900 shadow-sm'
-                          : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                          ? 'bg-white border-white text-slate-950 font-bold shadow-md'
+                          : 'bg-[#0F172A] border-white/[0.08] text-slate-300 hover:bg-white/[0.06] hover:text-white'
                       }`}
                     >
                       <span className="text-base">{meta.icon}</span>
@@ -459,12 +459,12 @@ export default function ReportHazardModal({
             {/* 4. VOICE NOTE & OPTIONAL NOTES */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 flex items-center gap-1">
-                  <Mic className="w-3.5 h-3.5 text-slate-700 dark:text-slate-300" />
+                <label className="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-1">
+                  <Mic className="w-3.5 h-3.5 text-indigo-400" />
                   4. Voice Note or Quick Memo
                 </label>
                 {audioUrl && (
-                  <span className="text-[11px] text-emerald-700 dark:text-emerald-400 font-medium flex items-center gap-1">
+                  <span className="text-[11px] text-emerald-400 font-medium flex items-center gap-1">
                     <CheckCircle2 className="w-3 h-3" /> Audio Recorded
                   </span>
                 )}
@@ -475,16 +475,16 @@ export default function ReportHazardModal({
                   <button
                     type="button"
                     onClick={startRecording}
-                    className="flex-1 py-2.5 px-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2 transition"
+                    className="flex-1 py-2.5 px-3 rounded-xl bg-[#0F172A] border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.06] text-xs font-medium text-slate-300 flex items-center justify-center gap-2 transition"
                   >
-                    <Mic className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+                    <Mic className="w-4 h-4 text-slate-400" />
                     <span>Tap to Record Voice Note</span>
                   </button>
                 ) : (
                   <button
                     type="button"
                     onClick={stopRecording}
-                    className="flex-1 py-2.5 px-3 rounded-xl bg-red-600 hover:bg-red-700 text-xs font-semibold text-white flex items-center justify-center gap-2 animate-pulse transition shadow-sm"
+                    className="flex-1 py-2.5 px-3 rounded-xl bg-red-600 hover:bg-red-500 text-xs font-bold text-white flex items-center justify-center gap-2 animate-pulse transition shadow-sm"
                   >
                     <Square className="w-4 h-4 fill-current" />
                     <span>Stop Recording ({recordingDuration}s)</span>
@@ -495,12 +495,12 @@ export default function ReportHazardModal({
                   <button
                     type="button"
                     onClick={toggleAudioPlayback}
-                    className="py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-850 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-800 text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1.5 transition"
+                    className="py-2.5 px-3 rounded-xl bg-[#080C14] border border-white/10 text-xs text-white flex items-center gap-1.5 transition"
                   >
                     {isPlayingAudio ? (
-                      <Pause className="w-4 h-4 text-slate-800 dark:text-slate-200 fill-current" />
+                      <Pause className="w-4 h-4 text-white fill-current" />
                     ) : (
-                      <Play className="w-4 h-4 text-slate-800 dark:text-slate-200 fill-current" />
+                      <Play className="w-4 h-4 text-white fill-current" />
                     )}
                     <span>Listen</span>
                   </button>
@@ -508,13 +508,13 @@ export default function ReportHazardModal({
               </div>
 
               {voiceTranscript && (
-                <div className="mt-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 p-2.5 rounded-xl flex items-start gap-2">
-                  <Volume2 className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
+                <div className="mt-2 text-xs bg-[#080C14] border border-white/[0.08] text-slate-200 p-2.5 rounded-xl flex items-start gap-2">
+                  <Volume2 className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
                   <div>
-                    <span className="text-[10px] text-slate-500 dark:text-slate-400 block uppercase font-mono">
+                    <span className="text-[10px] text-slate-400 block uppercase font-mono">
                       Voice Transcription
                     </span>
-                    <p className="italic text-slate-700 dark:text-slate-300">"{voiceTranscript}"</p>
+                    <p className="italic text-slate-300">"{voiceTranscript}"</p>
                   </div>
                 </div>
               )}
@@ -525,38 +525,38 @@ export default function ReportHazardModal({
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Optional details (e.g. Near pillar 45, water 2ft deep)..."
-                className="mt-2 w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-slate-400 dark:focus:border-slate-500 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 transition"
+                className="mt-2 w-full bg-[#0F172A] border border-slate-700/80 focus:border-indigo-500 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none transition"
               />
             </div>
 
             {/* SEVERITY RATING BANNER */}
-            <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+            <div className="p-3 rounded-2xl bg-[#0F172A] border border-white/[0.08] flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Flame
                   className={`w-4 h-4 ${
                     currentSeverityMeta.severity === 'critical'
-                      ? 'text-red-600 animate-pulse'
+                      ? 'text-rose-400 animate-pulse'
                       : currentSeverityMeta.severity === 'high'
-                      ? 'text-orange-500'
-                      : 'text-amber-500'
+                      ? 'text-orange-400'
+                      : 'text-amber-400'
                   }`}
                 />
                 <div>
-                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">Calculated Severity:</span>
+                  <span className="text-xs font-semibold text-slate-400">Calculated Severity:</span>
                   <span
                     className={`ml-1.5 text-xs font-bold uppercase ${
                       currentSeverityMeta.severity === 'critical'
-                        ? 'text-red-700 dark:text-red-400'
+                        ? 'text-rose-400'
                         : currentSeverityMeta.severity === 'high'
-                        ? 'text-orange-600 dark:text-orange-400'
-                        : 'text-amber-600 dark:text-amber-400'
+                        ? 'text-orange-400'
+                        : 'text-amber-400'
                     }`}
                   >
                     {currentSeverityMeta.severity}
                   </span>
                 </div>
               </div>
-              <div className="text-xs font-mono font-bold bg-white dark:bg-slate-900 px-2.5 py-1 rounded-lg text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-sm">
+              <div className="text-xs font-mono font-bold bg-[#080C14] px-2.5 py-1 rounded-lg text-slate-200 border border-white/10 shadow-sm">
                 Score: {currentSeverityMeta.score}/100
               </div>
             </div>
@@ -565,16 +565,16 @@ export default function ReportHazardModal({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3.5 px-4 rounded-2xl bg-slate-900 dark:bg-white hover:bg-black dark:hover:bg-slate-200 text-white dark:text-slate-900 font-bold text-sm shadow-md flex items-center justify-center gap-2 transition-all active:scale-[0.99] disabled:opacity-50"
+              className="w-full py-3.5 px-4 rounded-2xl bg-white hover:bg-slate-200 text-slate-950 font-bold text-sm shadow-xl shadow-white/10 flex items-center justify-center gap-2 transition-all active:scale-[0.99] disabled:opacity-50"
             >
               {isSubmitting ? (
                 <>
-                  <RefreshCw className="w-4 h-4 animate-spin text-white dark:text-slate-900" />
+                  <RefreshCw className="w-4 h-4 animate-spin text-slate-950" />
                   <span>Submitting Hazard Alert...</span>
                 </>
               ) : (
                 <>
-                  <AlertTriangle className="w-4 h-4 text-white dark:text-slate-900" />
+                  <AlertTriangle className="w-4 h-4 text-slate-950" />
                   <span>Log Hazard Now (Instant Broadcast)</span>
                 </>
               )}

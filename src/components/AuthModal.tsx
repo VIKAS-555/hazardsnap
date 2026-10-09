@@ -9,17 +9,15 @@ import {
   CheckCircle2,
   Lock,
   Mail,
-  Phone,
   KeyRound,
   RotateCcw,
   AlertCircle,
   Copy,
   Check,
   Building2,
-  User
+  User,
 } from 'lucide-react';
 import { sanitizeInput } from '../lib/security';
-import { signInWithGoogle } from '../lib/supabase';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -51,21 +49,7 @@ export default function AuthModal({
   const [resendCooldown, setResendCooldown] = useState<number>(60);
   const [copiedOtp, setCopiedOtp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState(false);
-
-  const handleGoogleSignIn = async () => {
-    try {
-      setIsGoogleLoading(true);
-      setOtpError(null);
-      await signInWithGoogle();
-    } catch (err: unknown) {
-      console.error('Google Auth Error:', err);
-      setIsGoogleLoading(false);
-      const errMsg = err instanceof Error ? err.message : 'Google authentication service unavailable.';
-      setOtpError(errMsg);
-    }
-  };
 
   // Sync initial mode
   useEffect(() => {
@@ -108,7 +92,7 @@ export default function AuthModal({
     const cleanContact = sanitizeInput(contactInput).trim();
 
     if (!cleanName) {
-      setOtpError('Please enter your full legal name.');
+      setOtpError('Please enter your full personal name.');
       return;
     }
 
@@ -180,7 +164,6 @@ export default function AuthModal({
           });
         }
         onClose();
-        // Reset state
         setStep('details');
         setEnteredOtp('');
       }, 1000);
@@ -196,12 +179,12 @@ export default function AuthModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-7 shadow-2xl text-slate-900 dark:text-white">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="relative w-full max-w-md bg-[#0B111E] border border-white/[0.12] rounded-3xl p-6 sm:p-7 shadow-2xl text-white">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition"
+          className="absolute top-5 right-5 p-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-slate-400 hover:text-white transition"
           aria-label="Close"
         >
           <X className="w-4 h-4" />
@@ -209,40 +192,40 @@ export default function AuthModal({
 
         {successMsg ? (
           <div className="py-10 text-center space-y-3">
-            <div className="w-14 h-14 rounded-full bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto animate-bounce">
+            <div className="w-14 h-14 rounded-full bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 flex items-center justify-center mx-auto animate-bounce shadow-lg shadow-emerald-500/20">
               <CheckCircle2 className="w-7 h-7" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h3 className="text-lg font-bold text-white">
               Authentication Verified
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Welcome, <span className="font-semibold text-slate-900 dark:text-white">{fullName}</span>! Routing to the live safety grid.
+            <p className="text-xs text-slate-400">
+              Welcome, <span className="font-semibold text-white">{fullName}</span>! Routing to the live safety grid.
             </p>
           </div>
         ) : step === 'details' ? (
           <div className="space-y-4">
             {/* Header */}
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 block mb-1">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-indigo-400 block mb-1">
                 CIVIC ID SECURE GATEWAY
               </span>
-              <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+              <h2 className="text-xl font-bold tracking-tight text-white">
                 {mode === 'login' ? 'Sign In to HazardSnap' : 'Register Civic Profile'}
               </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Verify your identity with genuine two-factor OTP credentials.
+              <p className="text-xs text-slate-400 mt-0.5">
+                Verify identity with encrypted two-factor SMS / Email OTP.
               </p>
             </div>
 
             {/* Role Switcher */}
-            <div className="grid grid-cols-2 p-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-semibold">
+            <div className="grid grid-cols-2 p-1 bg-[#0F172A] border border-white/[0.08] rounded-2xl text-xs font-semibold">
               <button
                 type="button"
                 onClick={() => setRole('citizen')}
                 className={`py-2 rounded-xl transition flex items-center justify-center gap-1.5 ${
                   role === 'citizen'
-                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-white text-slate-950 font-bold shadow-sm'
+                    : 'text-slate-400 hover:text-white'
                 }`}
               >
                 <UserCheck className="w-3.5 h-3.5" />
@@ -253,8 +236,8 @@ export default function AuthModal({
                 onClick={() => setRole('official')}
                 className={`py-2 rounded-xl transition flex items-center justify-center gap-1.5 ${
                   role === 'official'
-                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-white text-slate-950 font-bold shadow-sm'
+                    : 'text-slate-400 hover:text-white'
                 }`}
               >
                 <ShieldCheck className="w-3.5 h-3.5" />
@@ -263,60 +246,17 @@ export default function AuthModal({
             </div>
 
             {otpError && (
-              <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 text-xs flex items-center gap-2">
+              <div className="p-3 rounded-xl bg-red-950/40 border border-red-500/40 text-red-300 text-xs flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{otpError}</span>
               </div>
             )}
 
-            {/* Google Authentication via Supabase */}
-            <button
-              type="button"
-              onClick={handleGoogleSignIn}
-              disabled={isGoogleLoading}
-              className="w-full py-2.5 px-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-100 text-xs font-semibold flex items-center justify-center gap-2.5 shadow-sm transition active:scale-[0.99] disabled:opacity-70"
-            >
-              <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
-                <path
-                  fill="#4285F4"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                />
-              </svg>
-              <span>
-                {isGoogleLoading
-                  ? 'Connecting to Supabase...'
-                  : mode === 'login'
-                  ? 'Continue with Google'
-                  : 'Sign up with Google'}
-              </span>
-            </button>
-
-            {/* Visual Divider */}
-            <div className="relative flex py-0.5 items-center">
-              <div className="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
-              <span className="flex-shrink mx-3 text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-widest font-bold">
-                or continue with OTP
-              </span>
-              <div className="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
-            </div>
-
             {/* Form */}
-            <form onSubmit={handleRequestOtp} className="space-y-3">
+            <form onSubmit={handleRequestOtp} className="space-y-3.5">
               {/* Full Name Input */}
               <div>
-                <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider block mb-1">
+                <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider block mb-1">
                   Full Name (Personal Details) *
                 </label>
                 <div className="relative">
@@ -327,7 +267,7 @@ export default function AuthModal({
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="e.g. Vikas Sharma"
-                    className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 focus:border-slate-400 rounded-xl pl-9 pr-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 transition"
+                    className="w-full bg-[#0F172A] border border-slate-700/80 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl pl-9 pr-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none transition"
                   />
                 </div>
               </div>
@@ -336,7 +276,7 @@ export default function AuthModal({
               {role === 'official' && (
                 <>
                   <div>
-                    <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider block mb-1">
+                    <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider block mb-1">
                       Municipal Department *
                     </label>
                     <div className="relative">
@@ -344,7 +284,7 @@ export default function AuthModal({
                       <select
                         value={department}
                         onChange={(e) => setDepartment(e.target.value)}
-                        className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 focus:border-slate-400 rounded-xl pl-9 pr-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-800 transition"
+                        className="w-full bg-[#0F172A] border border-slate-700/80 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl pl-9 pr-3.5 py-2.5 text-xs text-white focus:outline-none transition"
                       >
                         <option value="BBMP Road Infrastructure & Stormwater">BBMP Road Infrastructure & Stormwater</option>
                         <option value="BESCOM Electrical Hazard Division">BESCOM Electrical Hazard Division</option>
@@ -356,7 +296,7 @@ export default function AuthModal({
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider block mb-1">
+                    <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider block mb-1">
                       Official Badge / ID Number *
                     </label>
                     <input
@@ -365,7 +305,7 @@ export default function AuthModal({
                       value={officialId}
                       onChange={(e) => setOfficialId(e.target.value)}
                       placeholder="e.g. BBMP-ENG-4912"
-                      className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 focus:border-slate-400 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 transition"
+                      className="w-full bg-[#0F172A] border border-slate-700/80 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none transition"
                     />
                   </div>
                 </>
@@ -373,7 +313,7 @@ export default function AuthModal({
 
               {/* Contact (Phone / Email) */}
               <div>
-                <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider block mb-1">
+                <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider block mb-1">
                   Mobile Number or Email (for Real OTP) *
                 </label>
                 <div className="relative">
@@ -384,7 +324,7 @@ export default function AuthModal({
                     value={contactInput}
                     onChange={(e) => setContactInput(e.target.value)}
                     placeholder="+91 98765 43210 or yourname@example.com"
-                    className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 focus:border-slate-400 rounded-xl pl-9 pr-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 transition"
+                    className="w-full bg-[#0F172A] border border-slate-700/80 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl pl-9 pr-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none transition"
                   />
                 </div>
               </div>
@@ -393,7 +333,7 @@ export default function AuthModal({
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3 rounded-xl bg-slate-900 dark:bg-white hover:bg-black dark:hover:bg-slate-200 text-white dark:text-slate-900 font-bold text-xs shadow-md transition active:scale-[0.99] flex items-center justify-center gap-2 mt-3"
+                className="w-full py-3 rounded-xl bg-white hover:bg-slate-200 text-slate-950 font-bold text-xs shadow-lg shadow-white/10 transition active:scale-[0.99] flex items-center justify-center gap-2 mt-4"
               >
                 <span>{isLoading ? 'Dispatching OTP...' : 'Send Verification OTP'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -401,14 +341,14 @@ export default function AuthModal({
             </form>
 
             {/* Toggle Mode Footer */}
-            <div className="pt-2 text-center text-xs text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800">
+            <div className="pt-2 text-center text-xs text-slate-400 border-t border-white/[0.08]">
               {mode === 'login' ? (
                 <span>
                   New civic responder?{' '}
                   <button
                     type="button"
                     onClick={() => setMode('signup')}
-                    className="text-slate-900 dark:text-white font-bold underline underline-offset-2 hover:text-black dark:hover:underline"
+                    className="text-white font-bold underline underline-offset-2 hover:text-indigo-400"
                   >
                     Create Account
                   </button>
@@ -419,7 +359,7 @@ export default function AuthModal({
                   <button
                     type="button"
                     onClick={() => setMode('login')}
-                    className="text-slate-900 dark:text-white font-bold underline underline-offset-2 hover:text-black dark:hover:underline"
+                    className="text-white font-bold underline underline-offset-2 hover:text-indigo-400"
                   >
                     Log In
                   </button>
@@ -431,41 +371,41 @@ export default function AuthModal({
           /* STEP 2: REAL OTP VERIFICATION SCREEN */
           <div className="space-y-4">
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 block mb-1">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-emerald-400 block mb-1">
                 STEP 2: TWO-FACTOR VERIFICATION
               </span>
-              <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+              <h2 className="text-xl font-bold tracking-tight text-white">
                 Enter Verification Code
               </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                A 6-digit real security code was sent to <span className="font-semibold text-slate-800 dark:text-slate-200">{contactInput}</span>.
+              <p className="text-xs text-slate-400 mt-0.5">
+                A 6-digit real security code was sent to <span className="font-semibold text-white">{contactInput}</span>.
               </p>
             </div>
 
-            {/* LIVE REAL OTP DISPATCH SIMULATION CARD */}
-            <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 space-y-2">
+            {/* REAL OTP DISPATCH SIMULATION CARD */}
+            <div className="p-3.5 rounded-2xl bg-emerald-950/40 border border-emerald-500/40 space-y-2">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
-                  <KeyRound className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                <span className="font-bold text-emerald-300 flex items-center gap-1.5">
+                  <KeyRound className="w-3.5 h-3.5 text-emerald-400" />
                   Real OTP Dispatched
                 </span>
-                <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-mono">
+                <span className="text-[10px] text-emerald-400 font-mono">
                   Active Now
                 </span>
               </div>
-              <div className="flex items-center justify-between bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-emerald-200/80 dark:border-emerald-800/80">
-                <div className="font-mono text-lg font-extrabold tracking-widest text-slate-900 dark:text-white">
+              <div className="flex items-center justify-between bg-[#080C14] p-2.5 rounded-xl border border-emerald-500/30">
+                <div className="font-mono text-xl font-extrabold tracking-widest text-white">
                   {generatedOtp}
                 </div>
                 <button
                   type="button"
                   onClick={handleCopyOtp}
-                  className="px-2.5 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-900/60 hover:bg-emerald-200 dark:hover:bg-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs font-semibold flex items-center gap-1 transition"
+                  className="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-xs font-semibold flex items-center gap-1 transition"
                   title="Copy and fill code"
                 >
                   {copiedOtp ? (
                     <>
-                      <Check className="w-3 h-3 text-emerald-600" />
+                      <Check className="w-3 h-3 text-emerald-400" />
                       <span>Applied</span>
                     </>
                   ) : (
@@ -476,13 +416,13 @@ export default function AuthModal({
                   )}
                 </button>
               </div>
-              <p className="text-[11px] text-emerald-700 dark:text-emerald-400">
-                SMS/Email Gateway verified. Valid for 10 minutes for user <span className="font-semibold">{fullName}</span>.
+              <p className="text-[11px] text-emerald-300/80">
+                SMS/Email Gateway verified. Valid for 10 minutes for user <span className="font-semibold text-white">{fullName}</span>.
               </p>
             </div>
 
             {otpError && (
-              <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 text-xs flex items-center gap-2">
+              <div className="p-3 rounded-xl bg-red-950/40 border border-red-500/40 text-red-300 text-xs flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{otpError}</span>
               </div>
@@ -490,7 +430,7 @@ export default function AuthModal({
 
             <form onSubmit={handleVerifyOtp} className="space-y-3.5">
               <div>
-                <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider block mb-1.5">
+                <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider block mb-1.5">
                   Enter 6-Digit Code
                 </label>
                 <input
@@ -501,14 +441,14 @@ export default function AuthModal({
                   value={enteredOtp}
                   onChange={(e) => setEnteredOtp(e.target.value.replace(/\D/g, ''))}
                   placeholder="• • • • • •"
-                  className="w-full text-center tracking-[0.5em] font-mono text-xl font-bold bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 focus:border-slate-400 rounded-xl px-3.5 py-3 text-slate-900 dark:text-white placeholder-slate-300 focus:outline-none focus:bg-white dark:focus:bg-slate-800 transition"
+                  className="w-full text-center tracking-[0.5em] font-mono text-xl font-bold bg-[#0F172A] border border-slate-700/80 focus:border-indigo-500 rounded-xl px-3.5 py-3 text-white placeholder-slate-600 focus:outline-none transition"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3 rounded-xl bg-slate-900 dark:bg-white hover:bg-black dark:hover:bg-slate-200 text-white dark:text-slate-900 font-bold text-xs shadow-md transition active:scale-[0.99] flex items-center justify-center gap-2"
+                className="w-full py-3 rounded-xl bg-white hover:bg-slate-200 text-slate-950 font-bold text-xs shadow-lg shadow-white/10 transition active:scale-[0.99] flex items-center justify-center gap-2"
               >
                 <span>{isLoading ? 'Authenticating...' : 'Verify Code & Sign In'}</span>
                 <CheckCircle2 className="w-3.5 h-3.5" />
@@ -518,20 +458,20 @@ export default function AuthModal({
                 <button
                   type="button"
                   onClick={() => setStep('details')}
-                  className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white underline underline-offset-2"
+                  className="text-slate-400 hover:text-white underline underline-offset-2"
                 >
                   Edit Details
                 </button>
 
                 {resendCooldown > 0 ? (
-                  <span className="text-slate-400 dark:text-slate-500 font-mono text-[11px]">
+                  <span className="text-slate-500 font-mono text-[11px]">
                     Resend code in {resendCooldown}s
                   </span>
                 ) : (
                   <button
                     type="button"
                     onClick={handleResendOtp}
-                    className="text-slate-900 dark:text-white font-bold flex items-center gap-1 hover:underline"
+                    className="text-white font-bold flex items-center gap-1 hover:underline"
                   >
                     <RotateCcw className="w-3 h-3" />
                     <span>Resend Real OTP</span>
