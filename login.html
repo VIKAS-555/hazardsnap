@@ -94,7 +94,7 @@
   <!-- ============================================================
        MAIN CONTENT CONTAINER
        ============================================================ -->
-  <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 sm:py-12 flex flex-col justify-center">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 flex flex-col justify-center">
 
     <!-- VIEW A: AUTHENTICATION TABS (Shown when logged out) -->
     <div id="auth-forms-container" class="w-full max-w-xl mx-auto">
@@ -215,11 +215,29 @@
 
       <!-- FORM 2: NEW MEMBER REGISTRATION -->
       <div id="form-register-card" class="hidden academic-card p-6 sm:p-8 rounded-2xl shadow-xl">
-        <div class="mb-5 border-b border-slate-100 dark:border-slate-800 pb-3">
-          <h2 class="text-base font-bold text-slate-900 dark:text-white">New Member Induction & ID Minting</h2>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Provide your student information to generate your unique Tech Club ID and profile.
+        <div class="mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
+          <h2 id="reg-heading-text" class="text-base font-bold text-slate-900 dark:text-white">Member Induction & ID Minting</h2>
+          <p id="reg-subheading-text" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Provide your details to join the BST Tech Club ecosystem.
           </p>
+        </div>
+
+        <!-- Role Selector: Student vs Faculty -->
+        <div class="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 mb-5">
+          <button 
+            type="button" 
+            id="reg-mode-student-btn" 
+            onclick="setRegistrationMode('student')" 
+            class="flex-1 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm">
+            <i data-lucide="graduation-cap" class="w-3.5 h-3.5"></i> Student Onboarding
+          </button>
+          <button 
+            type="button" 
+            id="reg-mode-teacher-btn" 
+            onclick="setRegistrationMode('teacher')" 
+            class="flex-1 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+            <i data-lucide="award" class="w-3.5 h-3.5"></i> Faculty / Teacher
+          </button>
         </div>
 
         <form onsubmit="handleRegister(event)" class="space-y-4">
@@ -227,7 +245,7 @@
 
           <!-- Full Name -->
           <div>
-            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Full Legal / College Name *</label>
+            <label id="reg-name-label" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Full Legal / College Name *</label>
             <div class="relative">
               <i data-lucide="user" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
               <input 
@@ -239,8 +257,8 @@
             </div>
           </div>
 
-          <!-- USN & Section Grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <!-- USN & Section Grid (Student Only) -->
+          <div id="reg-student-fields" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">University Seat Number (USN) *</label>
               <div class="relative">
@@ -248,7 +266,6 @@
                 <input 
                   type="number" 
                   id="reg-usn" 
-                  required 
                   min="2392608001" 
                   max="2392608302" 
                   placeholder="Enter University Seat Number" 
@@ -264,16 +281,43 @@
                 <input 
                   type="text" 
                   id="reg-section" 
-                  required 
                   placeholder="e.g. A, B, C" 
                   class="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
               </div>
             </div>
           </div>
 
-          <!-- College Email -->
+          <!-- Faculty Designation & Key (Teacher Only - Hidden by default) -->
+          <div id="reg-teacher-fields" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Designation / Role *</label>
+              <div class="relative">
+                <i data-lucide="briefcase" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                <input 
+                  type="text" 
+                  id="reg-teacher-designation" 
+                  placeholder="e.g. Assistant Professor / Mentor" 
+                  class="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Faculty Key (Optional)</label>
+              <div class="relative">
+                <i data-lucide="key" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                <input 
+                  type="text" 
+                  id="reg-teacher-key" 
+                  placeholder="e.g. BST-FACULTY" 
+                  class="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-mono focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+              </div>
+              <p class="text-[10px] text-slate-400 mt-1">Default key: BST-FACULTY</p>
+            </div>
+          </div>
+
+          <!-- Email (College for Student, Any for Teacher) -->
           <div>
-            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">College Email ID *</label>
+            <label id="reg-email-label" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">College Email ID *</label>
             <div class="relative">
               <i data-lucide="mail" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
               <input 
@@ -283,7 +327,7 @@
                 placeholder="e.g. 1234567890@svyasa-sas.edu.in" 
                 class="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
             </div>
-            <p class="text-[11px] text-slate-400 mt-1">Official college domains or student institutional mail IDs.</p>
+            <p id="reg-email-hint" class="text-[11px] text-slate-400 mt-1">Official college domains or student institutional mail IDs.</p>
           </div>
 
           <!-- Academic Branch (Only CSE AI & ML) -->
@@ -362,7 +406,7 @@
 
     <!-- VIEW B: AUTHENTICATED MEMBER DASHBOARD & DIGITAL ID CARD -->
     <!-- (Rendered dynamically when session is active) -->
-    <div id="member-dashboard-container" class="hidden w-full max-w-2xl mx-auto space-y-6">
+    <div id="member-dashboard-container" class="hidden w-full max-w-7xl mx-auto space-y-6">
       
       <!-- Top Welcome Header -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
@@ -448,8 +492,70 @@
         </div>
       </div>
 
-      <!-- DIGITAL TECH CLUB ID CARD (Modern Academic Minimalist) -->
-      <div id="digital-id-card" class="ticket-pass p-6 sm:p-7 rounded-2xl bg-gradient-to-br from-white via-slate-50 to-blue-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/20 border-2 border-blue-500 shadow-xl">
+      <!-- TEACHER / FACULTY EVALUATOR OPERATIONS SUITE (ONLY SHOWN FOR FACULTY & ADMINS) -->
+      <div id="teacher-section-card" class="hidden academic-card p-6 rounded-2xl shadow-sm border-2 border-indigo-500/60 bg-gradient-to-br from-indigo-50/50 via-white to-indigo-50/20 dark:from-indigo-950/20 dark:via-slate-900 dark:to-indigo-950/10">
+        <div class="flex items-start justify-between gap-3 mb-4">
+          <div>
+            <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-indigo-600 dark:text-indigo-400">
+              <i data-lucide="graduation-cap" class="w-4 h-4 text-indigo-500"></i> Faculty Evaluator Operations Suite
+            </div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">
+              Teacher Oversight & Academic Assessment Console
+            </h3>
+            <p class="text-xs text-slate-600 dark:text-slate-300 mt-0.5 leading-relaxed">
+              Academic Faculty Portal. Review student repositories, evaluate project submissions with rubric marks & feedback, and inspect hackathon team logs across all domains. Exempt from point-based demotions.
+            </p>
+          </div>
+          <span class="px-2.5 py-1 rounded-lg bg-indigo-600 text-white text-xs font-mono font-extrabold uppercase shadow-sm flex items-center gap-1">
+            <i data-lucide="award" class="w-3.5 h-3.5"></i> FACULTY EVALUATOR
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+          <a 
+            href="index.html#projects" 
+            class="p-3.5 rounded-xl border border-indigo-200 dark:border-indigo-900/60 bg-white dark:bg-slate-900 hover:border-indigo-500 text-left transition shadow-sm group">
+            <div class="flex items-center justify-between mb-1">
+              <i data-lucide="check-square" class="w-4 h-4 text-indigo-500 group-hover:scale-110 transition"></i>
+              <span class="font-mono text-xs font-bold text-indigo-600">GRADE</span>
+            </div>
+            <div class="text-xs font-bold text-slate-900 dark:text-white">Student Projects & Marks</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Evaluate builds and record official feedback</div>
+          </a>
+
+          <a 
+            href="index.html#events" 
+            class="p-3.5 rounded-xl border border-indigo-200 dark:border-indigo-900/60 bg-white dark:bg-slate-900 hover:border-indigo-500 text-left transition shadow-sm group">
+            <div class="flex items-center justify-between mb-1">
+              <i data-lucide="table" class="w-4 h-4 text-indigo-500 group-hover:scale-110 transition"></i>
+              <span class="font-mono text-xs font-bold text-indigo-600">SUBMISSIONS</span>
+            </div>
+            <div class="text-xs font-bold text-slate-900 dark:text-white">Hackathon Teams & PPTs</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">View logged teams, PPT slides & status</div>
+          </a>
+
+          <button 
+            type="button" 
+            onclick="openMemberDirectoryModal()" 
+            class="p-3.5 rounded-xl border border-indigo-200 dark:border-indigo-900/60 bg-white dark:bg-slate-900 hover:border-indigo-500 text-left transition shadow-sm group">
+            <div class="flex items-center justify-between mb-1">
+              <i data-lucide="users" class="w-4 h-4 text-indigo-500 group-hover:scale-110 transition"></i>
+              <span class="font-mono text-xs font-bold text-indigo-600">ROSTER</span>
+            </div>
+            <div class="text-xs font-bold text-slate-900 dark:text-white">Department Roster</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Review registered students and mentors</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- RESPONSIVE 2-COLUMN GRID (Expansive layout on laptops/desktops, clean single-column on mobile) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- LEFT COLUMN: PRIMARY IDENTITY, METRICS & GOVERNANCE (lg:col-span-7 xl:col-span-8 space-y-6) -->
+        <div class="lg:col-span-7 xl:col-span-8 space-y-6">
+
+          <!-- DIGITAL TECH CLUB ID CARD (Modern Academic Minimalist) -->
+          <div id="digital-id-card" class="ticket-pass p-6 sm:p-7 rounded-2xl bg-gradient-to-br from-white via-slate-50 to-blue-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/20 border-2 border-blue-500 shadow-xl">
         
         <!-- ID Header -->
         <div class="flex items-start justify-between border-b border-slate-200 dark:border-slate-800 pb-4 mb-4">
@@ -586,29 +692,6 @@
 
         <!-- Dynamic Advancement Status Box -->
         <div id="dash-contrib-advancement-box" class="mt-2"></div>
-      </div>
-
-      <!-- MEMBER ACTIONS: 2. REGISTERED MEMBERS ROSTER & DIRECTORY -->
-      <div class="academic-card p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-blue-600 dark:text-blue-400">
-              <i data-lucide="users" class="w-3.5 h-3.5"></i> Department Community
-            </div>
-            <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">
-              Registered Members Directory
-            </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Verified member roster with assigned governance ranks and live merit points.
-            </p>
-          </div>
-          <button 
-            type="button" 
-            onclick="openMemberDirectoryModal()" 
-            class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-sm shrink-0">
-            <i data-lucide="list" class="w-3.5 h-3.5"></i> View Member Roster (<span id="dash-roster-count">0</span>)
-          </button>
-        </div>
       </div>
 
       <!-- MEMBER ACTIONS: 3. TECHNICAL CONTRIBUTION TRACKS & COMMUNITY ROLES -->
@@ -760,6 +843,33 @@
           </div>
         </div>
       </div>
+    </div> <!-- End Left Column -->
+
+    <!-- RIGHT COLUMN: SIDEBAR, ROSTER & OPERATIONS (lg:col-span-5 xl:col-span-4 space-y-6) -->
+    <div class="lg:col-span-5 xl:col-span-4 space-y-6">
+
+      <!-- MEMBER ACTIONS: 2. REGISTERED MEMBERS ROSTER & DIRECTORY -->
+      <div class="academic-card p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-blue-600 dark:text-blue-400">
+              <i data-lucide="users" class="w-3.5 h-3.5"></i> Department Community
+            </div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">
+              Registered Members Directory
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Verified member roster with assigned governance ranks and live merit points.
+            </p>
+          </div>
+          <button 
+            type="button" 
+            onclick="openMemberDirectoryModal()" 
+            class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-sm shrink-0">
+            <i data-lucide="list" class="w-3.5 h-3.5"></i> View Member Roster (<span id="dash-roster-count">0</span>)
+          </button>
+        </div>
+      </div>
 
       <!-- MEMBER ACTIONS: 4. EDIT PASSWORD (SECURITY SETTINGS) -->
       <div class="academic-card p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
@@ -875,9 +985,13 @@
         </div>
       </div>
 
-    </div>
+    </div> <!-- End Right Column -->
 
-  </main>
+    </div> <!-- End 12-column Grid -->
+
+  </div> <!-- End member-dashboard-container -->
+
+</main>
 
   <!-- ============================================================
        PAGE FOOTER
@@ -1179,25 +1293,78 @@
       }
     }
 
+    // --- REGISTRATION MODE TOGGLE (Student vs Faculty) ---
+    let currentRegistrationMode = 'student';
+
+    function setRegistrationMode(mode) {
+      currentRegistrationMode = mode;
+      const studentBtn = document.getElementById('reg-mode-student-btn');
+      const teacherBtn = document.getElementById('reg-mode-teacher-btn');
+      const studentFields = document.getElementById('reg-student-fields');
+      const teacherFields = document.getElementById('reg-teacher-fields');
+      const emailLabel = document.getElementById('reg-email-label');
+      const emailHint = document.getElementById('reg-email-hint');
+      const emailInput = document.getElementById('reg-email');
+      const regHeading = document.getElementById('reg-heading-text');
+      const regSubheading = document.getElementById('reg-subheading-text');
+      const submitBtn = document.getElementById('register-submit-btn');
+      const regUsn = document.getElementById('reg-usn');
+      const regSection = document.getElementById('reg-section');
+
+      if (mode === 'teacher') {
+        if (studentBtn) {
+          studentBtn.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer';
+        }
+        if (teacherBtn) {
+          teacherBtn.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm cursor-pointer';
+        }
+        if (studentFields) studentFields.classList.add('hidden');
+        if (teacherFields) teacherFields.classList.remove('hidden');
+        if (regUsn) regUsn.removeAttribute('required');
+        if (regSection) regSection.removeAttribute('required');
+        if (emailLabel) emailLabel.textContent = 'Email Address (Personal or Institutional) *';
+        if (emailHint) emailHint.textContent = 'Teachers can use any valid email (Gmail, Outlook, College email, etc.). College domain not required.';
+        if (emailInput) emailInput.placeholder = 'e.g. faculty.name@gmail.com';
+        if (regHeading) regHeading.textContent = 'Faculty Evaluator Induction & ID Minting';
+        if (regSubheading) regSubheading.textContent = 'Register as a teacher/faculty evaluator to observe club activities and assess student projects.';
+        if (submitBtn) {
+          submitBtn.className = 'w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 cursor-pointer';
+          submitBtn.innerHTML = '<i data-lucide="award" class="w-4 h-4"></i> Mint Faculty Evaluator ID & Register';
+        }
+      } else {
+        if (studentBtn) {
+          studentBtn.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm cursor-pointer';
+        }
+        if (teacherBtn) {
+          teacherBtn.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer';
+        }
+        if (studentFields) studentFields.classList.remove('hidden');
+        if (teacherFields) teacherFields.classList.add('hidden');
+        if (regUsn) regUsn.setAttribute('required', 'required');
+        if (regSection) regSection.setAttribute('required', 'required');
+        if (emailLabel) emailLabel.textContent = 'College Email ID *';
+        if (emailHint) emailHint.textContent = 'Official college domains or student institutional mail IDs.';
+        if (emailInput) emailInput.placeholder = 'e.g. 1234567890@svyasa-sas.edu.in';
+        if (regHeading) regHeading.textContent = 'Member Induction & ID Minting';
+        if (regSubheading) regSubheading.textContent = 'Provide your details to join the BST Tech Club ecosystem.';
+        if (submitBtn) {
+          submitBtn.className = 'w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 cursor-pointer';
+          submitBtn.innerHTML = '<i data-lucide="sparkles" class="w-4 h-4"></i> Mint Tech Club ID & Register';
+        }
+      }
+      if (window.lucide) window.lucide.createIcons();
+    }
+
     // --- SUBMIT: NEW MEMBER REGISTRATION ---
     async function handleRegister(e) {
       e.preventDefault();
       const name = document.getElementById('reg-name').value;
-      const usn = document.getElementById('reg-usn').value;
-      const section = document.getElementById('reg-section').value;
       const email = document.getElementById('reg-email').value;
       const department = document.getElementById('reg-dept').value;
       const password = document.getElementById('reg-password').value;
       const confirmPassword = document.getElementById('reg-confirm-password').value;
       const referredBy = document.getElementById('register-referred-by').value;
       const submitBtn = document.getElementById('register-submit-btn');
-
-      // USN Range Check: 2392608001 to 2392608302
-      const usnNum = parseInt(usn.trim(), 10);
-      if (isNaN(usnNum) || usnNum < 2392608001 || usnNum > 2392608302) {
-        showToast('USN must be within the range 2392608001 to 2392608302.', 'alert-circle');
-        return;
-      }
 
       if (password !== confirmPassword) {
         showToast('Passwords do not match. Please recheck.', 'alert-circle');
@@ -1206,6 +1373,49 @@
 
       if (password.length < 8) {
         showToast('Password must be at least 8 characters long.', 'alert-circle');
+        return;
+      }
+
+      // TEACHER / FACULTY MODE
+      if (currentRegistrationMode === 'teacher') {
+        const designation = (document.getElementById('reg-teacher-designation')?.value || 'Faculty Evaluator').trim();
+        const facultyKey = (document.getElementById('reg-teacher-key')?.value || '').trim();
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Minting Faculty ID...`;
+        if (window.lucide) window.lucide.createIcons();
+
+        try {
+          const faculty = await window.AuthEngine.registerTeacher({
+            name,
+            email,
+            department: department || 'CSE (AI & ML)',
+            designation,
+            password,
+            facultyKey
+          });
+
+          window.AuthEngine.setActiveSession(faculty, true);
+          showToast(`Welcome Professor/Faculty! Your Faculty Pass ID is ${faculty.techClubId}`, 'award');
+          renderMemberDashboard(faculty);
+        } catch (err) {
+          showToast(err.message, 'alert-circle');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `<i data-lucide="award" class="w-4 h-4"></i> Mint Faculty Evaluator ID & Register`;
+          if (window.lucide) window.lucide.createIcons();
+        }
+        return;
+      }
+
+      // STUDENT MODE
+      const usn = document.getElementById('reg-usn').value;
+      const section = document.getElementById('reg-section').value;
+
+      // USN Range Check: 2392608001 to 2392608302
+      const usnNum = parseInt((usn || '').trim(), 10);
+      if (isNaN(usnNum) || usnNum < 2392608001 || usnNum > 2392608302) {
+        showToast('USN must be within the range 2392608001 to 2392608302.', 'alert-circle');
         return;
       }
 
@@ -1260,8 +1470,8 @@
       document.getElementById('dash-user-name').textContent = session.name;
       document.getElementById('card-club-id').textContent = session.techClubId;
       document.getElementById('card-name').textContent = session.name;
-      document.getElementById('card-usn').textContent = session.usn;
-      document.getElementById('card-section').textContent = `SEC ${session.section}`;
+      document.getElementById('card-usn').textContent = session.usn === 'FACULTY' ? 'FACULTY OBSERVER' : session.usn;
+      document.getElementById('card-section').textContent = session.usn === 'FACULTY' ? (session.designation || 'FACULTY') : `SEC ${session.section}`;
       document.getElementById('card-dept').textContent = session.department;
       document.getElementById('card-email').textContent = session.email;
 
@@ -1277,8 +1487,35 @@
       const cardStatusText = document.getElementById('card-status-text');
       const cardAvatar = document.getElementById('card-avatar-badge');
       const adminSuite = document.getElementById('admin-suite-card');
+      const teacherSuite = document.getElementById('teacher-section-card');
 
-      if (userRank === 'Root Architect') {
+      if (teacherSuite) {
+        if (userRank === 'Faculty Evaluator' || userRank === 'Root Architect' || userRank === 'Core Maintainer' || currentMemberRecord.isTeacher) {
+          teacherSuite.classList.remove('hidden');
+        } else {
+          teacherSuite.classList.add('hidden');
+        }
+      }
+
+      if (userRank === 'Faculty Evaluator' || currentMemberRecord.isTeacher) {
+        if (rolePill) rolePill.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-950/80 text-indigo-800 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 text-xs font-mono font-bold mb-1 shadow-sm';
+        if (roleTitle) roleTitle.textContent = 'Faculty Evaluator';
+        if (roleIcon) roleIcon.setAttribute('data-lucide', 'graduation-cap');
+        if (idCard) idCard.className = 'ticket-pass p-6 sm:p-7 rounded-2xl bg-gradient-to-br from-indigo-50/70 via-white to-indigo-100/30 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950/40 border-2 border-indigo-500 shadow-xl shadow-indigo-500/10 ring-2 ring-indigo-400/20';
+        if (cardAvatar) {
+          cardAvatar.className = 'w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white flex items-center justify-center font-mono font-extrabold text-base shadow-sm ring-2 ring-indigo-400/30';
+          cardAvatar.innerHTML = '<i data-lucide="graduation-cap" class="w-5 h-5"></i>';
+        }
+        if (cardTypeLabel) {
+          cardTypeLabel.textContent = 'FACULTY OBSERVER PASS';
+          cardTypeLabel.className = 'text-xs font-mono font-extrabold tracking-wider uppercase text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5';
+        }
+        if (cardPassLabel) cardPassLabel.textContent = 'FACULTY OBSERVER PASS';
+        if (cardStatusBadge) cardStatusBadge.className = 'font-mono font-extrabold text-indigo-600 dark:text-indigo-400 flex items-center gap-1';
+        if (cardStatusDot) cardStatusDot.className = 'w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse';
+        if (cardStatusText) cardStatusText.textContent = 'FACULTY OBSERVER & EVALUATOR';
+        if (adminSuite) adminSuite.classList.add('hidden');
+      } else if (userRank === 'Root Architect') {
         if (rolePill) rolePill.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700 text-xs font-mono font-bold mb-1 shadow-sm';
         if (roleTitle) roleTitle.textContent = 'Lead Administrator';
         if (roleIcon) roleIcon.setAttribute('data-lucide', 'terminal');
@@ -1442,6 +1679,21 @@
               </p>
             </div>
           `;
+        } else if (userRank === 'Faculty Evaluator' || currentMemberRecord.isTeacher) {
+          advancementBox.innerHTML = `
+            <div class="p-3.5 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-900/60">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-xs font-bold text-indigo-900 dark:text-indigo-200 flex items-center gap-1.5">
+                  <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400"></i>
+                  Faculty Role: Academic Evaluator & Observer
+                </span>
+                <span class="text-[10px] font-mono font-extrabold bg-indigo-100 dark:bg-indigo-900/80 text-indigo-800 dark:text-indigo-200 px-2 py-0.5 rounded border border-indigo-300 dark:border-indigo-700">CONTRIBUTION EXEMPT</span>
+              </div>
+              <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+                Faculty accounts hold independent evaluation authority. You have access to review and mark student projects, inspect hackathon team submissions, and monitor student progress across all tracks without point constraints.
+              </p>
+            </div>
+          `;
         } else if (userRank === 'Root Architect') {
           advancementBox.innerHTML = `
             <div class="p-3.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/60">
@@ -1466,7 +1718,21 @@
       const referralBoxDesc = document.getElementById('referral-box-desc');
       const referralStatLabel = document.getElementById('referral-stat-label');
 
-      if (userRank === 'Root Architect') {
+      if (userRank === 'Faculty Evaluator' || currentMemberRecord.isTeacher) {
+        if (referralTagBadge) {
+          referralTagBadge.className = 'inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-indigo-600 dark:text-indigo-400';
+          referralTagBadge.innerHTML = '<i data-lucide="graduation-cap" class="w-3.5 h-3.5"></i> Faculty Onboarding & Class Referral';
+        }
+        if (referralBoxTitle) {
+          referralBoxTitle.textContent = 'Invite Students to BST Tech Club';
+        }
+        if (referralBoxDesc) {
+          referralBoxDesc.innerHTML = 'Share your official faculty invite link with your class or department students. As a <b>Faculty Evaluator</b>, your account observes all activity and grades projects without point-based rank restrictions.';
+        }
+        if (referralStatLabel) {
+          referralStatLabel.textContent = 'STUDENTS ONBOARDED';
+        }
+      } else if (userRank === 'Root Architect') {
         // Lead Administrator (Club Admin) - sits at top, auto-promotion does not apply
         if (referralTagBadge) {
           referralTagBadge.className = 'inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-amber-600 dark:text-amber-400';
@@ -2031,7 +2297,7 @@
 
       container.innerHTML = filtered.map((m, index) => {
         const mRank = window.AuthEngine.normalizeMemberRank ? window.AuthEngine.normalizeMemberRank(m.role) : (m.role || 'Active Developer');
-        const ranksOrder = { 'Active Developer': 1, 'Staff Contributor': 2, 'Core Maintainer': 3, 'Root Architect': 4 };
+        const ranksOrder = { 'Active Developer': 1, 'Staff Contributor': 2, 'Core Maintainer': 3, 'Root Architect': 4, 'Faculty Evaluator': 5 };
         const mRankLevel = ranksOrder[mRank] || 1;
         const isTargetSelf = (activeSession && activeSession.techClubId === m.techClubId);
         const mContrib = window.AuthEngine && typeof window.AuthEngine.calculateMemberContribution === 'function'
@@ -2059,7 +2325,9 @@
         }
 
         let badgeHtml = '';
-        if (mRank === 'Root Architect') {
+        if (mRank === 'Faculty Evaluator' || m.isTeacher) {
+          badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950/80 text-indigo-800 dark:text-indigo-300 font-mono text-[9px] font-extrabold border border-indigo-300 dark:border-indigo-700 flex items-center gap-1 shadow-xs"><i data-lucide="graduation-cap" class="w-3 h-3"></i> FACULTY EVALUATOR</span>`;
+        } else if (mRank === 'Root Architect') {
           badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-mono text-[9px] font-extrabold border border-amber-300 dark:border-amber-700 flex items-center gap-1 shadow-xs"><i data-lucide="terminal" class="w-3 h-3"></i> LEAD ADMIN</span>`;
         } else if (mRank === 'Core Maintainer') {
           badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/80 text-purple-800 dark:text-purple-300 font-mono text-[9px] font-extrabold border border-purple-300 dark:border-purple-700 flex items-center gap-1 shadow-xs"><i data-lucide="git-branch" class="w-3 h-3"></i> CORE MAINTAINER</span>`;
@@ -2126,7 +2394,7 @@
                       <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-semibold">${m.section || 'AIML'}</span>
                     </div>
                     <div class="text-[10px] font-mono text-slate-500 dark:text-slate-400 mt-0.5">
-                      USN: <span class="font-semibold text-slate-700 dark:text-slate-300">${m.usn || 'N/A'}</span>
+                      ${m.isTeacher || m.usn === 'FACULTY' ? `<span class="font-semibold text-indigo-600 dark:text-indigo-400">FACULTY OBSERVER</span> • ${m.designation || 'Faculty'}` : `USN: <span class="font-semibold text-slate-700 dark:text-slate-300">${m.usn || 'N/A'}</span>`}
                     </div>
                   </div>
                 </div>
@@ -2146,7 +2414,9 @@
 
         // Tier B: Lead Administrator & Core Maintainer (Elevated Governance Insights & Full Diagnostics)
         let statusDiagnosticHtml = '';
-        if (mRank === 'Root Architect') {
+        if (mRank === 'Faculty Evaluator' || m.isTeacher) {
+          statusDiagnosticHtml = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-[9px] font-bold"><i data-lucide="graduation-cap" class="w-2.5 h-2.5"></i> Faculty Evaluator (Exempt)</span>`;
+        } else if (mRank === 'Root Architect') {
           statusDiagnosticHtml = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 text-[9px] font-bold"><i data-lucide="shield" class="w-2.5 h-2.5"></i> Lead Admin (Exempt)</span>`;
         } else if (mRank === 'Core Maintainer') {
           statusDiagnosticHtml = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-[9px] font-bold"><i data-lucide="git-branch" class="w-2.5 h-2.5"></i> Maintainer (Exempt)</span>`;
@@ -2178,7 +2448,7 @@
                     <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-semibold">${m.section || 'AIML'}</span>
                   </div>
                   <div class="text-[10px] font-mono text-slate-500 dark:text-slate-400 mt-0.5">
-                    USN: <span class="font-semibold text-slate-700 dark:text-slate-300">${m.usn || 'N/A'}</span>
+                    ${m.isTeacher || m.usn === 'FACULTY' ? `<span class="font-semibold text-indigo-600 dark:text-indigo-400">FACULTY OBSERVER</span> • ${m.designation || 'Faculty'}` : `USN: <span class="font-semibold text-slate-700 dark:text-slate-300">${m.usn || 'N/A'}</span>`}
                   </div>
                 </div>
               </div>

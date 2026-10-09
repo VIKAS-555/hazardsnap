@@ -76,8 +76,20 @@ function hasContentAdminAccess() {
   return role === 'Root Architect' || role === 'Core Maintainer';
 }
 
+function hasEvaluatorAccess() {
+  if (!window.AuthEngine || typeof window.AuthEngine.getActiveSession !== 'function') {
+    return false;
+  }
+  const session = window.AuthEngine.getActiveSession();
+  if (!session) return false;
+  const role = window.AuthEngine.normalizeMemberRank ? window.AuthEngine.normalizeMemberRank(session.role) : session.role;
+  return role === 'Root Architect' || role === 'Core Maintainer' || role === 'Faculty Evaluator' || !!session.isTeacher;
+}
+
 function syncContentAdminControls() {
   const canEdit = hasContentAdminAccess();
+  const canEvaluate = hasEvaluatorAccess();
+
   const btnAddEvent = document.getElementById('btn-add-event-toolbar');
   if (btnAddEvent) {
     if (canEdit) btnAddEvent.classList.remove('hidden');
@@ -88,6 +100,12 @@ function syncContentAdminControls() {
   if (btnAddProj) {
     if (canEdit) btnAddProj.classList.remove('hidden');
     else btnAddProj.classList.add('hidden');
+  }
+
+  const btnTeamsConsole = document.getElementById('btn-teams-submissions-toolbar');
+  if (btnTeamsConsole) {
+    if (canEvaluate) btnTeamsConsole.classList.remove('hidden');
+    else btnTeamsConsole.classList.add('hidden');
   }
 }
 
@@ -110,6 +128,9 @@ function checkAuthNavbarState() {
     } else if (role === 'Staff Contributor') {
       navText.textContent = `Staff • ${firstName}`;
       navLink.className = 'holographic-id-badge inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white transition shadow-md border border-emerald-300/60 ring-2 ring-emerald-400/20';
+    } else if (role === 'Faculty Evaluator' || session.isTeacher) {
+      navText.textContent = `Faculty • ${firstName}`;
+      navLink.className = 'holographic-id-badge inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white transition shadow-md border border-indigo-300/60 ring-2 ring-indigo-400/20';
     } else {
       navText.textContent = `${session.techClubId} (${firstName})`;
       navLink.className = 'holographic-id-badge inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition shadow-sm border border-blue-400/40';
@@ -567,7 +588,24 @@ function renderEvents() {
     const speakerRole = evt.speaker && evt.speaker.role ? evt.speaker.role : 'Technical Lead';
 
     return `
-      <div class="academic-card rounded-2xl overflow-hidden flex flex-col justify-between relative group" id="event-card-${evt.id}">
+      <div class="academic-card rounded-2xl overflow-hidden flex flex-col justify-between relative group shadow-sm hover:shadow-md transition" id="event-card-${evt.id}">
+        ${evt.coverImage ? `
+          <div class="relative w-full h-40 overflow-hidden bg-slate-900 border-b border-slate-100 dark:border-slate-800">
+            <img src="${evt.coverImage}" alt="${evt.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.parentElement.style.display='none'">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent"></div>
+            ${evt.minTeamSize && evt.maxTeamSize ? `
+              <span class="absolute bottom-2.5 left-3 px-2 py-0.5 rounded-md bg-black/75 backdrop-blur-xs text-white text-[10px] font-mono font-bold flex items-center gap-1 border border-white/20">
+                <i data-lucide="users" class="w-3 h-3 text-indigo-400"></i> ${evt.minTeamSize === evt.maxTeamSize ? `Team: ${evt.maxTeamSize}` : `Team: ${evt.minTeamSize}–${evt.maxTeamSize} Members`}
+              </span>
+            ` : ''}
+          </div>
+        ` : (evt.minTeamSize && evt.maxTeamSize && (evt.maxTeamSize > 1 || evt.minTeamSize > 1) ? `
+          <div class="px-6 pt-4 -mb-2">
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-mono text-[10px] font-bold border border-indigo-200 dark:border-indigo-800">
+              <i data-lucide="users" class="w-3 h-3 text-indigo-500"></i> Team Size: ${evt.minTeamSize === evt.maxTeamSize ? evt.maxTeamSize : `${evt.minTeamSize}–${evt.maxTeamSize} Members`}
+            </span>
+          </div>
+        ` : '')}
         <div class="p-6">
           <div class="flex items-center justify-between gap-3 mb-3">
             <span class="text-xs font-mono font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2.5 py-1 rounded-md">
@@ -669,6 +707,44 @@ function resetEventFilters() {
   else renderEvents();
 }
 
+// --- EVENT COVER IMAGE HELPERS ---
+function previewEventCoverImage(url) {
+  const box = document.getElementById('edit-event-cover-preview-box');
+  const img = document.getElementById('edit-event-cover-preview');
+  if (!box || !img) return;
+  if (url && url.trim()) {
+    img.src = url.trim();
+    box.classList.remove('hidden');
+  } else {
+    img.src = '';
+    box.classList.add('hidden');
+  }
+}
+
+function setEventCoverPreset(preset) {
+  const presets = {
+    aiml: 'https://images.unsplash.com/photo-1677442136019-21780efad99a?auto=format&fit=crop&w=1200&q=80',
+    robotics: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1200&q=80',
+    hackathon: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80',
+    algorithms: 'https://images.unsplash.com/photo-1516116211227-bbc03e3cb828?auto=format&fit=crop&w=1200&q=80',
+    opensource: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80'
+  };
+  const url = presets[preset] || presets.aiml;
+  const input = document.getElementById('edit-event-cover-image');
+  if (input) {
+    input.value = url;
+    previewEventCoverImage(url);
+  }
+}
+
+function clearEventCoverImage() {
+  const input = document.getElementById('edit-event-cover-image');
+  if (input) {
+    input.value = '';
+    previewEventCoverImage('');
+  }
+}
+
 // --- EVENT EDITOR MODAL LOGIC (ADD / EDIT) ---
 function openEventEditorModal(eventId = null) {
   if (!hasContentAdminAccess()) {
@@ -702,10 +778,18 @@ function openEventEditorModal(eventId = null) {
     document.getElementById('edit-event-speaker-name').value = evt.speaker?.name || '';
     document.getElementById('edit-event-speaker-role').value = evt.speaker?.role || '';
     document.getElementById('edit-event-description').value = evt.description || '';
+    document.getElementById('edit-event-cover-image').value = evt.coverImage || '';
+    document.getElementById('edit-event-min-team-size').value = evt.minTeamSize || 1;
+    document.getElementById('edit-event-max-team-size').value = evt.maxTeamSize || 4;
+    previewEventCoverImage(evt.coverImage || '');
   } else {
     titleEl.textContent = 'Schedule New Event';
     idInput.value = '';
     document.getElementById('edit-event-seats').value = 90;
+    document.getElementById('edit-event-cover-image').value = '';
+    document.getElementById('edit-event-min-team-size').value = 1;
+    document.getElementById('edit-event-max-team-size').value = 4;
+    previewEventCoverImage('');
   }
 
   modal.classList.remove('hidden');
@@ -741,6 +825,9 @@ function handleEventEditorSubmit(e) {
   const speakerName = document.getElementById('edit-event-speaker-name').value.trim() || 'BST Tech Team';
   const speakerRole = document.getElementById('edit-event-speaker-role').value.trim() || 'Domain Coordinator';
   const description = document.getElementById('edit-event-description').value.trim();
+  const coverImage = document.getElementById('edit-event-cover-image')?.value.trim() || '';
+  const minTeamSize = parseInt(document.getElementById('edit-event-min-team-size')?.value, 10) || 1;
+  const maxTeamSize = parseInt(document.getElementById('edit-event-max-team-size')?.value, 10) || 4;
 
   let events = getStoredEvents();
 
@@ -760,6 +847,9 @@ function handleEventEditorSubmit(e) {
         seatsTotal,
         seatsLeft: Math.min(events[idx].seatsLeft, seatsTotal),
         description,
+        coverImage,
+        minTeamSize,
+        maxTeamSize,
         speaker: {
           ...events[idx].speaker,
           name: speakerName,
@@ -783,6 +873,9 @@ function handleEventEditorSubmit(e) {
       seatsTotal,
       seatsLeft: seatsTotal,
       description,
+      coverImage,
+      minTeamSize,
+      maxTeamSize,
       rsvpOpen: status === 'Upcoming',
       speaker: {
         name: speakerName,
@@ -852,12 +945,40 @@ function saveStoredProjects(projects) {
   localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(projects));
 }
 
+const PROJECT_EVALUATIONS_STORAGE_KEY = 'bst_project_evaluations_v1';
+
+function getStoredProjectEvaluations() {
+  try {
+    const raw = localStorage.getItem(PROJECT_EVALUATIONS_STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+    return {
+      'proj-1': {
+        score: 96,
+        tier: 'Outstanding (Tier A+)',
+        feedback: 'Superb architecture utilizing quantized on-device embeddings and FAISS index. Well-documented and clean academic implementation.',
+        evaluatorName: 'Dr. S. K. Raman (Faculty Evaluator)',
+        evaluatedAt: '2026-09-28T14:30:00.000Z'
+      }
+    };
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveStoredProjectEvaluations(evals) {
+  try {
+    localStorage.setItem(PROJECT_EVALUATIONS_STORAGE_KEY, JSON.stringify(evals));
+  } catch (e) {}
+}
+
 function renderProjects() {
   const container = document.getElementById('projects-grid');
   if (!container) return;
 
   const projects = getStoredProjects();
   const canManage = hasContentAdminAccess();
+  const canEvaluate = hasEvaluatorAccess();
+  const evals = getStoredProjectEvaluations();
 
   // If empty state
   if (projects.length === 0) {
@@ -883,63 +1004,97 @@ function renderProjects() {
     return;
   }
 
-  container.innerHTML = projects.map(proj => `
-    <div class="academic-card p-6 rounded-2xl flex flex-col justify-between group relative">
-      <div>
-        <div class="flex items-center justify-between gap-2 mb-3">
-          <span class="text-xs font-mono font-medium text-slate-500 dark:text-slate-400">
-            ${proj.category === 'Competative Programming' ? 'Competitive Programming' : (proj.category || 'Competitive Programming')}
-          </span>
-          <div class="flex items-center gap-2">
-            <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-900/40">
-              ${proj.badge || 'Project'}
+  container.innerHTML = projects.map(proj => {
+    const evaluation = evals[proj.id] || null;
+
+    return `
+      <div class="academic-card p-6 rounded-2xl flex flex-col justify-between group relative shadow-sm hover:shadow-md transition">
+        <div>
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <span class="text-xs font-mono font-medium text-slate-500 dark:text-slate-400">
+              ${proj.category === 'Competative Programming' ? 'Competitive Programming' : (proj.category || 'Competitive Programming')}
             </span>
-            ${canManage ? `
-              <!-- Edit & Delete Controls (Lead Admin & Core Maintainer only) -->
-              <div class="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition">
-                <button onclick="openProjectEditorModal('${proj.id}')" title="Edit Project" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-blue-600 transition cursor-pointer">
-                  <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
-                </button>
-                <button onclick="deleteProject('${proj.id}')" title="Delete Project" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-rose-600 transition cursor-pointer">
-                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                </button>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-900/40">
+                ${proj.badge || 'Project'}
+              </span>
+              ${canManage ? `
+                <!-- Edit & Delete Controls (Lead Admin & Core Maintainer only) -->
+                <div class="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition">
+                  <button onclick="openProjectEditorModal('${proj.id}')" title="Edit Project" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-blue-600 transition cursor-pointer">
+                    <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                  </button>
+                  <button onclick="deleteProject('${proj.id}')" title="Delete Project" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-rose-600 transition cursor-pointer">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                  </button>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">
+            ${proj.title}
+          </h3>
+          <p class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-3">${proj.tagline || ''}</p>
+          <p class="text-sm text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
+            ${proj.description}
+          </p>
+
+          <!-- Academic Evaluation Badge if marked -->
+          ${evaluation ? `
+            <div class="mb-4 p-3 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-900/60">
+              <div class="flex items-center justify-between text-xs mb-1">
+                <span class="font-bold text-indigo-900 dark:text-indigo-200 flex items-center gap-1">
+                  <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400"></i> ${evaluation.evaluatorName || 'Faculty Evaluator'}
+                </span>
+                <span class="font-mono font-extrabold text-indigo-700 dark:text-indigo-300 bg-white dark:bg-slate-900 px-2 py-0.5 rounded border border-indigo-200 dark:border-indigo-800 text-[10px]">
+                  ${evaluation.score}/100 • ${evaluation.tier || 'Graded'}
+                </span>
               </div>
+              ${evaluation.feedback ? `
+                <p class="text-[11px] text-slate-600 dark:text-slate-300 italic leading-snug">
+                  "${evaluation.feedback}"
+                </p>
+              ` : ''}
+            </div>
+          ` : ''}
+        </div>
+
+        <div>
+          <div class="flex flex-wrap gap-1.5 mb-5">
+            ${(proj.tech || []).map(t => `
+              <span class="px-2 py-0.5 text-[11px] font-mono rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                ${t}
+              </span>
+            `).join('')}
+          </div>
+
+          <div class="flex items-center justify-between gap-3 pt-4 border-t border-slate-100 dark:border-slate-800 text-xs font-semibold">
+            <div class="flex items-center gap-3">
+              <a href="${proj.github || '#'}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition">
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+                </svg> Source Code
+              </a>
+              <span class="text-slate-300 dark:text-slate-700">•</span>
+              <a href="${proj.demo || '#'}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-blue-600 dark:text-blue-400 hover:underline">
+                <i data-lucide="external-link" class="w-3.5 h-3.5"></i> Live Demo
+              </a>
+            </div>
+
+            ${canEvaluate ? `
+              <button 
+                type="button" 
+                onclick="openProjectEvaluationModal('${proj.id}')" 
+                class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-1 transition shadow-sm cursor-pointer shrink-0">
+                <i data-lucide="award" class="w-3.5 h-3.5"></i> ${evaluation ? 'Update Marks' : 'Mark Project'}
+              </button>
             ` : ''}
           </div>
         </div>
-
-        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">
-          ${proj.title}
-        </h3>
-        <p class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-3">${proj.tagline || ''}</p>
-        <p class="text-sm text-slate-600 dark:text-slate-400 mb-5 leading-relaxed">
-          ${proj.description}
-        </p>
       </div>
-
-      <div>
-        <div class="flex flex-wrap gap-1.5 mb-5">
-          ${(proj.tech || []).map(t => `
-            <span class="px-2 py-0.5 text-[11px] font-mono rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-              ${t}
-            </span>
-          `).join('')}
-        </div>
-
-        <div class="flex items-center gap-3 pt-4 border-t border-slate-100 dark:border-slate-800 text-xs font-semibold">
-          <a href="${proj.github || '#'}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition">
-            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
-            </svg> Source Code
-          </a>
-          <span class="text-slate-300 dark:text-slate-700">•</span>
-          <a href="${proj.demo || '#'}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-blue-600 dark:text-blue-400 hover:underline">
-            <i data-lucide="external-link" class="w-3.5 h-3.5"></i> Live Demo
-          </a>
-        </div>
-      </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 
   if (window.lucide) window.lucide.createIcons();
 }
@@ -1115,6 +1270,61 @@ function toggleFaq(idx) {
 }
 
 /* ============================================================
+   EVENT TEAMS STORAGE & MUTUAL EXCLUSIVITY ENGINE
+   ============================================================ */
+const EVENT_TEAMS_STORAGE_KEY = 'bst_event_teams_v1';
+
+function getStoredEventTeams() {
+  try {
+    const raw = localStorage.getItem(EVENT_TEAMS_STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+    return [
+      {
+        id: 'team-neural-nexus',
+        eventId: 'hack-1',
+        eventTitle: 'HackNova 2026: 24h AI Hackathon',
+        teamName: 'Neural Nexus',
+        leaderName: 'Aarav Sharma',
+        leaderUsn: '2392608101',
+        leaderEmail: 'aarav.sharma@college.edu',
+        members: [
+          { usn: '2392608102', name: 'Priya Patel' },
+          { usn: '2392608103', name: 'Rohan Iyer' }
+        ],
+        projectLink: 'https://github.com/bst-club/neural-nexus',
+        pptLink: 'https://docs.google.com/presentation/d/sample-pitch',
+        status: 'SUBMITTED',
+        registeredAt: '2026-10-01T10:15:00.000Z'
+      },
+      {
+        id: 'team-quantum-coders',
+        eventId: 'hack-1',
+        eventTitle: 'HackNova 2026: 24h AI Hackathon',
+        teamName: 'Quantum Coders',
+        leaderName: 'Divya Nair',
+        leaderUsn: '2392608145',
+        leaderEmail: 'divya.nair@college.edu',
+        members: [
+          { usn: '2392608146', name: 'Karthik Menon' }
+        ],
+        projectLink: '',
+        pptLink: '',
+        status: 'NOT SUBMITTED',
+        registeredAt: '2026-10-02T16:40:00.000Z'
+      }
+    ];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveStoredEventTeams(teams) {
+  try {
+    localStorage.setItem(EVENT_TEAMS_STORAGE_KEY, JSON.stringify(teams));
+  } catch (e) {}
+}
+
+/* ============================================================
    RSVP MODAL & PASS GENERATOR
    ============================================================ */
 let activeRsvpEvent = null;
@@ -1149,20 +1359,78 @@ function openRsvpModal(eventId) {
   const activeSession = window.AuthEngine && window.AuthEngine.getActiveSession ? window.AuthEngine.getActiveSession() : null;
   const cachedProfile = JSON.parse(localStorage.getItem('devsphere-student-profile') || '{}');
   
-  if (activeSession) {
-    document.getElementById('rsvp-name').value = activeSession.name || '';
-    document.getElementById('rsvp-email').value = activeSession.email || '';
-    document.getElementById('rsvp-student-id').value = activeSession.usn || '';
-  } else {
-    if (cachedProfile.name) document.getElementById('rsvp-name').value = cachedProfile.name;
-    if (cachedProfile.email) document.getElementById('rsvp-email').value = cachedProfile.email;
-    if (cachedProfile.studentId) document.getElementById('rsvp-student-id').value = cachedProfile.studentId;
-    if (cachedProfile.year) document.getElementById('rsvp-year').value = cachedProfile.year;
-  }
+  const currentName = activeSession?.name || cachedProfile?.name || '';
+  const currentEmail = activeSession?.email || cachedProfile?.email || '';
+  const currentUsn = activeSession?.usn || cachedProfile?.studentId || '';
+  const currentYear = cachedProfile?.year || '2nd Year';
+
+  document.getElementById('rsvp-name').value = currentName;
+  document.getElementById('rsvp-email').value = currentEmail;
+  document.getElementById('rsvp-student-id').value = currentUsn;
+  const yearSelect = document.getElementById('rsvp-year');
+  if (yearSelect && currentYear) yearSelect.value = currentYear;
 
   // Lock branch to CSE (AI & ML)
   const deptSelect = document.getElementById('rsvp-dept');
   if (deptSelect) deptSelect.value = 'CSE (AI & ML)';
+
+  // Dynamic Team Section Setup
+  const teamSection = document.getElementById('rsvp-team-section');
+  const teamSizeBadge = document.getElementById('rsvp-team-size-badge');
+  const teamLeaderLabel = document.getElementById('rsvp-team-leader-label');
+  const teamNameInput = document.getElementById('rsvp-team-name');
+  const teammatesList = document.getElementById('rsvp-teammates-list');
+  const projectLinkInput = document.getElementById('rsvp-project-link');
+  const pptLinkInput = document.getElementById('rsvp-ppt-link');
+
+  const minTeamSize = evt.minTeamSize || 1;
+  const maxTeamSize = evt.maxTeamSize || 1;
+  const isTeamEvent = maxTeamSize > 1 || minTeamSize > 1;
+
+  if (teamSection) {
+    if (isTeamEvent) {
+      teamSection.classList.remove('hidden');
+      if (teamSizeBadge) {
+        teamSizeBadge.textContent = minTeamSize === maxTeamSize
+          ? `Team Event (${maxTeamSize} Members)`
+          : `Team: ${minTeamSize}–${maxTeamSize} Members`;
+      }
+      if (teammatesList) teammatesList.innerHTML = '';
+
+      // Check if user is already registered in a team for this event
+      const allTeams = getStoredEventTeams();
+      const existingTeam = allTeams.find(t => t.eventId === evt.id && (t.leaderUsn === currentUsn || (t.members || []).some(m => m.usn === currentUsn)));
+
+      if (existingTeam) {
+        if (teamNameInput) teamNameInput.value = existingTeam.teamName;
+        if (projectLinkInput) projectLinkInput.value = existingTeam.projectLink || '';
+        if (pptLinkInput) pptLinkInput.value = existingTeam.pptLink || '';
+
+        const isLeader = existingTeam.leaderUsn === currentUsn;
+        if (teamLeaderLabel) {
+          teamLeaderLabel.textContent = isLeader 
+            ? `${existingTeam.leaderName} (You - Team Leader)` 
+            : `${existingTeam.leaderName} (Team Leader)`;
+        }
+
+        // Populate existing teammates
+        (existingTeam.members || []).forEach(m => {
+          addTeammateRow(m.usn, m.name);
+        });
+      } else {
+        if (teamNameInput) teamNameInput.value = '';
+        if (projectLinkInput) projectLinkInput.value = '';
+        if (pptLinkInput) pptLinkInput.value = '';
+        if (teamLeaderLabel) {
+          teamLeaderLabel.textContent = currentName 
+            ? `${currentName} (Team Leader)` 
+            : 'Current Registrant (Designated Team Leader)';
+        }
+      }
+    } else {
+      teamSection.classList.add('hidden');
+    }
+  }
 
   // Show modal
   const modal = document.getElementById('rsvp-modal');
@@ -1179,6 +1447,45 @@ function closeRsvpModal() {
   modal.classList.remove('flex');
   document.body.style.overflow = 'auto';
   activeRsvpEvent = null;
+}
+
+function addTeammateRow(initialUsn = '', initialName = '') {
+  const container = document.getElementById('rsvp-teammates-list');
+  if (!container) return;
+
+  const maxTeamSize = (activeRsvpEvent && activeRsvpEvent.maxTeamSize) ? activeRsvpEvent.maxTeamSize : 4;
+  const currentCount = container.querySelectorAll('.teammate-row').length + 1; // +1 for Leader
+
+  if (currentCount >= maxTeamSize && !initialUsn) {
+    showToast(`Maximum team size reached (${maxTeamSize} members allowed).`, 'alert-circle');
+    return;
+  }
+
+  const row = document.createElement('div');
+  row.className = 'teammate-row flex items-center gap-2 p-2 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800';
+  row.innerHTML = `
+    <span class="text-[10px] font-mono font-bold text-slate-400 w-4">${currentCount + 1}.</span>
+    <input 
+      type="text" 
+      class="teammate-usn flex-1 px-2.5 py-1 text-xs rounded border border-slate-200 dark:border-slate-800 bg-transparent text-slate-900 dark:text-white font-mono placeholder:text-slate-400 focus:outline-none focus:border-indigo-500" 
+      placeholder="USN (e.g. 2392608102)" 
+      value="${initialUsn || ''}">
+    <input 
+      type="text" 
+      class="teammate-name flex-1 px-2.5 py-1 text-xs rounded border border-slate-200 dark:border-slate-800 bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-indigo-500" 
+      placeholder="Teammate Full Name" 
+      value="${initialName || ''}">
+    <button 
+      type="button" 
+      onclick="this.closest('.teammate-row').remove()" 
+      class="p-1 rounded text-slate-400 hover:text-rose-600 transition cursor-pointer" 
+      title="Remove member">
+      <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+    </button>
+  `;
+
+  container.appendChild(row);
+  if (window.lucide) window.lucide.createIcons();
 }
 
 function handleRsvpSubmit(e) {
@@ -1198,8 +1505,142 @@ function handleRsvpSubmit(e) {
     return;
   }
 
-  // Cache student info for convenient 1-click subsequent RSVPs
+  // Cache student info for convenient subsequent RSVPs
   localStorage.setItem('devsphere-student-profile', JSON.stringify({ name, email, studentId, dept, year }));
+
+  const minTeamSize = activeRsvpEvent.minTeamSize || 1;
+  const maxTeamSize = activeRsvpEvent.maxTeamSize || 1;
+  const isTeamEvent = maxTeamSize > 1 || minTeamSize > 1;
+
+  let teamRecord = null;
+
+  if (isTeamEvent) {
+    const teamNameInput = document.getElementById('rsvp-team-name');
+    const teamName = teamNameInput ? teamNameInput.value.trim() : '';
+    if (!teamName) {
+      showToast('Please enter a team name.', 'alert-circle');
+      if (teamNameInput) teamNameInput.focus();
+      return;
+    }
+
+    // Collect and validate teammates
+    const teammateRows = document.querySelectorAll('.teammate-row');
+    const teammates = [];
+    const seenUsns = new Set([studentId]);
+
+    for (const row of teammateRows) {
+      const u = (row.querySelector('.teammate-usn')?.value || '').trim();
+      const n = (row.querySelector('.teammate-name')?.value || '').trim();
+
+      if (!u || !n) {
+        showToast('Please provide both USN and Full Name for all added teammates.', 'alert-circle');
+        return;
+      }
+
+      const uNum = parseInt(u, 10);
+      if (isNaN(uNum) || uNum < 2392608001 || uNum > 2392608302) {
+        showToast(`Teammate USN ${u} must be between 2392608001 and 2392608302.`, 'alert-circle');
+        return;
+      }
+
+      if (u === studentId) {
+        showToast(`Teammate USN ${u} cannot be the same as Team Leader USN.`, 'alert-circle');
+        return;
+      }
+
+      if (seenUsns.has(u)) {
+        showToast(`Duplicate USN ${u} detected in team roster. Each member must be unique.`, 'alert-circle');
+        return;
+      }
+
+      seenUsns.add(u);
+      teammates.push({ usn: u, name: n });
+    }
+
+    const totalMembers = 1 + teammates.length;
+    if (totalMembers < minTeamSize) {
+      showToast(`This event requires a minimum of ${minTeamSize} team members. Currently: ${totalMembers}.`, 'alert-circle');
+      return;
+    }
+
+    if (totalMembers > maxTeamSize) {
+      showToast(`This event allows a maximum of ${maxTeamSize} team members. Currently: ${totalMembers}.`, 'alert-circle');
+      return;
+    }
+
+    // --- STRICT MUTUAL EXCLUSIVITY ENFORCEMENT ---
+    // A person in one group cannot register in another team. To do so, they must get out (leave) from existing team.
+    const allTeams = getStoredEventTeams();
+    const allRosterUsns = [studentId, ...teammates.map(t => t.usn)];
+
+    for (const existingTeam of allTeams) {
+      if (existingTeam.eventId === activeRsvpEvent.id) {
+        // Is this the team currently being updated by its own leader?
+        const isCurrentLeaderUpdating = existingTeam.leaderUsn === studentId;
+
+        for (const u of allRosterUsns) {
+          const inThisTeam = (existingTeam.leaderUsn === u) || (existingTeam.members || []).some(m => m.usn === u);
+          
+          if (inThisTeam && !isCurrentLeaderUpdating) {
+            const memberObj = u === studentId 
+              ? { name, usn: studentId } 
+              : (teammates.find(t => t.usn === u) || { name: u, usn: u });
+
+            alert(
+              `[Mutual Exclusivity Enforced]\n\n` +
+              `Student: ${memberObj.name} (USN: ${memberObj.usn})\n` +
+              `Status: Already registered in team "${existingTeam.teamName}" for this event.\n\n` +
+              `Rule: A student in one group cannot register in another team. ` +
+              `To join this team, they must first get out (leave or disband) from team "${existingTeam.teamName}".`
+            );
+            return;
+          }
+        }
+      }
+    }
+
+    const projectLink = (document.getElementById('rsvp-project-link')?.value || '').trim();
+    const pptLink = (document.getElementById('rsvp-ppt-link')?.value || '').trim();
+    const isDeliverablesSubmitted = Boolean(projectLink && pptLink);
+
+    // Save or update team in bst_event_teams
+    let currentTeams = getStoredEventTeams();
+    const existingTeamIdx = currentTeams.findIndex(t => t.eventId === activeRsvpEvent.id && t.leaderUsn === studentId);
+
+    if (existingTeamIdx !== -1) {
+      currentTeams[existingTeamIdx] = {
+        ...currentTeams[existingTeamIdx],
+        teamName,
+        leaderName: name,
+        leaderUsn: studentId,
+        leaderEmail: email,
+        members: teammates,
+        projectLink,
+        pptLink,
+        status: isDeliverablesSubmitted ? 'SUBMITTED' : 'NOT SUBMITTED',
+        updatedAt: new Date().toISOString()
+      };
+      teamRecord = currentTeams[existingTeamIdx];
+    } else {
+      teamRecord = {
+        id: `team-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 900)}`,
+        eventId: activeRsvpEvent.id,
+        eventTitle: activeRsvpEvent.title,
+        teamName,
+        leaderName: name,
+        leaderUsn: studentId,
+        leaderEmail: email,
+        members: teammates,
+        projectLink,
+        pptLink,
+        status: isDeliverablesSubmitted ? 'SUBMITTED' : 'NOT SUBMITTED',
+        registeredAt: new Date().toISOString()
+      };
+      currentTeams.push(teamRecord);
+    }
+
+    saveStoredEventTeams(currentTeams);
+  }
 
   // Generate unique ticket number
   const ticketId = `BST-${studentId.slice(-4)}-${Math.floor(100 + Math.random() * 900)}`;
@@ -1216,7 +1657,10 @@ function handleRsvpSubmit(e) {
     studentEmail: email,
     studentId: studentId,
     department: 'CSE (AI & ML)',
-    year: year
+    year: year,
+    teamId: teamRecord ? teamRecord.id : null,
+    teamName: teamRecord ? teamRecord.teamName : null,
+    role: teamRecord ? 'Team Leader' : 'Attendee'
   };
 
   saveUserRsvp(activeRsvpEvent.id, rsvpRecord);
@@ -1244,7 +1688,7 @@ function handleRsvpSubmit(e) {
   renderClubOverview();
   updateRsvpBadges();
   openPassModal(activeRsvpEvent.id);
-  showToast('RSVP Confirmed! Your admission pass is ready.', 'check-circle-2');
+  showToast(teamRecord ? `Team "${teamRecord.teamName}" registered! Pass ready.` : 'RSVP Confirmed! Your admission pass is ready.', 'check-circle-2');
 }
 
 function openPassModal(eventId) {
@@ -1262,6 +1706,55 @@ function openPassModal(eventId) {
   document.getElementById('pass-venue').textContent = rsvp.eventVenue;
   document.getElementById('pass-meta').textContent = `CSE (AI & ML) (${rsvp.year})`;
 
+  // Display Team Details if attendee belongs to a team
+  const teamContainer = document.getElementById('pass-team-container');
+  const teamNameEl = document.getElementById('pass-team-name');
+  const teamRoleBadge = document.getElementById('pass-team-role-badge');
+  const teamMembersEl = document.getElementById('pass-team-members');
+  const teamStatusEl = document.getElementById('pass-team-submission-status');
+  const leaveTeamBtn = document.getElementById('btn-pass-leave-team');
+
+  const allTeams = getStoredEventTeams();
+  const userTeam = allTeams.find(t => t.eventId === eventId && (t.leaderUsn === rsvp.studentId || (t.members || []).some(m => m.usn === rsvp.studentId)));
+
+  if (teamContainer) {
+    if (userTeam) {
+      teamContainer.classList.remove('hidden');
+      if (teamNameEl) teamNameEl.textContent = userTeam.teamName;
+      
+      const isLeader = userTeam.leaderUsn === rsvp.studentId;
+      if (teamRoleBadge) {
+        teamRoleBadge.textContent = isLeader ? 'TEAM LEADER' : 'TEAM MEMBER';
+        teamRoleBadge.className = isLeader 
+          ? 'px-2 py-0.5 rounded text-[9px] font-mono font-extrabold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
+          : 'px-2 py-0.5 rounded text-[9px] font-mono font-extrabold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700';
+      }
+
+      if (teamMembersEl) {
+        const roster = [
+          `${userTeam.leaderName} (Lead)`,
+          ...(userTeam.members || []).map(m => m.name)
+        ];
+        teamMembersEl.textContent = `Roster: ${roster.join(', ')}`;
+      }
+
+      if (teamStatusEl) {
+        const hasLinks = Boolean(userTeam.projectLink && userTeam.pptLink);
+        teamStatusEl.textContent = hasLinks ? 'Deliverables: SUBMITTED' : 'Deliverables: NOT SUBMITTED';
+        teamStatusEl.className = hasLinks 
+          ? 'font-mono font-bold text-emerald-600 dark:text-emerald-400' 
+          : 'font-mono font-bold text-rose-600 dark:text-rose-400';
+      }
+
+      if (leaveTeamBtn) {
+        leaveTeamBtn.textContent = isLeader ? 'Disband Team' : 'Leave Team';
+        leaveTeamBtn.onclick = () => leaveEventTeam(eventId, rsvp.studentId);
+      }
+    } else {
+      teamContainer.classList.add('hidden');
+    }
+  }
+
   renderTicketQr(rsvp.ticketId);
 
   modal.classList.remove('hidden');
@@ -1274,6 +1767,56 @@ function openPassModal(eventId) {
   }
 
   if (window.lucide) window.lucide.createIcons();
+}
+
+function leaveEventTeam(eventId, studentUsn) {
+  let teams = getStoredEventTeams();
+  const teamIdx = teams.findIndex(t => t.eventId === eventId && (t.leaderUsn === studentUsn || (t.members || []).some(m => m.usn === studentUsn)));
+  
+  if (teamIdx === -1) {
+    showToast('No active team found for this event.', 'alert-circle');
+    return;
+  }
+
+  const team = teams[teamIdx];
+  const isLeader = team.leaderUsn === studentUsn;
+
+  if (isLeader) {
+    const confirmDisband = confirm(
+      `As Team Leader of "${team.teamName}", leaving will disband this team for all registered teammates (${(team.members || []).length} members).\n\n` +
+      `Are you sure you want to disband this team? You and your members will then be free to register in other teams.`
+    );
+    if (!confirmDisband) return;
+
+    teams.splice(teamIdx, 1);
+    saveStoredEventTeams(teams);
+
+    // Remove user RSVP
+    const userRsvps = getUserRsvps();
+    delete userRsvps[eventId];
+    localStorage.setItem('devsphere-user-rsvps', JSON.stringify(userRsvps));
+
+    showToast(`Team "${team.teamName}" disbanded. You can now register in another team.`, 'check-circle-2');
+  } else {
+    const confirmLeave = confirm(
+      `Are you sure you want to leave team "${team.teamName}"?\n\nYou will be removed from the roster and can then register with a different team.`
+    );
+    if (!confirmLeave) return;
+
+    team.members = (team.members || []).filter(m => m.usn !== studentUsn);
+    saveStoredEventTeams(teams);
+
+    const userRsvps = getUserRsvps();
+    delete userRsvps[eventId];
+    localStorage.setItem('devsphere-user-rsvps', JSON.stringify(userRsvps));
+
+    showToast(`You have left team "${team.teamName}". You can now register with another team.`, 'check-circle-2');
+  }
+
+  closePassModal();
+  renderEvents();
+  renderClubOverview();
+  updateRsvpBadges();
 }
 
 function closePassModal() {
@@ -1516,6 +2059,392 @@ window.handleProjectEditorSubmit = handleProjectEditorSubmit;
 window.deleteProject = deleteProject;
 window.hasContentAdminAccess = hasContentAdminAccess;
 window.syncContentAdminControls = syncContentAdminControls;
+window.hasEvaluatorAccess = hasEvaluatorAccess;
+window.addTeammateRow = addTeammateRow;
+window.leaveEventTeam = leaveEventTeam;
+window.previewEventCoverImage = previewEventCoverImage;
+window.setEventCoverPreset = setEventCoverPreset;
+window.clearEventCoverImage = clearEventCoverImage;
+
+/* ============================================================
+   HACKATHON & EVENT TEAMS SUBMISSIONS CONSOLE
+   (Admin, Core Maintainer & Faculty Evaluator Suite)
+   ============================================================ */
+function openTeamSubmissionsModal() {
+  if (!hasEvaluatorAccess()) {
+    showToast('Access Restricted: Lead Administrator, Maintainer or Faculty Evaluator access required.', 'shield-alert');
+    return;
+  }
+
+  // Populate events filter selector
+  const eventSelect = document.getElementById('team-submissions-event-filter');
+  if (eventSelect) {
+    const events = getStoredEvents();
+    const currentVal = eventSelect.value || 'ALL';
+    eventSelect.innerHTML = `<option value="ALL">All Events & Hackathons</option>` +
+      events.map(ev => `<option value="${ev.id}" ${ev.id === currentVal ? 'selected' : ''}>${ev.title}</option>`).join('');
+  }
+
+  renderTeamSubmissionsTable();
+
+  const modal = document.getElementById('team-submissions-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+    if (window.lucide) window.lucide.createIcons();
+  }
+}
+
+function closeTeamSubmissionsModal() {
+  const modal = document.getElementById('team-submissions-modal');
+  if (!modal) return;
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+  document.body.style.overflow = 'auto';
+}
+
+function renderTeamSubmissionsTable() {
+  const container = document.getElementById('team-submissions-list');
+  if (!container) return;
+
+  const teams = getStoredEventTeams();
+  const filterEventId = document.getElementById('team-submissions-event-filter')?.value || 'ALL';
+  const searchTerm = (document.getElementById('team-submissions-search')?.value || '').toLowerCase().trim();
+
+  let filtered = teams.filter(t => {
+    if (filterEventId !== 'ALL' && t.eventId !== filterEventId) return false;
+    if (searchTerm) {
+      const matchName = (t.teamName || '').toLowerCase().includes(searchTerm);
+      const matchLeader = (t.leaderName || '').toLowerCase().includes(searchTerm) || (t.leaderUsn || '').includes(searchTerm);
+      const matchEvent = (t.eventTitle || '').toLowerCase().includes(searchTerm);
+      const matchMembers = (t.members || []).some(m => (m.name || '').toLowerCase().includes(searchTerm) || (m.usn || '').includes(searchTerm));
+      return matchName || matchLeader || matchEvent || matchMembers;
+    }
+    return true;
+  });
+
+  // Calculate statistics
+  const totalCount = filtered.length;
+  const submittedCount = filtered.filter(t => t.projectLink && t.pptLink && t.status === 'SUBMITTED').length;
+  const missingCount = totalCount - submittedCount;
+
+  const countEl = document.getElementById('team-submissions-count');
+  const subEl = document.getElementById('team-submissions-submitted-count');
+  const missEl = document.getElementById('team-submissions-missing-count');
+
+  if (countEl) countEl.textContent = totalCount;
+  if (subEl) subEl.textContent = submittedCount;
+  if (missEl) missEl.textContent = missingCount;
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="py-12 px-4 text-center rounded-xl border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+        <i data-lucide="users" class="w-8 h-8 text-slate-400 mx-auto mb-2"></i>
+        <h4 class="text-sm font-bold text-slate-800 dark:text-slate-200">No Teams Found</h4>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">No registered teams match the current search or event filter criteria.</p>
+      </div>
+    `;
+    if (window.lucide) window.lucide.createIcons();
+    return;
+  }
+
+  container.innerHTML = filtered.map(t => {
+    const isComplete = Boolean(t.projectLink && t.pptLink && t.status === 'SUBMITTED');
+    const membersList = (t.members && t.members.length > 0)
+      ? t.members.map(m => `<span class="inline-flex items-center gap-1 font-medium bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-[11px]">${m.name} <span class="font-mono text-slate-400 text-[10px]">(${m.usn})</span></span>`).join(' ')
+      : '<span class="text-slate-400 italic text-[11px]">No additional teammates</span>';
+
+    return `
+      <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700 transition space-y-3">
+        <!-- Team Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h4 class="font-bold text-sm text-slate-900 dark:text-white">${t.teamName}</h4>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold ${isComplete ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' : 'bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-400 border border-rose-200 dark:border-rose-800 animate-pulse'}">
+                ${isComplete ? '✓ SUBMITTED' : '⚠ NOT SUBMITTED'}
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              ${t.eventTitle} • Logged on ${new Date(t.registeredAt).toLocaleDateString()}
+            </p>
+          </div>
+
+          <!-- Controls -->
+          <div class="flex items-center gap-2 shrink-0">
+            <button 
+              type="button" 
+              onclick="promptEditTeamLinks('${t.id}')" 
+              class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition cursor-pointer flex items-center gap-1">
+              <i data-lucide="edit-3" class="w-3 h-3"></i> Edit Links
+            </button>
+            <button 
+              type="button" 
+              onclick="toggleTeamSubmissionStatus('${t.id}')" 
+              class="px-2.5 py-1 text-xs font-semibold rounded-lg ${isComplete ? 'bg-slate-800 hover:bg-slate-700 text-white dark:bg-slate-800' : 'bg-emerald-600 hover:bg-emerald-700 text-white'} transition cursor-pointer">
+              ${isComplete ? 'Mark Unsubmitted' : 'Mark Submitted'}
+            </button>
+            <button 
+              type="button" 
+              onclick="deleteTeamSubmission('${t.id}')" 
+              class="p-1 rounded text-slate-400 hover:text-rose-600 transition cursor-pointer" 
+              title="Disband / Remove Team">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Roster Information -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-2.5 border-t border-slate-100 dark:border-slate-800/80">
+          <div>
+            <span class="text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400 tracking-wider">TEAM LEADER (CREATOR)</span>
+            <div class="font-semibold text-slate-800 dark:text-slate-200 mt-0.5">
+              ${t.leaderName} <span class="font-mono text-slate-400 text-[10px]">(${t.leaderUsn})</span>
+            </div>
+            <div class="text-[11px] text-slate-500 dark:text-slate-400">${t.leaderEmail}</div>
+          </div>
+          <div>
+            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">TEAMMATES (${(t.members || []).length})</span>
+            <div class="flex flex-wrap gap-1.5 mt-1">
+              ${membersList}
+            </div>
+          </div>
+        </div>
+
+        <!-- Deliverables -->
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 pt-2.5 border-t border-slate-100 dark:border-slate-800/80 text-xs">
+          <div class="flex items-center gap-1.5">
+            <span class="text-[11px] font-bold text-slate-600 dark:text-slate-400">GitHub Code Link:</span>
+            ${t.projectLink ? `
+              <a href="${t.projectLink}" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 underline font-mono text-[11px] hover:text-blue-800 truncate max-w-xs flex items-center gap-1">
+                <i data-lucide="github" class="w-3 h-3"></i> ${t.projectLink}
+              </a>
+            ` : `
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-950 dark:text-rose-400">Not Submitted</span>
+            `}
+          </div>
+
+          <span class="hidden sm:inline text-slate-300 dark:text-slate-700">•</span>
+
+          <div class="flex items-center gap-1.5">
+            <span class="text-[11px] font-bold text-slate-600 dark:text-slate-400">PPT Presentation:</span>
+            ${t.pptLink ? `
+              <a href="${t.pptLink}" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 underline font-mono text-[11px] hover:text-blue-800 truncate max-w-xs flex items-center gap-1">
+                <i data-lucide="presentation" class="w-3 h-3"></i> ${t.pptLink}
+              </a>
+            ` : `
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-950 dark:text-rose-400">Not Submitted</span>
+            `}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  if (window.lucide) window.lucide.createIcons();
+}
+
+function toggleTeamSubmissionStatus(teamId) {
+  let teams = getStoredEventTeams();
+  const team = teams.find(t => t.id === teamId);
+  if (!team) return;
+
+  team.status = team.status === 'SUBMITTED' ? 'NOT SUBMITTED' : 'SUBMITTED';
+  saveStoredEventTeams(teams);
+  renderTeamSubmissionsTable();
+  showToast(`Team "${team.teamName}" status changed to ${team.status}.`, 'check-circle-2');
+}
+
+function promptEditTeamLinks(teamId) {
+  let teams = getStoredEventTeams();
+  const team = teams.find(t => t.id === teamId);
+  if (!team) return;
+
+  const newProjectLink = prompt(`Enter GitHub / Project URL for "${team.teamName}":`, team.projectLink || '');
+  if (newProjectLink === null) return;
+
+  const newPptLink = prompt(`Enter PPT Slides Presentation URL for "${team.teamName}":`, team.pptLink || '');
+  if (newPptLink === null) return;
+
+  team.projectLink = newProjectLink.trim();
+  team.pptLink = newPptLink.trim();
+  team.status = (team.projectLink && team.pptLink) ? 'SUBMITTED' : 'NOT SUBMITTED';
+
+  saveStoredEventTeams(teams);
+  renderTeamSubmissionsTable();
+  showToast(`Deliverables updated for team "${team.teamName}".`, 'check-circle-2');
+}
+
+function deleteTeamSubmission(teamId) {
+  if (!confirm('Are you sure you want to remove/disband this registered team?')) return;
+  let teams = getStoredEventTeams();
+  teams = teams.filter(t => t.id !== teamId);
+  saveStoredEventTeams(teams);
+  renderTeamSubmissionsTable();
+  showToast('Team removed from registry.', 'trash-2');
+}
+
+function exportTeamsToGoogleSpreadsheet() {
+  const teams = getStoredEventTeams();
+  if (teams.length === 0) {
+    showToast('No registered teams available to export.', 'alert-circle');
+    return;
+  }
+
+  // Generate CSV rows
+  const headers = [
+    'Team Name',
+    'Event / Hackathon Title',
+    'Team Leader Name',
+    'Team Leader USN',
+    'Team Leader Email',
+    'Total Team Members',
+    'Teammate Roster (USNs)',
+    'GitHub / Project Link',
+    'PPT Presentation Slides Link',
+    'Submission Status',
+    'Registered Timestamp'
+  ];
+
+  const escapeCsv = (str) => {
+    if (str === null || str === undefined) return '""';
+    const s = String(str).replaceAll('"', '""');
+    return `"${s}"`;
+  };
+
+  const csvRows = [headers.map(escapeCsv).join(',')];
+
+  teams.forEach(t => {
+    const totalMembers = 1 + (t.members ? t.members.length : 0);
+    const rosterStr = (t.members || []).map(m => `${m.name} (${m.usn})`).join('; ') || 'None';
+    const statusText = (t.projectLink && t.pptLink && t.status === 'SUBMITTED') ? 'SUBMITTED' : 'NOT SUBMITTED';
+
+    const row = [
+      escapeCsv(t.teamName),
+      escapeCsv(t.eventTitle),
+      escapeCsv(t.leaderName),
+      escapeCsv(t.leaderUsn),
+      escapeCsv(t.leaderEmail),
+      escapeCsv(totalMembers),
+      escapeCsv(rosterStr),
+      escapeCsv(t.projectLink || 'NOT SUBMITTED'),
+      escapeCsv(t.pptLink || 'NOT SUBMITTED'),
+      escapeCsv(statusText),
+      escapeCsv(t.registeredAt ? new Date(t.registeredAt).toLocaleString() : '')
+    ];
+    csvRows.push(row.join(','));
+  });
+
+  const csvContent = '\uFEFF' + csvRows.join('\r\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const downloadLink = document.createElement('a');
+  const filename = `BST_Teams_Submissions_${new Date().toISOString().slice(0, 10)}.csv`;
+
+  downloadLink.href = url;
+  downloadLink.setAttribute('download', filename);
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+  URL.revokeObjectURL(url);
+
+  // 1-Click Launch Google Spreadsheet in a new tab
+  window.open('https://docs.google.com/spreadsheets/u/0/create', '_blank');
+
+  showToast('CSV downloaded! Google Sheets opened in a new tab. Select File > Import > Upload.', 'check-circle-2');
+}
+
+/* ============================================================
+   PROJECT ACADEMIC EVALUATION CONSOLE (Faculty Evaluator)
+   ============================================================ */
+function openProjectEvaluationModal(projectId) {
+  if (!hasEvaluatorAccess()) {
+    showToast('Access Restricted: Only Faculty Evaluators, Lead Administrators, and Core Maintainers can evaluate projects.', 'shield-alert');
+    return;
+  }
+
+  const projects = getStoredProjects();
+  const proj = projects.find(p => p.id === projectId);
+  if (!proj) return;
+
+  const evals = getStoredProjectEvaluations();
+  const existing = evals[projectId];
+
+  document.getElementById('eval-project-id').value = proj.id;
+  document.getElementById('eval-project-title-display').textContent = proj.title;
+  document.getElementById('eval-project-meta-display').textContent = `${proj.badge || 'Project'} • ${(proj.tech || []).join(', ')}`;
+
+  const activeSession = window.AuthEngine?.getActiveSession?.();
+  const defaultEvaluator = activeSession 
+    ? `${activeSession.name} (${activeSession.role || 'Evaluator'})` 
+    : 'Faculty Evaluator';
+
+  document.getElementById('eval-teacher-name').value = existing?.evaluatorName || defaultEvaluator;
+  document.getElementById('eval-grade-tier').value = existing?.tier || 'Outstanding (Tier A+)';
+  
+  const score = existing?.score ?? 85;
+  document.getElementById('eval-score-range').value = score;
+  document.getElementById('eval-score-number').value = score;
+  document.getElementById('eval-score-display').textContent = `${score} / 100`;
+  document.getElementById('eval-feedback-text').value = existing?.feedback || '';
+
+  const modal = document.getElementById('project-evaluation-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+    if (window.lucide) window.lucide.createIcons();
+  }
+}
+
+function closeProjectEvaluationModal() {
+  const modal = document.getElementById('project-evaluation-modal');
+  if (!modal) return;
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+  document.body.style.overflow = 'auto';
+}
+
+function handleProjectEvaluationSubmit(e) {
+  e.preventDefault();
+  if (!hasEvaluatorAccess()) {
+    showToast('Access Restricted: Evaluator privileges required.', 'shield-alert');
+    return;
+  }
+
+  const projectId = document.getElementById('eval-project-id').value;
+  const evaluatorName = document.getElementById('eval-teacher-name').value.trim();
+  const tier = document.getElementById('eval-grade-tier').value;
+  const score = parseInt(document.getElementById('eval-score-number').value, 10) || 85;
+  const feedback = document.getElementById('eval-feedback-text').value.trim();
+
+  let evals = getStoredProjectEvaluations();
+  evals[projectId] = {
+    score,
+    tier,
+    feedback,
+    evaluatorName,
+    evaluatedAt: new Date().toISOString()
+  };
+
+  saveStoredProjectEvaluations(evals);
+  closeProjectEvaluationModal();
+  renderProjects();
+  showToast(`Academic marks & evaluation published for project!`, 'award');
+}
+
+// Window exports for submissions & evaluation consoles
+window.openTeamSubmissionsModal = openTeamSubmissionsModal;
+window.closeTeamSubmissionsModal = closeTeamSubmissionsModal;
+window.renderTeamSubmissionsTable = renderTeamSubmissionsTable;
+window.toggleTeamSubmissionStatus = toggleTeamSubmissionStatus;
+window.promptEditTeamLinks = promptEditTeamLinks;
+window.deleteTeamSubmission = deleteTeamSubmission;
+window.exportTeamsToGoogleSpreadsheet = exportTeamsToGoogleSpreadsheet;
+window.openProjectEvaluationModal = openProjectEvaluationModal;
+window.closeProjectEvaluationModal = closeProjectEvaluationModal;
+window.handleProjectEvaluationSubmit = handleProjectEvaluationSubmit;
 
 /* ============================================================
    DEEPSEEK-STYLE DETECTIVE CODE LENS

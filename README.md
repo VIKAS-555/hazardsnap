@@ -18,31 +18,39 @@ A modern, responsive, high-performance web platform built with **Clean Minimalis
    - **Hackathon**: Rapid prototyping, full-stack MVPs in 24–48 hours, pitch storytelling.
 
 3. **Tiered Open-Source Governance Framework**
+   - **Faculty Evaluator (Academic Observer)**: Teachers and faculty advisors. Can register with any email domain (exempt from college email and student USN requirements). Holds dedicated observation privileges, access to student projects for academic grading/evaluation, and hackathon teams review. Exempt from point decay and demotions.
    - **Lead Administrator (Root / UID 0)**: Highest tier in club administration and platform infrastructure. Operates under multi-admin governance (≥1 Lead Admin). Exclusive authority to manually promote/demote leadership ranks; exempt from point decay.
    - **Core Maintainer**: Technical leadership, domain tracks coordinator, and code submission reviewer. Exempt from points and decay.
    - **Staff Contributor**: Senior peer mentor. Unlocked automatically when an Active Developer achieves **100+ merit points**. Requires maintaining **≥60 points** (auto-demoted below 60).
    - **Active Developer**: Verified student member entry tier. Automatically earns contribution points: **+20 pts** per verified peer referral, **+15 pts** per workshop RSVP, **+25 pts** per approved project showcase.
 
-4. **Curated Workshops, Labs & Hackathons**
+4. **Curated Workshops, Labs & Hackathons with Cover Images & Team Size Range**
    - Interactive scheduling and management strictly accessible to **Lead Administrators** and **Core Maintainers**.
+   - Custom **Cover Image URL** with 5 curated presets (AI/ML, Robotics, Hackathons, Algorithms, Open Source) rendered in high-definition 16:9 banners.
+   - Configurable **Min & Max Team Size Range** per event with real-time badges on event cards.
    - General students and visitors enjoy full search, filtering (All, Upcoming, Hackathons, Past), live seat tracking, personalized digital RSVP passes, QR verification codes, and one-click `.ics` calendar sync.
 
-5. **Student Projects Gallery**
+5. **Hackathon Team Registration & Strict Mutual Exclusivity**
+   - Designated **Team Leader** indicator for creator, dynamic teammate roster addition, and project/presentation deliverable inputs.
+   - **Strict Mutual Exclusivity**: A student registered in one team for an event cannot register in another team. To switch teams, they must leave or disband their existing team first.
+   - Admission passes display live team name, roster, deliverables submission state, and a 1-click "Leave / Disband Team" release button.
+
+6. **Hackathon Teams & Submissions Console with 1-Click Google Spreadsheet Export**
+   - Centralized administrative console accessible to **Lead Admins**, **Core Maintainers**, and **Faculty Evaluators**.
+   - Real-time registry of all logged teams, member rosters, GitHub repositories, and PPT presentation slide links.
+   - Auto-flagging of missing deliverables as **NOT SUBMITTED**.
+   - **1-Click Export to Google Spreadsheet**: Automatically downloads formatted UTF-8 CSV and opens a new Google Spreadsheet tab ready for import.
+
+7. **Student Projects Gallery & Academic Assessment Console**
    - Curated showcase of applications, robotics hardware builds, open-source utilities, and hackathon prototypes.
-   - Project publishing and editing guarded strictly for **Lead Administrators** and **Core Maintainers** to ensure production-grade project quality.
-   - Public view includes live demo launch, GitHub repository inspect, and domain category tags.
+   - Project publishing and editing guarded strictly for **Lead Administrators** and **Core Maintainers**.
+   - **Academic Evaluation Console**: Teachers, Admins, and Maintainers can assign rubric marks (out of 100), academic tiers, and official mentor feedback rendered directly on project cards.
 
-6. **Executive Board & Leadership Directory**
-   - Interactive directory featuring domain leads, mentors, and faculty advisors with LinkedIn and GitHub links.
-   - Clickable governance filter pills allowing instant filtering by rank (Lead Admin, Core Maintainer, Staff Contributor, Active Dev).
-
-7. **Cryptographic Member Authentication & Vault (`login.html`)**
-   - **Existing Member Sign-In**: Via Tech Club ID or College Email + Password.
-   - **New Member Onboarding**: Automated USN range validation (`2392608001`–`2392608302`), full name, section, and college email.
-   - **Personalized Tech Club ID**: Minted in canonical format (e.g. `BST-2026-XXXX`).
-   - **Password Security**: Client-side Web Crypto **SHA-256 with per-user cryptographic salt**, real-time password strength meter, brute-force rate-limiting, and an in-app password update tool.
-
-8. **Peer Referral System (QR & Instant Share Link)**
+8. **Expansive Profile & Member Portal (`login.html`)**
+   - **Responsive SaaS Grid Layout**: Expands to `max-w-7xl` 12-column layout on laptops/desktops (`lg:col-span-8` + `lg:col-span-4`) while preserving clean single-column readability on mobile devices.
+   - **Teacher Section**: Dedicated Faculty Evaluator Operations Suite for project grading and hackathon roster inspection.
+   - **Student & Faculty Mode Toggle**: Clean segmented pill switch in the registration modal.
+   - **Personalized Tech Club ID**: Minted in canonical format (`BST-2026-XXXX` for students, `BST-FAC-XXXX` for faculty).
    - Every registered member receives an individualized referral link (`login.html?ref=BST-XXXX`) and an instant high-resolution QR code.
    - Automatic point attribution (+20 points credited per joined peer) driving auto-advancement toward Staff Contributor.
 

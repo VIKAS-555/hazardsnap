@@ -47,6 +47,16 @@ const CLUB_RANKS = {
     badgeClass: 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700',
     description: 'Senior peer mentor and verified contributor. Earned automatically by Active Developers achieving 100+ contribution points. Must maintain ≥60 points to retain rank. System auto-promotion caps here; higher tiers require Lead Admin appointment.'
   },
+  'Faculty Evaluator': {
+    rankLevel: 5,
+    name: 'Faculty Evaluator',
+    title: 'Faculty Observer & Evaluator',
+    passLabel: 'FACULTY OBSERVER PASS',
+    statusLabel: 'FACULTY OBSERVER & EVALUATOR',
+    avatarIcon: 'graduation-cap',
+    badgeClass: 'bg-indigo-100 dark:bg-indigo-950/80 text-indigo-800 dark:text-indigo-300 border-indigo-300 dark:border-indigo-700',
+    description: 'Academic Faculty Coordinator & Evaluator. Observes all club activities, reviews and evaluates student project showcases, and grades hackathon presentations without point constraints.'
+  },
   'Active Developer': {
     rankLevel: 1,
     name: 'Active Developer',
@@ -134,13 +144,13 @@ async function evaluateContributionRank(member, saveToStorage = true) {
   if (!member) return { member, rankChanged: false };
   const currentRank = normalizeMemberRank(member.role);
 
-  // Rule 1: Club Admin and Core Maintainer have NO contribution promotion or demotion
-  if (currentRank === 'Root Architect' || currentRank === 'Core Maintainer') {
+  // Rule 1: Club Admin, Core Maintainer, and Faculty Evaluator have NO contribution promotion or demotion
+  if (currentRank === 'Root Architect' || currentRank === 'Core Maintainer' || currentRank === 'Faculty Evaluator') {
     return {
       member,
       rankChanged: false,
       currentRank,
-      reason: 'Governance tier is exempt from contribution-based auto-promotion and auto-demotion.'
+      reason: 'Governance and Faculty tiers are exempt from contribution-based auto-promotion and auto-demotion.'
     };
   }
 
@@ -209,6 +219,13 @@ function normalizeMemberRank(role) {
   ) return 'Root Architect';
   if (role === 'Core Maintainer' || role === 'Co-Leader') return 'Core Maintainer';
   if (role === 'Staff Contributor' || role === 'Elder') return 'Staff Contributor';
+  if (
+    role === 'Faculty Evaluator' || 
+    role === 'Teacher' || 
+    role === 'Faculty' || 
+    role === 'Professor' || 
+    role === 'Mentor'
+  ) return 'Faculty Evaluator';
   return 'Active Developer';
 }
 
@@ -458,6 +475,83 @@ async function registerNewMember({ name, usn, section, email, department, passwo
 }
 
 /**
+ * Register a Teacher / Faculty Evaluator
+ * Note: College domain email is NOT required. USN is not required.
+ */
+async function registerTeacher({ name, email, department, designation, password, facultyKey }) {
+  const vault = getMembersVault();
+
+  const cleanName = (name || '').trim();
+  const cleanEmail = (email || '').trim().toLowerCase();
+  const cleanDept = (department || 'CSE (AI & ML)').trim();
+  const cleanDesignation = (designation || 'Faculty Evaluator').trim();
+
+  if (!cleanName) throw new Error('Please enter faculty full name.');
+  if (!cleanEmail) throw new Error('Please enter email address.');
+  if (!password || password.length < 8) throw new Error('Password must be at least 8 characters.');
+
+  // Validate email format (any standard email address accepted)
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(cleanEmail)) {
+    throw new Error('Please enter a valid email address.');
+  }
+
+  // Duplicate email check
+  const existingValues = Object.values(vault);
+  const emailExists = existingValues.some(m => m.email && m.email.toLowerCase() === cleanEmail);
+  if (emailExists) {
+    throw new Error('An account with this email already exists. Please sign in instead.');
+  }
+
+  // Optional Faculty Key validation (default accepted: BST-FACULTY or BST-FACULTY-2026)
+  if (facultyKey && facultyKey.trim()) {
+    const key = facultyKey.trim().toUpperCase();
+    if (key !== 'BST-FACULTY' && key !== 'BST-FACULTY-2026') {
+      throw new Error('Invalid Faculty Key. Please use BST-FACULTY or contact the department admin.');
+    }
+  }
+
+  // Generate Unique Faculty ID
+  let clubId = `BST-FAC-${Math.floor(1000 + Math.random() * 9000)}`;
+  while (vault[clubId]) {
+    clubId = `BST-FAC-${Math.floor(1000 + Math.random() * 9000)}`;
+  }
+
+  const salt = generateRandomSalt();
+  const passwordHash = await hashPasswordWithSalt(password, salt);
+
+  const newFaculty = {
+    techClubId: clubId,
+    name: cleanName,
+    email: cleanEmail,
+    usn: 'FACULTY',
+    section: cleanDesignation,
+    department: cleanDept,
+    designation: cleanDesignation,
+    role: 'Faculty Evaluator',
+    isTeacher: true,
+    salt,
+    passwordHash,
+    joinedAt: new Date().toISOString(),
+    referralCount: 0,
+    referredBy: null
+  };
+
+  vault[clubId] = newFaculty;
+  saveMembersVault(vault);
+
+  if (window.SupabaseEngine && window.SupabaseEngine.isConfigured()) {
+    try {
+      await window.SupabaseEngine.insertMember(newFaculty);
+    } catch (e) {
+      console.warn('[AuthEngine] Cloud insert notice for faculty:', e.message);
+    }
+  }
+
+  return newFaculty;
+}
+
+/**
  * Authenticate existing member
  */
 async function authenticateMember(identifier, password, rememberMe = true) {
@@ -700,6 +794,12 @@ async function promoteMember(targetClubId, newRank) {
   return updateMemberRank(targetClubId, newRank);
 }
 
+function isFaculty(member) {
+  if (!member) member = getActiveSession();
+  if (!member) return false;
+  return normalizeMemberRank(member.role) === 'Faculty Evaluator' || !!member.isTeacher;
+}
+
 // Export for browser
 window.AuthEngine = {
   CLUB_RANKS,
@@ -711,6 +811,7 @@ window.AuthEngine = {
   getMembersVault,
   getLeadAdminCount,
   registerNewMember,
+  registerTeacher,
   authenticateMember,
   changeMemberPassword,
   getActiveSession,
@@ -723,6 +824,7 @@ window.AuthEngine = {
   isRootArchitect,
   isMaintainer,
   isStaffContributor,
+  isFaculty,
   updateMemberRank,
   demoteMember,
   promoteMember
