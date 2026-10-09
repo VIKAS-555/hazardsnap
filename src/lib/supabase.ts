@@ -6,7 +6,7 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOi
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-const LOCAL_STORAGE_KEY = 'hazardsnap_reports_cache_v1';
+const LOCAL_STORAGE_KEY = 'hazardsnap_reports_cache_v2';
 
 // Seed mock data for realistic immediate live preview (e.g. Bangalore / Tech Hub coordinates)
 const INITIAL_DEMO_HAZARDS: HazardReport[] = [
@@ -21,7 +21,7 @@ const INITIAL_DEMO_HAZARDS: HazardReport[] = [
     latitude: 12.9716,
     longitude: 77.5946,
     address: 'Near Central Metro Station, MG Road, Ward 112',
-    photo_url: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=600&q=80',
+    photo_url: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=600&q=80',
     voice_transcript: 'Attention, wire is dangling near the electric pole right across the pedestrian crossing!',
     upvotes_count: 14,
     reported_by: 'Rahul S. (Commuter)',
@@ -38,7 +38,7 @@ const INITIAL_DEMO_HAZARDS: HazardReport[] = [
     latitude: 12.9752,
     longitude: 77.6012,
     address: 'Opposite State Bank junction, 100ft Road',
-    photo_url: 'https://images.unsplash.com/photo-1517649763962-0c623266ddc0?auto=format&fit=crop&w=600&q=80',
+    photo_url: 'https://images.unsplash.com/photo-1541888946425-d0fbb1861568?auto=format&fit=crop&w=600&q=80',
     voice_transcript: 'Manhole cover smashed in, severe hazard for two-wheelers in evening rain.',
     upvotes_count: 8,
     reported_by: 'Ananya M.',
@@ -71,7 +71,7 @@ const INITIAL_DEMO_HAZARDS: HazardReport[] = [
     latitude: 12.9634,
     longitude: 77.5891,
     address: 'Near Government High School, 4th Main',
-    photo_url: 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?auto=format&fit=crop&w=600&q=80',
+    photo_url: 'https://images.unsplash.com/photo-1584463699042-3a3782b5fae5?auto=format&fit=crop&w=600&q=80',
     fix_photo_url: 'https://images.unsplash.com/photo-1590402494682-cd3fb53b1f70?auto=format&fit=crop&w=600&q=80',
     fix_notes: 'Civil Maintenance Unit #4 repaved blocks, reinforced edge curb concrete, and cleared debris.',
     fixed_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
