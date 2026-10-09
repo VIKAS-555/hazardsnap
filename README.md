@@ -3,21 +3,47 @@ TEAM: 2392608146-Obsidian
 NAME: Vikas N
 USN: 2392608146
 MEMBERS:
-2392608071 Aditya kumar
-2392608146 Vikas N
-2392608166 Arnav Patel
-2392608154 Cherish Goyal
-2392608124 Mayank Goyal
+2392608071 Aditya kumar,
+2392608146 Vikas N,
+2392608166 Arnav Patel,
+2392608154 Cherish Goyal,
+2392608124 Mayank Goyal,
 2392608142 Sujal Ganesh Nirgude
+
+
+
+
+
+
+
 
 PPT LINK----
 https://drive.google.com/drive/folders/1AoezRLdXyVIis4kTP4q1UBe-lu9GGXYJ?usp=sharing
 
 
 
+
+
+
+
+
+
+
 PHOTOS----
 <img width="1465" height="840" alt="Screenshot 2026-10-10 at 3 21 13 AM" src="https://github.com/user-attachments/assets/df396f0b-5142-4d6f-b6fe-b3cc0b904aca" />
+
+
+
+
 <img width="1460" height="837" alt="Screenshot 2026-10-10 at 3 22 25 AM" src="https://github.com/user-attachments/assets/be965656-7fe3-4359-9862-668adb0658d0" />
+
+
+
+
+
+
+
+
 
 
 
