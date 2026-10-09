@@ -137,11 +137,8 @@ flowchart TD
 ### 2. Clone and Install
 ```bash
 # Clone the repository
-git clone https://github.com/XiaoArnav/bst-tech-club.git
-cd bst-tech-club
-
-# Switch to the hackathon feature branch
-git checkout feature/hazard-reporter
+git clone https://github.com/VIKAS-555/hazardsnap.git
+cd hazardsnap
 
 # Install dependencies
 npm install
