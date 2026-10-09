@@ -43,15 +43,8 @@ export default function MainNavigation({
         >
           <div className="w-6 h-6 flex items-center justify-center">
             <svg viewBox="0 0 24 24" className="w-5 h-5 group-hover:scale-105 transition" fill="none">
-              <path d="M12 2L3 21h18L12 2z" stroke="#111827" strokeWidth="2.2" strokeLinejoin="round" />
-              <path d="M12 7l-5 11h10l-5-11z" fill="url(#navBrandGrad)" />
-              <defs>
-                <linearGradient id="navBrandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#4338ca" />
-                  <stop offset="50%" stopColor="#8b5cf6" />
-                  <stop offset="100%" stopColor="#3b82f6" />
-                </linearGradient>
-              </defs>
+              <path d="M12 2L3 21h18L12 2z" stroke="#0f172a" strokeWidth="2.2" strokeLinejoin="round" />
+              <path d="M12 8l-4 9h8l-4-9z" fill="#0f172a" />
             </svg>
           </div>
           <div>

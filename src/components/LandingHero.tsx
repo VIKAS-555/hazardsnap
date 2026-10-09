@@ -27,17 +27,10 @@ export default function LandingHero({
         {/* Top Centered Brand Badge */}
         <div className="flex items-center gap-2 text-slate-800 mb-1">
           <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
-            <path d="M12 3L4 20h16L12 3z" stroke="currentColor" strokeWidth="2.2" strokeLinejoin="round" />
-            <path d="M12 7l-5 11h10l-5-11z" fill="url(#heroGrad2)" />
-            <defs>
-              <linearGradient id="heroGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#4338ca" />
-                <stop offset="50%" stopColor="#8b5cf6" />
-                <stop offset="100%" stopColor="#3b82f6" />
-              </linearGradient>
-            </defs>
+            <path d="M12 2L3 21h18L12 2z" stroke="#0f172a" strokeWidth="2.2" strokeLinejoin="round" />
+            <path d="M12 8l-4 9h8l-4-9z" fill="#0f172a" />
           </svg>
-          <span className="font-bold text-base tracking-tight text-slate-900">
+          <span className="font-semibold text-sm tracking-tight text-slate-900">
             HazardSnap Civic Grid
           </span>
         </div>

@@ -73,11 +73,11 @@ export default function EmergencyLogSection({
         {/* Emergency Hotline Banner */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-red-100 text-red-600 flex items-center justify-center font-bold">
+            <div className="w-9 h-9 rounded-xl bg-red-50 text-red-600 border border-red-200 flex items-center justify-center text-sm font-bold">
               ⚡
             </div>
             <div>
-              <span className="text-[10px] font-mono font-bold uppercase text-slate-500 block">
+              <span className="text-[10px] font-mono font-bold uppercase text-slate-400 block">
                 Live Electric Wires / Snapped Cable
               </span>
               <span className="text-sm font-bold text-slate-900">BESCOM Hotline: 1912</span>
@@ -85,11 +85,11 @@ export default function EmergencyLogSection({
           </div>
 
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center font-bold">
+            <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center text-sm font-bold">
               🕳️
             </div>
             <div>
-              <span className="text-[10px] font-mono font-bold uppercase text-slate-500 block">
+              <span className="text-[10px] font-mono font-bold uppercase text-slate-400 block">
                 Open Sewers / Drain Collapse
               </span>
               <span className="text-sm font-bold text-slate-900">Control Room: 1533</span>
@@ -97,11 +97,11 @@ export default function EmergencyLogSection({
           </div>
 
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
+            <div className="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 border border-slate-200 flex items-center justify-center text-sm font-bold">
               🚨
             </div>
             <div>
-              <span className="text-[10px] font-mono font-bold uppercase text-slate-500 block">
+              <span className="text-[10px] font-mono font-bold uppercase text-slate-400 block">
                 Immediate Road Rescue / Ambulance
               </span>
               <span className="text-sm font-bold text-slate-900">National Emergency: 112</span>

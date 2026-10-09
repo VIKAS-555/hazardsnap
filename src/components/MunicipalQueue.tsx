@@ -79,41 +79,41 @@ export default function MunicipalQueue({ hazards, onHazardUpdated }: MunicipalQu
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 text-white">
+    <div className="max-w-6xl mx-auto px-4 py-8 text-slate-900">
       {/* HEADER */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-zinc-800">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 text-xs font-semibold">
+            <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold">
               Municipal Response Authority
             </span>
-            <span className="text-xs text-zinc-500">Live AI Priority Dispatch</span>
+            <span className="text-xs text-slate-500">Live AI Priority Dispatch</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-1 text-white">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-1 text-slate-900">
             Civic Hazard Triage Queue
           </h1>
-          <p className="text-sm text-zinc-400 mt-0.5">
+          <p className="text-sm text-slate-600 mt-0.5">
             Real-time ranked municipal queue. Resolved items require photographic before/after proof.
           </p>
         </div>
 
         {/* STATS PILLS */}
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="bg-zinc-900 border border-zinc-800 px-3 py-2 rounded-2xl text-center">
-            <div className="text-xs text-red-400 font-semibold">Critical</div>
-            <div className="text-lg font-bold text-white">
+          <div className="bg-white border border-slate-200 px-3.5 py-2 rounded-2xl text-center shadow-sm">
+            <div className="text-xs text-red-600 font-semibold">Critical</div>
+            <div className="text-lg font-bold text-slate-900">
               {hazards.filter((h) => h.severity === 'critical' && h.status !== 'verified_fixed').length}
             </div>
           </div>
-          <div className="bg-zinc-900 border border-zinc-800 px-3 py-2 rounded-2xl text-center">
-            <div className="text-xs text-amber-400 font-semibold">In Progress</div>
-            <div className="text-lg font-bold text-white">
+          <div className="bg-white border border-slate-200 px-3.5 py-2 rounded-2xl text-center shadow-sm">
+            <div className="text-xs text-amber-600 font-semibold">In Progress</div>
+            <div className="text-lg font-bold text-slate-900">
               {hazards.filter((h) => h.status === 'in_progress').length}
             </div>
           </div>
-          <div className="bg-zinc-900 border border-zinc-800 px-3 py-2 rounded-2xl text-center">
-            <div className="text-xs text-emerald-400 font-semibold">Verified Fixed</div>
-            <div className="text-lg font-bold text-white">
+          <div className="bg-white border border-slate-200 px-3.5 py-2 rounded-2xl text-center shadow-sm">
+            <div className="text-xs text-emerald-600 font-semibold">Verified Fixed</div>
+            <div className="text-lg font-bold text-slate-900">
               {hazards.filter((h) => h.status === 'verified_fixed').length}
             </div>
           </div>
@@ -121,13 +121,13 @@ export default function MunicipalQueue({ hazards, onHazardUpdated }: MunicipalQu
       </div>
 
       {/* STATUS TABS */}
-      <div className="flex items-center gap-2 mt-6 border-b border-zinc-800 pb-3">
+      <div className="flex items-center gap-2 mt-6 border-b border-slate-200 pb-3 overflow-x-auto scrollbar-none">
         <button
           onClick={() => setActiveTab('pending')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 ${
             activeTab === 'pending'
-              ? 'bg-red-600 text-white shadow-lg shadow-red-950/50'
-              : 'bg-zinc-900/60 text-zinc-400 hover:text-white hover:bg-zinc-850'
+              ? 'bg-slate-900 text-white shadow-sm'
+              : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200'
           }`}
         >
           <AlertOctagon className="w-3.5 h-3.5" />
@@ -136,10 +136,10 @@ export default function MunicipalQueue({ hazards, onHazardUpdated }: MunicipalQu
 
         <button
           onClick={() => setActiveTab('in_progress')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 ${
             activeTab === 'in_progress'
-              ? 'bg-amber-600 text-white shadow-lg shadow-amber-950/50'
-              : 'bg-zinc-900/60 text-zinc-400 hover:text-white hover:bg-zinc-850'
+              ? 'bg-amber-600 text-white shadow-sm'
+              : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200'
           }`}
         >
           <Clock className="w-3.5 h-3.5" />
@@ -148,10 +148,10 @@ export default function MunicipalQueue({ hazards, onHazardUpdated }: MunicipalQu
 
         <button
           onClick={() => setActiveTab('verified_fixed')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 ${
             activeTab === 'verified_fixed'
-              ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-950/50'
-              : 'bg-zinc-900/60 text-zinc-400 hover:text-white hover:bg-zinc-850'
+              ? 'bg-emerald-600 text-white shadow-sm'
+              : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200'
           }`}
         >
           <CheckCircle2 className="w-3.5 h-3.5" />
@@ -162,10 +162,10 @@ export default function MunicipalQueue({ hazards, onHazardUpdated }: MunicipalQu
       {/* CARDS LIST */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
         {filtered.length === 0 ? (
-          <div className="col-span-full py-16 text-center text-zinc-500">
-            <CheckCircle2 className="w-12 h-12 mx-auto text-emerald-500/40 mb-3" />
-            <p className="text-base font-semibold text-zinc-300">Queue is Clear for this status</p>
-            <p className="text-xs text-zinc-500 mt-1">
+          <div className="col-span-full py-16 text-center text-slate-500 bg-white rounded-3xl border border-slate-200">
+            <CheckCircle2 className="w-12 h-12 mx-auto text-emerald-500 mb-3" />
+            <p className="text-base font-semibold text-slate-900">Queue is Clear for this status</p>
+            <p className="text-xs text-slate-500 mt-1">
               All reported hazards in this category have been addressed.
             </p>
           </div>
@@ -175,7 +175,7 @@ export default function MunicipalQueue({ hazards, onHazardUpdated }: MunicipalQu
             return (
               <div
                 key={hazard.id}
-                className="bg-zinc-950/80 border border-zinc-800/80 hover:border-zinc-700 rounded-3xl p-5 shadow-xl transition flex flex-col justify-between"
+                className="bg-white border border-slate-200 hover:border-slate-300 rounded-3xl p-5 shadow-sm hover:shadow transition flex flex-col justify-between"
               >
                 <div>
                   {/* Card top */}
@@ -188,20 +188,20 @@ export default function MunicipalQueue({ hazards, onHazardUpdated }: MunicipalQu
                         >
                           {hazard.severity} • Score: {hazard.severity_score}/100
                         </span>
-                        <h3 className="font-bold text-sm text-zinc-100 mt-1 line-clamp-1">
+                        <h3 className="font-bold text-sm text-slate-900 mt-1 line-clamp-1">
                           {hazard.title}
                         </h3>
                       </div>
                     </div>
 
                     <div className="text-right">
-                      <span className="text-[11px] font-mono text-zinc-500 block">
+                      <span className="text-[11px] font-mono text-slate-400 block">
                         {new Date(hazard.created_at).toLocaleTimeString([], {
                           hour: '2-digit',
                           minute: '2-digit',
                         })}
                       </span>
-                      <span className="text-[11px] text-zinc-400">
+                      <span className="text-[11px] text-slate-500 font-medium">
                         👍 {hazard.upvotes_count || 1} Confirmations
                       </span>
                     </div>
@@ -210,7 +210,7 @@ export default function MunicipalQueue({ hazards, onHazardUpdated }: MunicipalQu
                   {/* Photo Preview & Location */}
                   <div className="mt-3 flex gap-3">
                     {hazard.photo_url ? (
-                      <div className="w-28 h-24 rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800 shrink-0">
+                      <div className="w-28 h-24 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
                         <img
                           src={hazard.photo_url}
                           alt="Citizen Report"
@@ -218,21 +218,21 @@ export default function MunicipalQueue({ hazards, onHazardUpdated }: MunicipalQu
                         />
                       </div>
                     ) : (
-                      <div className="w-28 h-24 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-600 text-xs shrink-0">
+                      <div className="w-28 h-24 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 text-xs shrink-0">
                         No photo
                       </div>
                     )}
 
                     <div className="flex-1 min-w-0 flex flex-col justify-center">
-                      <p className="text-xs text-zinc-300 line-clamp-2">
+                      <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
                         {hazard.description}
                       </p>
-                      <p className="text-[11px] text-zinc-400 mt-2 flex items-center gap-1 truncate">
-                        <MapPin className="w-3 h-3 text-red-400 shrink-0" />
+                      <p className="text-[11px] text-slate-500 mt-2 flex items-center gap-1 truncate font-medium">
+                        <MapPin className="w-3.5 h-3.5 text-red-500 shrink-0" />
                         <span className="truncate">{hazard.address || 'Address logged'}</span>
                       </p>
                       {hazard.voice_transcript && (
-                        <p className="text-[10px] text-amber-300 italic mt-1 truncate">
+                        <p className="text-[10px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 italic mt-1.5 truncate">
                           🎙️ "{hazard.voice_transcript}"
                         </p>
                       )}
@@ -241,15 +241,15 @@ export default function MunicipalQueue({ hazards, onHazardUpdated }: MunicipalQu
 
                   {/* Before / After View for Fixed Hazards */}
                   {hazard.status === 'verified_fixed' && (
-                    <div className="mt-4 p-3 rounded-2xl bg-emerald-950/30 border border-emerald-500/30">
-                      <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-400 mb-2">
-                        <CheckCircle2 className="w-4 h-4" />
+                    <div className="mt-4 p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-200">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 mb-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                         <span>Fix Verified by Field Unit</span>
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         <div>
-                          <span className="text-[10px] text-zinc-400 block mb-1">Before:</span>
-                          <div className="rounded-xl overflow-hidden h-20 bg-zinc-900 border border-zinc-800">
+                          <span className="text-[10px] text-slate-500 block mb-1 font-medium">Before:</span>
+                          <div className="rounded-xl overflow-hidden h-20 bg-slate-100 border border-slate-200">
                             <img
                               src={hazard.photo_url}
                               alt="Before"
@@ -258,8 +258,8 @@ export default function MunicipalQueue({ hazards, onHazardUpdated }: MunicipalQu
                           </div>
                         </div>
                         <div>
-                          <span className="text-[10px] text-emerald-400 block mb-1">After Fix:</span>
-                          <div className="rounded-xl overflow-hidden h-20 bg-zinc-900 border border-emerald-600/40">
+                          <span className="text-[10px] text-emerald-700 block mb-1 font-medium">After Fix:</span>
+                          <div className="rounded-xl overflow-hidden h-20 bg-slate-100 border border-emerald-300">
                             <img
                               src={hazard.fix_photo_url || hazard.photo_url}
                               alt="After Fix"
@@ -269,7 +269,7 @@ export default function MunicipalQueue({ hazards, onHazardUpdated }: MunicipalQu
                         </div>
                       </div>
                       {hazard.fix_notes && (
-                        <p className="text-xs text-zinc-300 italic mt-2">
+                        <p className="text-xs text-slate-600 italic mt-2">
                           "{hazard.fix_notes}"
                         </p>
                       )}
@@ -278,11 +278,11 @@ export default function MunicipalQueue({ hazards, onHazardUpdated }: MunicipalQu
                 </div>
 
                 {/* Actions */}
-                <div className="mt-4 pt-3 border-t border-zinc-800/80 flex items-center justify-end gap-2">
+                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
                   {hazard.status === 'reported' && (
                     <button
                       onClick={() => handleDispatchCrew(hazard.id)}
-                      className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition flex items-center gap-1.5"
+                      className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition flex items-center gap-1.5 active:scale-95"
                     >
                       <Send className="w-3.5 h-3.5" />
                       <span>Dispatch Field Crew</span>
@@ -292,7 +292,7 @@ export default function MunicipalQueue({ hazards, onHazardUpdated }: MunicipalQu
                   {hazard.status === 'in_progress' && (
                     <button
                       onClick={() => handleOpenFixModal(hazard)}
-                      className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-1.5"
+                      className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center gap-1.5 active:scale-95 shadow-sm"
                     >
                       <Camera className="w-3.5 h-3.5" />
                       <span>Upload Fix Photo Verification</span>
@@ -300,8 +300,8 @@ export default function MunicipalQueue({ hazards, onHazardUpdated }: MunicipalQu
                   )}
 
                   {hazard.status === 'verified_fixed' && (
-                    <span className="text-xs font-medium text-emerald-400 flex items-center gap-1">
-                      <Check className="w-3.5 h-3.5" />
+                    <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 flex items-center gap-1">
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
                       Resolved & Archival Stored
                     </span>
                   )}
@@ -314,24 +314,24 @@ export default function MunicipalQueue({ hazards, onHazardUpdated }: MunicipalQu
 
       {/* FIX PROOF VERIFICATION MODAL */}
       {selectedFixHazard && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="w-full max-w-md bg-zinc-950 border border-zinc-800 rounded-3xl p-6 shadow-2xl text-white">
-            <h3 className="text-lg font-bold flex items-center gap-2">
-              <Camera className="w-5 h-5 text-emerald-400" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl text-slate-900">
+            <h3 className="text-lg font-bold flex items-center gap-2 text-slate-900">
+              <Camera className="w-5 h-5 text-emerald-600" />
               Upload Photographic Fix Proof
             </h3>
-            <p className="text-xs text-zinc-400 mt-1">
+            <p className="text-xs text-slate-500 mt-1">
               Required by civic audit: provide an 'After' photograph showing the repaired manhole, insulated wire, or cleared drain.
             </p>
 
             <form onSubmit={handleSubmitFix} className="mt-4 space-y-4">
               {/* Photo Input */}
               <div>
-                <label className="block text-xs font-semibold text-zinc-300 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
                   After-Fix Photograph
                 </label>
                 {fixPhotoPreview ? (
-                  <div className="relative rounded-2xl overflow-hidden aspect-video border border-emerald-500/40">
+                  <div className="relative rounded-2xl overflow-hidden aspect-video border border-emerald-400 bg-slate-50">
                     <img
                       src={fixPhotoPreview}
                       alt="Fix Preview"
@@ -346,9 +346,9 @@ export default function MunicipalQueue({ hazards, onHazardUpdated }: MunicipalQu
                     </button>
                   </div>
                 ) : (
-                  <label className="cursor-pointer border-2 border-dashed border-zinc-700 hover:border-emerald-500/60 rounded-2xl p-6 flex flex-col items-center justify-center bg-zinc-900/60">
-                    <Camera className="w-8 h-8 text-zinc-400 mb-2" />
-                    <span className="text-xs text-zinc-300 font-semibold">
+                  <label className="cursor-pointer border-2 border-dashed border-slate-300 hover:border-slate-500 rounded-2xl p-6 flex flex-col items-center justify-center bg-slate-50 transition">
+                    <Camera className="w-8 h-8 text-slate-400 mb-2" />
+                    <span className="text-xs text-slate-700 font-semibold">
                       Take or Select Repaired Photo
                     </span>
                     <input
@@ -364,7 +364,7 @@ export default function MunicipalQueue({ hazards, onHazardUpdated }: MunicipalQu
 
               {/* Maintenance Notes */}
               <div>
-                <label className="block text-xs font-semibold text-zinc-300 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
                   Field Maintenance Log / Notes
                 </label>
                 <textarea
@@ -372,7 +372,7 @@ export default function MunicipalQueue({ hazards, onHazardUpdated }: MunicipalQu
                   onChange={(e) => setFixNotes(e.target.value)}
                   placeholder="e.g. Spliced wire re-elevated to 18ft clearance, transformer fuse replaced."
                   rows={3}
-                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-400 focus:bg-white transition"
                 />
               </div>
 
@@ -381,16 +381,16 @@ export default function MunicipalQueue({ hazards, onHazardUpdated }: MunicipalQu
                 <button
                   type="button"
                   onClick={() => setSelectedFixHazard(null)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-400 hover:text-white"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-900"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingFix}
-                  className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-1.5"
+                  className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
                 >
-                  <CheckCircle2 className="w-4 h-4" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                   <span>Verify & Close Ticket</span>
                 </button>
               </div>

@@ -268,27 +268,27 @@ export default function ReportHazardModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg bg-zinc-950 border border-zinc-800 rounded-3xl shadow-2xl p-5 sm:p-7 text-white my-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200">
+      <div className="relative w-full max-w-lg bg-white border border-slate-200 rounded-3xl shadow-2xl p-5 sm:p-7 text-slate-900 my-auto">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-zinc-800">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-2xl bg-red-500/20 text-red-400 flex items-center justify-center border border-red-500/30">
-              <AlertTriangle className="w-5 h-5 text-red-400" />
+            <div className="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center border border-red-200">
+              <AlertTriangle className="w-5 h-5 text-red-600" />
             </div>
             <div>
-              <h2 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+              <h2 className="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
                 Report Hazard
-                <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-semibold">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">
                   ⚡ 5s Quick Snap
                 </span>
               </h2>
-              <p className="text-xs text-zinc-400">Save lives by logging hazards before accidents happen</p>
+              <p className="text-xs text-slate-500">Save lives by logging hazards before accidents happen</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition"
+            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition"
             aria-label="Close"
           >
             <X className="w-5 h-5" />
@@ -297,11 +297,11 @@ export default function ReportHazardModal({
 
         {submitSuccess ? (
           <div className="py-12 flex flex-col items-center justify-center text-center space-y-3">
-            <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center animate-bounce">
+            <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center animate-bounce">
               <CheckCircle2 className="w-8 h-8" />
             </div>
-            <h3 className="text-xl font-bold text-white">Hazard Logged Successfully!</h3>
-            <p className="text-sm text-zinc-400 max-w-xs">
+            <h3 className="text-xl font-bold text-slate-900">Hazard Logged Successfully!</h3>
+            <p className="text-sm text-slate-500 max-w-xs">
               Live broadcasted to public safety map & added to the Municipal Triage Queue.
             </p>
           </div>
@@ -309,10 +309,10 @@ export default function ReportHazardModal({
           <form onSubmit={handleSubmit} className="mt-5 space-y-5">
             {/* 1. PHOTO-FIRST SNAPPER */}
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2 flex items-center justify-between">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2 flex items-center justify-between">
                 <span>1. Hazard Photo (Instant Capture)</span>
                 {isAnalyzingPhoto && (
-                  <span className="text-amber-400 flex items-center gap-1 text-[11px] font-normal animate-pulse">
+                  <span className="text-amber-600 flex items-center gap-1 text-[11px] font-normal animate-pulse">
                     <Sparkles className="w-3.5 h-3.5" /> AI Scanning...
                   </span>
                 )}
@@ -328,20 +328,20 @@ export default function ReportHazardModal({
               />
 
               {photoPreview ? (
-                <div className="relative rounded-2xl overflow-hidden border border-zinc-700 bg-zinc-900 group aspect-video">
+                <div className="relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 group aspect-video">
                   <img
                     src={photoPreview}
                     alt="Hazard Snapshot"
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 flex items-end justify-between p-3">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end justify-between p-3">
                     <span className="text-xs font-medium text-emerald-300 flex items-center gap-1 bg-black/60 px-2.5 py-1 rounded-lg backdrop-blur">
                       <CheckCircle2 className="w-3.5 h-3.5" /> Photo Attached
                     </span>
                     <button
                       type="button"
                       onClick={() => setPhotoPreview(null)}
-                      className="px-2.5 py-1 bg-red-600/80 hover:bg-red-600 text-white rounded-lg text-xs backdrop-blur transition"
+                      className="px-2.5 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs backdrop-blur transition shadow"
                     >
                       Retake
                     </button>
@@ -350,23 +350,23 @@ export default function ReportHazardModal({
               ) : (
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="cursor-pointer border-2 border-dashed border-zinc-700 hover:border-red-500/60 bg-zinc-900/60 hover:bg-zinc-900 rounded-2xl p-6 flex flex-col items-center justify-center transition-all group text-center"
+                  className="cursor-pointer border-2 border-dashed border-slate-300 hover:border-slate-500 bg-slate-50 hover:bg-slate-100 rounded-2xl p-6 flex flex-col items-center justify-center transition-all group text-center"
                 >
-                  <div className="w-14 h-14 rounded-2xl bg-zinc-800 group-hover:bg-red-500/20 text-zinc-400 group-hover:text-red-400 flex items-center justify-center transition mb-2 shadow-inner">
+                  <div className="w-14 h-14 rounded-2xl bg-white border border-slate-200 shadow-sm text-slate-600 group-hover:text-slate-900 flex items-center justify-center transition mb-2">
                     <Camera className="w-7 h-7" />
                   </div>
-                  <span className="text-sm font-semibold text-zinc-200 group-hover:text-white">
+                  <span className="text-sm font-semibold text-slate-800 group-hover:text-black">
                     Tap to Snap or Upload Photo
                   </span>
-                  <span className="text-xs text-zinc-500 mt-1">
+                  <span className="text-xs text-slate-500 mt-1">
                     Auto-opens camera on mobile phones
                   </span>
                 </div>
               )}
 
               {aiAnalysisFeedback && (
-                <div className="mt-2 text-xs bg-amber-500/10 border border-amber-500/30 text-amber-300 p-2.5 rounded-xl flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+                <div className="mt-2 text-xs bg-amber-50 border border-amber-200 text-amber-800 p-2.5 rounded-xl flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
                   <span>{aiAnalysisFeedback}</span>
                 </div>
               )}
@@ -375,31 +375,31 @@ export default function ReportHazardModal({
             {/* 2. INSTANT GEOLOCATION PIN */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-red-400" />
+                <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 flex items-center gap-1">
+                  <MapPin className="w-3.5 h-3.5 text-red-500" />
                   2. GPS Location Pin
                 </label>
                 <button
                   type="button"
                   onClick={fetchCurrentLocation}
                   disabled={isLocating}
-                  className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition"
+                  className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1 transition font-medium"
                 >
                   <RefreshCw className={`w-3 h-3 ${isLocating ? 'animate-spin' : ''}`} />
                   {isLocating ? 'Pinpointing...' : 'Refresh GPS'}
                 </button>
               </div>
 
-              <div className="bg-zinc-900/90 border border-zinc-800 rounded-2xl p-3 flex items-start gap-3">
-                <div className="w-8 h-8 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 flex items-center justify-center shrink-0 mt-0.5">
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 flex items-start gap-3">
+                <div className="w-8 h-8 rounded-xl bg-red-50 border border-red-200 text-red-600 flex items-center justify-center shrink-0 mt-0.5">
                   <MapPin className="w-4 h-4" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-zinc-200 truncate">{address}</p>
-                  <div className="flex items-center gap-3 text-[11px] text-zinc-500 mt-0.5">
+                  <p className="text-sm font-medium text-slate-900 truncate">{address}</p>
+                  <div className="flex items-center gap-3 text-[11px] text-slate-500 mt-0.5">
                     <span>Lat: {coords.lat.toFixed(5)}</span>
                     <span>Lng: {coords.lng.toFixed(5)}</span>
-                    <span className="text-emerald-400 font-mono">{locationAccuracy}</span>
+                    <span className="text-emerald-700 font-mono font-medium">{locationAccuracy}</span>
                   </div>
                 </div>
               </div>
@@ -407,7 +407,7 @@ export default function ReportHazardModal({
 
             {/* 3. QUICK HAZARD CATEGORY PILLS */}
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">
                 3. Quick Hazard Category
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -421,8 +421,8 @@ export default function ReportHazardModal({
                       onClick={() => setSelectedCategory(cat)}
                       className={`text-left p-2.5 rounded-xl border text-xs font-medium transition flex items-center gap-2 ${
                         isSelected
-                          ? 'bg-zinc-800 border-red-500 text-white shadow-md shadow-red-950/40 ring-1 ring-red-500'
-                          : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:bg-zinc-850 hover:text-zinc-200'
+                          ? 'bg-slate-900 border-slate-900 text-white shadow-sm'
+                          : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 hover:text-slate-950'
                       }`}
                     >
                       <span className="text-base">{meta.icon}</span>
@@ -436,12 +436,12 @@ export default function ReportHazardModal({
             {/* 4. VOICE NOTE & OPTIONAL NOTES */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1">
-                  <Mic className="w-3.5 h-3.5 text-amber-400" />
+                <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 flex items-center gap-1">
+                  <Mic className="w-3.5 h-3.5 text-slate-700" />
                   4. Voice Note or Quick Memo
                 </label>
                 {audioUrl && (
-                  <span className="text-[11px] text-emerald-400 font-medium flex items-center gap-1">
+                  <span className="text-[11px] text-emerald-700 font-medium flex items-center gap-1">
                     <CheckCircle2 className="w-3 h-3" /> Audio Recorded
                   </span>
                 )}
@@ -452,16 +452,16 @@ export default function ReportHazardModal({
                   <button
                     type="button"
                     onClick={startRecording}
-                    className="flex-1 py-2.5 px-3 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-amber-500/50 hover:bg-zinc-850 text-xs font-medium text-zinc-300 flex items-center justify-center gap-2 transition"
+                    className="flex-1 py-2.5 px-3 rounded-xl bg-slate-50 border border-slate-200 hover:border-slate-400 hover:bg-slate-100 text-xs font-medium text-slate-700 flex items-center justify-center gap-2 transition"
                   >
-                    <Mic className="w-4 h-4 text-amber-400" />
+                    <Mic className="w-4 h-4 text-slate-600" />
                     <span>Tap to Record Voice Note</span>
                   </button>
                 ) : (
                   <button
                     type="button"
                     onClick={stopRecording}
-                    className="flex-1 py-2.5 px-3 rounded-xl bg-red-600 hover:bg-red-700 text-xs font-semibold text-white flex items-center justify-center gap-2 animate-pulse transition"
+                    className="flex-1 py-2.5 px-3 rounded-xl bg-red-600 hover:bg-red-700 text-xs font-semibold text-white flex items-center justify-center gap-2 animate-pulse transition shadow-sm"
                   >
                     <Square className="w-4 h-4 fill-current" />
                     <span>Stop Recording ({recordingDuration}s)</span>
@@ -472,12 +472,12 @@ export default function ReportHazardModal({
                   <button
                     type="button"
                     onClick={toggleAudioPlayback}
-                    className="py-2.5 px-3 rounded-xl bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 text-xs text-white flex items-center gap-1.5 transition"
+                    className="py-2.5 px-3 rounded-xl bg-slate-100 border border-slate-200 hover:bg-slate-200 text-xs text-slate-800 flex items-center gap-1.5 transition"
                   >
                     {isPlayingAudio ? (
-                      <Pause className="w-4 h-4 text-amber-400 fill-current" />
+                      <Pause className="w-4 h-4 text-slate-800 fill-current" />
                     ) : (
-                      <Play className="w-4 h-4 text-amber-400 fill-current" />
+                      <Play className="w-4 h-4 text-slate-800 fill-current" />
                     )}
                     <span>Listen</span>
                   </button>
@@ -485,13 +485,13 @@ export default function ReportHazardModal({
               </div>
 
               {voiceTranscript && (
-                <div className="mt-2 text-xs bg-zinc-900 border border-zinc-800 text-zinc-300 p-2.5 rounded-xl flex items-start gap-2">
-                  <Volume2 className="w-4 h-4 text-zinc-400 shrink-0 mt-0.5" />
+                <div className="mt-2 text-xs bg-slate-50 border border-slate-200 text-slate-800 p-2.5 rounded-xl flex items-start gap-2">
+                  <Volume2 className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
                   <div>
-                    <span className="text-[10px] text-zinc-500 block uppercase font-mono">
+                    <span className="text-[10px] text-slate-500 block uppercase font-mono">
                       Voice Transcription
                     </span>
-                    <p className="italic">"{voiceTranscript}"</p>
+                    <p className="italic text-slate-700">"{voiceTranscript}"</p>
                   </div>
                 </div>
               )}
@@ -502,38 +502,38 @@ export default function ReportHazardModal({
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Optional details (e.g. Near pillar 45, water 2ft deep)..."
-                className="mt-2 w-full bg-zinc-900/80 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-red-500 transition"
+                className="mt-2 w-full bg-slate-50 border border-slate-200 focus:border-slate-400 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white transition"
               />
             </div>
 
             {/* SEVERITY RATING BANNER */}
-            <div className="p-3 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-between">
+            <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Flame
                   className={`w-4 h-4 ${
                     currentSeverityMeta.severity === 'critical'
-                      ? 'text-red-500 animate-pulse'
+                      ? 'text-red-600 animate-pulse'
                       : currentSeverityMeta.severity === 'high'
                       ? 'text-orange-500'
-                      : 'text-yellow-500'
+                      : 'text-amber-500'
                   }`}
                 />
                 <div>
-                  <span className="text-xs font-semibold text-zinc-300">Calculated Severity:</span>
+                  <span className="text-xs font-semibold text-slate-600">Calculated Severity:</span>
                   <span
                     className={`ml-1.5 text-xs font-bold uppercase ${
                       currentSeverityMeta.severity === 'critical'
-                        ? 'text-red-400'
+                        ? 'text-red-700'
                         : currentSeverityMeta.severity === 'high'
-                        ? 'text-orange-400'
-                        : 'text-yellow-400'
+                        ? 'text-orange-600'
+                        : 'text-amber-600'
                     }`}
                   >
                     {currentSeverityMeta.severity}
                   </span>
                 </div>
               </div>
-              <div className="text-xs font-mono font-bold bg-zinc-800 px-2.5 py-1 rounded-lg text-zinc-300 border border-zinc-700">
+              <div className="text-xs font-mono font-bold bg-white px-2.5 py-1 rounded-lg text-slate-800 border border-slate-200 shadow-sm">
                 Score: {currentSeverityMeta.score}/100
               </div>
             </div>
@@ -542,16 +542,16 @@ export default function ReportHazardModal({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3.5 px-4 rounded-2xl bg-white hover:bg-zinc-200 text-zinc-950 font-bold text-sm shadow-xl flex items-center justify-center gap-2 transition-all active:scale-[0.99] disabled:opacity-50"
+              className="w-full py-3.5 px-4 rounded-2xl bg-slate-900 hover:bg-black text-white font-bold text-sm shadow-md flex items-center justify-center gap-2 transition-all active:scale-[0.99] disabled:opacity-50"
             >
               {isSubmitting ? (
                 <>
-                  <RefreshCw className="w-4 h-4 animate-spin text-zinc-950" />
+                  <RefreshCw className="w-4 h-4 animate-spin text-white" />
                   <span>Submitting Hazard Alert...</span>
                 </>
               ) : (
                 <>
-                  <AlertTriangle className="w-4 h-4 text-zinc-950" />
+                  <AlertTriangle className="w-4 h-4 text-white" />
                   <span>Log Hazard Now (Instant Broadcast)</span>
                 </>
               )}
