@@ -74,13 +74,13 @@ export default function SafeRoutePlanner({
             setIsOpen(true);
             handleComputeRoute();
           }}
-          className="px-4 py-2.5 rounded-2xl bg-white/95 hover:bg-white text-slate-900 border border-slate-200 shadow-lg backdrop-blur-md flex items-center gap-2 text-xs font-bold transition group"
+          className="px-4 py-2.5 rounded-2xl bg-white/95 dark:bg-slate-900/95 hover:bg-white dark:hover:bg-slate-900 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-800 shadow-lg backdrop-blur-md flex items-center gap-2 text-xs font-bold transition group"
         >
-          <div className="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200 group-hover:scale-105 transition">
+          <div className="w-6 h-6 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 flex items-center justify-center border border-emerald-200 dark:border-emerald-800 group-hover:scale-105 transition">
             <Footprints className="w-3.5 h-3.5" />
           </div>
           <span>Safe Route Navigator</span>
-          <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">
+          <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 font-semibold">
             Hazard-Free
           </span>
         </button>
@@ -89,18 +89,18 @@ export default function SafeRoutePlanner({
   }
 
   return (
-    <div className="absolute top-20 left-4 right-4 sm:right-auto sm:w-96 z-20 pointer-events-auto bg-white/95 backdrop-blur-xl border border-slate-200 rounded-3xl p-4 sm:p-5 shadow-2xl text-slate-900 animate-in fade-in duration-200">
+    <div className="absolute top-20 left-4 right-4 sm:right-auto sm:w-96 z-20 pointer-events-auto bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-5 shadow-2xl text-slate-900 dark:text-white animate-in fade-in duration-200">
       {/* Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+      <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200">
+          <div className="w-7 h-7 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 flex items-center justify-center border border-emerald-200 dark:border-emerald-800">
             <Footprints className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
               Safe Route Navigator
             </h3>
-            <p className="text-[11px] text-slate-500">Avoid live wires, open manholes & floods</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">Avoid live wires, open manholes & floods</p>
           </div>
         </div>
         <button
@@ -108,7 +108,7 @@ export default function SafeRoutePlanner({
             setIsOpen(false);
             handleClearRoute();
           }}
-          className="text-xs text-slate-400 hover:text-slate-800 p-1"
+          className="text-xs text-slate-400 hover:text-slate-800 dark:hover:text-white p-1"
         >
           ✕
         </button>

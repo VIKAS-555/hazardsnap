@@ -48,11 +48,11 @@ export default function AuthModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-md bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 shadow-2xl text-slate-900">
+      <div className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-7 shadow-2xl text-slate-900 dark:text-white">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition"
+          className="absolute top-5 right-5 p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition"
           aria-label="Close"
         >
           <X className="w-4 h-4" />
@@ -60,13 +60,13 @@ export default function AuthModal({
 
         {successMsg ? (
           <div className="py-10 text-center space-y-3">
-            <div className="w-14 h-14 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto animate-bounce">
+            <div className="w-14 h-14 rounded-full bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto animate-bounce">
               <CheckCircle2 className="w-7 h-7" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
               {mode === 'login' ? 'Authentication Verified' : 'Account Registered'}
             </h3>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Welcome to the HazardSnap Civic Intelligence Grid.
             </p>
           </div>
@@ -74,13 +74,13 @@ export default function AuthModal({
           <div className="space-y-5">
             {/* Header */}
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 block mb-1">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 block mb-1">
                 CIVIC ID GATEWAY
               </span>
-              <h2 className="text-xl font-bold tracking-tight text-slate-900">
+              <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
                 {mode === 'login' ? 'Access HazardSnap Grid' : 'Create Civic Reporter Account'}
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 {mode === 'login'
                   ? 'Sign in to confirm road hazards, verify fixes, or access dispatch.'
                   : 'Join urban commuters protecting streets in real-time.'}
@@ -88,14 +88,14 @@ export default function AuthModal({
             </div>
 
             {/* Role Switcher */}
-            <div className="grid grid-cols-2 p-1 bg-slate-100 border border-slate-200 rounded-2xl text-xs font-semibold">
+            <div className="grid grid-cols-2 p-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-semibold">
               <button
                 type="button"
                 onClick={() => setRole('citizen')}
                 className={`py-2 rounded-xl transition flex items-center justify-center gap-1.5 ${
                   role === 'citizen'
-                    ? 'bg-white text-slate-900 font-bold shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 <UserCheck className="w-3.5 h-3.5" />
@@ -106,8 +106,8 @@ export default function AuthModal({
                 onClick={() => setRole('official')}
                 className={`py-2 rounded-xl transition flex items-center justify-center gap-1.5 ${
                   role === 'official'
-                    ? 'bg-white text-slate-900 font-bold shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 <ShieldCheck className="w-3.5 h-3.5" />
@@ -119,7 +119,7 @@ export default function AuthModal({
             <form onSubmit={handleSubmit} className="space-y-3.5">
               {role === 'official' ? (
                 <div>
-                  <label className="text-[11px] font-semibold text-slate-600 uppercase tracking-wider block mb-1.5">
+                  <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider block mb-1.5">
                     Municipal Agency Employee ID
                   </label>
                   <input
@@ -128,12 +128,12 @@ export default function AuthModal({
                     value={officialId}
                     onChange={(e) => setOfficialId(e.target.value)}
                     placeholder="e.g. BBMP-ENG-4912"
-                    className="w-full bg-slate-50 border border-slate-200 focus:border-slate-400 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white transition"
+                    className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 focus:border-slate-400 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 transition"
                   />
                 </div>
               ) : (
                 <div>
-                  <label className="text-[11px] font-semibold text-slate-600 uppercase tracking-wider block mb-1.5">
+                  <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider block mb-1.5">
                     Mobile Number or Email
                   </label>
                   <input
@@ -142,13 +142,13 @@ export default function AuthModal({
                     value={emailOrPhone}
                     onChange={(e) => setEmailOrPhone(e.target.value)}
                     placeholder="+91 98765 43210 or user@example.com"
-                    className="w-full bg-slate-50 border border-slate-200 focus:border-slate-400 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white transition"
+                    className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 focus:border-slate-400 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 transition"
                   />
                 </div>
               )}
 
               <div>
-                <label className="text-[11px] font-semibold text-slate-600 uppercase tracking-wider block mb-1.5">
+                <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider block mb-1.5">
                   Password or OTP Code
                 </label>
                 <input
@@ -157,7 +157,7 @@ export default function AuthModal({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-slate-50 border border-slate-200 focus:border-slate-400 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white transition"
+                  className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 focus:border-slate-400 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 transition"
                 />
               </div>
 
@@ -165,7 +165,7 @@ export default function AuthModal({
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs shadow-md transition active:scale-[0.99] flex items-center justify-center gap-2 mt-4"
+                className="w-full py-3 rounded-xl bg-slate-900 dark:bg-white hover:bg-black dark:hover:bg-slate-200 text-white dark:text-slate-900 font-bold text-xs shadow-md transition active:scale-[0.99] flex items-center justify-center gap-2 mt-4"
               >
                 <span>{isLoading ? 'Verifying...' : mode === 'login' ? 'Sign In to Grid' : 'Register Account'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -180,21 +180,21 @@ export default function AuthModal({
                   }
                   onClose();
                 }}
-                className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-xs font-semibold transition"
+                className="w-full py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold transition"
               >
                 Instant Access as Guest Commuter (Demo Mode)
               </button>
             </form>
 
             {/* Toggle Mode Footer */}
-            <div className="pt-2 text-center text-xs text-slate-500 border-t border-slate-100">
+            <div className="pt-2 text-center text-xs text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800">
               {mode === 'login' ? (
                 <span>
                   Don't have a civic ID?{' '}
                   <button
                     type="button"
                     onClick={() => setMode('signup')}
-                    className="text-slate-900 font-bold underline underline-offset-2 hover:text-black"
+                    className="text-slate-900 dark:text-white font-bold underline underline-offset-2 hover:text-black dark:hover:underline"
                   >
                     Create Account
                   </button>
@@ -205,7 +205,7 @@ export default function AuthModal({
                   <button
                     type="button"
                     onClick={() => setMode('login')}
-                    className="text-slate-900 font-bold underline underline-offset-2 hover:text-black"
+                    className="text-slate-900 dark:text-white font-bold underline underline-offset-2 hover:text-black dark:hover:underline"
                   >
                     Log In
                   </button>
