@@ -75,7 +75,7 @@ HazardSnap delivers a **zero-friction, photo-first emergency response grid** bui
 
 ---
 
-## 🏗️ System Architecture & Data Flow
+## 🏗️ System Architecture & Data Flows
 
 ```mermaid
 flowchart TD
