@@ -86,25 +86,12 @@
 
       // Format as vault dictionary keyed by techClubId
       const vault = {};
-      const expelled = (function () {
-        try {
-          return JSON.parse(localStorage.getItem('devsphere_expelled_members') || '[]');
-        } catch (e) {
-          return [];
-        }
-      })();
 
       (data || []).forEach(row => {
         if (!row.tech_club_id) return;
 
-        // Never restore expelled members from cloud snapshot
-        if (
-          row.role === 'EXPELLED' ||
-          row.name === '[EXPELLED]' ||
-          expelled.includes(row.tech_club_id) ||
-          (row.usn && expelled.includes(row.usn)) ||
-          (row.email && expelled.includes(row.email.toLowerCase()))
-        ) {
+        // Skip any legacy expelled markers
+        if (row.role === 'EXPELLED' || row.name === '[EXPELLED]') {
           return;
         }
 
@@ -208,7 +195,17 @@
         console.warn('[Supabase] Could not delete event RSVPs for member:', e);
       }
 
-      // 2. Direct hard delete from members table
+      // 2. Delete projects authored by this member
+      try {
+        await client
+          .from('projects')
+          .delete()
+          .eq('author_id', techClubId);
+      } catch (e) {
+        console.warn('[Supabase] Could not delete projects for member:', e);
+      }
+
+      // 3. Direct hard delete from members table (total eradication)
       try {
         const { error: delErr } = await client
           .from('members')
@@ -223,27 +220,13 @@
         console.warn('[Supabase] Direct delete exception:', delErr);
       }
 
-      // 3. Fallback tombstone update (in case RLS blocks DELETE for anon role)
-      // Supabase policy "Allow members update own record" guarantees UPDATE works!
+      // 4. Clean up any lingering legacy test markers
       try {
-        const dummyEmail = `expelled_${Date.now()}_${techClubId.replace(/[^a-zA-Z0-9]/g, '')}@removed.invalid`;
-        const { error: updErr } = await client
+        await client
           .from('members')
-          .update({
-            role: 'EXPELLED',
-            name: '[EXPELLED]',
-            email: dummyEmail
-          })
-          .eq('tech_club_id', techClubId);
-
-        if (!updErr) {
-          deleteOk = true;
-        } else {
-          console.warn('[Supabase] Tombstone update notice:', updErr.message);
-        }
-      } catch (updErr) {
-        console.warn('[Supabase] Tombstone update exception:', updErr);
-      }
+          .delete()
+          .eq('role', 'EXPELLED');
+      } catch (e) {}
 
       return deleteOk;
     },

@@ -253,40 +253,10 @@ function generateTechClubId(usn, year = '2026') {
 }
 
 // --- Members Database / Vault ---
-const EXPELLED_STORAGE_KEY = 'devsphere_expelled_members';
-
-function getExpelledMembers() {
-  try {
-    const raw = localStorage.getItem(EXPELLED_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch (e) {
-    return [];
-  }
-}
-
-function addExpelledMember(identifier) {
-  if (!identifier) return;
-  const list = getExpelledMembers();
-  const idStr = String(identifier).trim();
-  if (!list.includes(idStr)) {
-    list.push(idStr);
-    localStorage.setItem(EXPELLED_STORAGE_KEY, JSON.stringify(list));
-  }
-}
-
-function isMemberExpelled(memberOrId) {
-  if (!memberOrId) return false;
-  const list = getExpelledMembers();
-  if (typeof memberOrId === 'string') {
-    const s = memberOrId.trim();
-    return list.includes(s) || list.includes(s.toLowerCase());
-  }
-  return (
-    list.includes(memberOrId.techClubId) ||
-    (memberOrId.email && list.includes(memberOrId.email.toLowerCase())) ||
-    (memberOrId.usn && list.includes(memberOrId.usn))
-  );
-}
+// Clean up any legacy expelled registry so kicked-out members can re-register freshly
+try {
+  localStorage.removeItem('devsphere_expelled_members');
+} catch (e) {}
 
 function getMembersVault() {
   try {
@@ -297,14 +267,12 @@ function getMembersVault() {
     const vault = JSON.parse(raw);
     let modified = false;
 
-    // Purge any pre-seeded demo accounts (e.g. Aditya Sharma) & any expelled accounts
+    // Purge any pre-seeded demo accounts (e.g. Aditya Sharma) & legacy test markers
     for (const key of Object.keys(vault)) {
       const record = vault[key];
       if (
         key === 'BST-2026-8001' || 
         (record && (record.name === 'Aditya Sharma' || record.name === 'Alex Sharma' || record.email === '2392608001@svyasa-sas.edu.in')) ||
-        isMemberExpelled(key) ||
-        isMemberExpelled(record) ||
         (record && (record.role === 'EXPELLED' || record.name === '[EXPELLED]'))
       ) {
         delete vault[key];
@@ -325,11 +293,7 @@ function saveMembersVault(vault) {
   if (vault && typeof vault === 'object') {
     for (const key of Object.keys(vault)) {
       const record = vault[key];
-      if (
-        isMemberExpelled(key) ||
-        isMemberExpelled(record) ||
-        (record && (record.role === 'EXPELLED' || record.name === '[EXPELLED]'))
-      ) {
+      if (record && (record.role === 'EXPELLED' || record.name === '[EXPELLED]')) {
         delete vault[key];
       }
     }
@@ -380,7 +344,8 @@ function getActiveSession() {
       session.techClubId === 'BST-2026-8001' || 
       session.name === 'Aditya Sharma' || 
       session.name === 'Alex Sharma' ||
-      isMemberExpelled(session)
+      session.role === 'EXPELLED' ||
+      session.name === '[EXPELLED]'
     )) {
       localStorage.removeItem(SESSION_STORAGE_KEY);
       sessionStorage.removeItem(SESSION_STORAGE_KEY);
@@ -667,11 +632,7 @@ async function authenticateMember(identifier, password, rememberMe = true) {
     }
   }
 
-  const cleanIdentifier = identifier.trim().toLowerCase();
-
-  if (isMemberExpelled(cleanIdentifier)) {
-    throw new Error('Account Expelled: This member ID has been permanently revoked by the Lead Administrator.');
-  }
+  const cleanIdentifier = (identifier || '').trim().toLowerCase();
 
   // Find by Tech Club ID (case-insensitive) OR College Email OR USN
   const member = Object.values(vault).find(m => 
@@ -680,7 +641,7 @@ async function authenticateMember(identifier, password, rememberMe = true) {
     m.usn.toLowerCase() === cleanIdentifier
   );
 
-  if (!member || isMemberExpelled(member)) {
+  if (!member) {
     recordFailedAttempt();
     throw new Error('Invalid Tech Club ID, Email, or Password.');
   }
@@ -773,11 +734,7 @@ async function syncWithCloud() {
       if (cloudVault) {
         for (const key of Object.keys(cloudVault)) {
           const rec = cloudVault[key];
-          if (
-            isMemberExpelled(key) ||
-            isMemberExpelled(rec) ||
-            (rec && (rec.role === 'EXPELLED' || rec.name === '[EXPELLED]'))
-          ) {
+          if (rec && (rec.role === 'EXPELLED' || rec.name === '[EXPELLED]')) {
             delete cloudVault[key];
           }
         }
@@ -934,14 +891,18 @@ async function kickOutMember(targetClubId) {
     }
   }
 
-  // 1. Permanently register this member in the local expelled tombstone registry
-  addExpelledMember(targetClubId);
-  if (target.email) addExpelledMember(target.email);
-  if (target.usn) addExpelledMember(target.usn);
-
-  // 2. Delete from local vault and persist
+  // 1. Delete from local vault and persist
   delete vault[targetClubId];
   saveMembersVault(vault);
+
+  // 2. If the user being kicked out is currently logged in on this browser, immediately terminate session
+  const activeSessionCheck = getActiveSession();
+  if (activeSessionCheck && activeSessionCheck.techClubId === targetClubId) {
+    try {
+      localStorage.removeItem(SESSION_STORAGE_KEY);
+      sessionStorage.removeItem(SESSION_STORAGE_KEY);
+    } catch (e) {}
+  }
 
   // 3. Clean up any local RSVPs stored for this member
   try {
@@ -977,7 +938,7 @@ async function kickOutMember(targetClubId) {
     }
   } catch (e) {}
 
-  // 5. Cloud Database Purge (Supabase): Delete row, delete RSVPs, and tombstone
+  // 5. Cloud Database Hard Delete (Supabase): completely wipe all member data, RSVPs, and projects
   if (window.SupabaseEngine && window.SupabaseEngine.isConfigured()) {
     try {
       if (typeof window.SupabaseEngine.deleteMember === 'function') {
@@ -986,8 +947,8 @@ async function kickOutMember(targetClubId) {
         const client = window.SupabaseEngine.getClient();
         if (client) {
           await client.from('event_rsvps').delete().eq('tech_club_id', targetClubId);
+          await client.from('projects').delete().eq('author_id', targetClubId);
           await client.from('members').delete().eq('tech_club_id', targetClubId);
-          await client.from('members').update({ role: 'EXPELLED', name: '[EXPELLED]' }).eq('tech_club_id', targetClubId);
         }
       }
     } catch (e) {
@@ -1033,9 +994,6 @@ window.AuthEngine = {
   demoteMember,
   promoteMember,
   kickOutMember,
-  getExpelledMembers,
-  addExpelledMember,
-  isMemberExpelled,
   saveMembersVault,
   updateMemberProfile
 };
