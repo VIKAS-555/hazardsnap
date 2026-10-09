@@ -62,36 +62,34 @@ export default function SafetyMap({
   const [activeRoutePlan, setActiveRoutePlan] = useState<SafeNavigationPlan | null>(null);
   const [isSimulating, setIsSimulating] = useState(false);
 
-  // Handle focused hazard from external list
+  // Handle focused hazard from feed click
   useEffect(() => {
     if (focusedHazard && mapInstanceRef.current) {
       setSelectedHazardModal(focusedHazard);
       mapInstanceRef.current.flyTo(
         [focusedHazard.latitude, focusedHazard.longitude],
         16,
-        { animate: true, duration: 1 }
+        { animate: true, duration: 0.8 }
       );
     }
   }, [focusedHazard]);
 
-  // Invalidate map size when expanded state or 3D view changes
+  // Adjust size smoothly when expanded or 3D view changes
   useEffect(() => {
     if (mapInstanceRef.current) {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         mapInstanceRef.current.invalidateSize();
-      }, 300);
+      }, 250);
+      return () => clearTimeout(timer);
     }
   }, [isExpanded, is3DView]);
 
-  // Fetch initial user geolocation
+  // Fetch initial user GPS
   useEffect(() => {
-    if (navigator.geolocation) {
+    if (typeof window !== 'undefined' && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          const loc = {
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
-          };
+          const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
           setUserLocation(loc);
           if (mapInstanceRef.current) {
             updateUserMarker(loc.lat, loc.lng);
@@ -103,7 +101,7 @@ export default function SafetyMap({
     }
   }, []);
 
-  // Update user pulse marker on map
+  // Update user pulse marker
   const updateUserMarker = (lat: number, lng: number) => {
     if (!mapInstanceRef.current || typeof window === 'undefined') return;
 
@@ -116,27 +114,27 @@ export default function SafetyMap({
       const userIcon = L.divIcon({
         className: 'user-gps-pulse',
         html: `
-          <div style="position: relative; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+          <div style="position: relative; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;">
             <div style="
               position: absolute;
-              width: 24px;
-              height: 24px;
+              width: 22px;
+              height: 22px;
               border-radius: 50%;
-              background: rgba(59, 130, 246, 0.4);
-              animation: radar-pulse 2s infinite;
+              background: rgba(59, 130, 246, 0.45);
+              animation: pulse-ring 2.2s infinite;
             "></div>
             <div style="
-              width: 14px;
-              height: 14px;
+              width: 12px;
+              height: 12px;
               border-radius: 50%;
               background: #3b82f6;
-              border: 3px solid #ffffff;
-              box-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+              border: 2px solid #ffffff;
+              box-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
             "></div>
           </div>
         `,
-        iconSize: [24, 24],
-        iconAnchor: [12, 12],
+        iconSize: [22, 22],
+        iconAnchor: [11, 11],
       });
 
       userMarkerRef.current = L.marker([lat, lng], { icon: userIcon }).addTo(map);
@@ -152,7 +150,7 @@ export default function SafetyMap({
           const lng = pos.coords.longitude;
           setUserLocation({ lat, lng });
           updateUserMarker(lat, lng);
-          mapInstanceRef.current.flyTo([lat, lng], 16, { animate: true, duration: 1.2 });
+          mapInstanceRef.current.flyTo([lat, lng], 16, { animate: true, duration: 1 });
         },
         () => {
           mapInstanceRef.current.flyTo([userLocation.lat, userLocation.lng], 15, { animate: true });
@@ -162,39 +160,55 @@ export default function SafetyMap({
     }
   };
 
-  // High-Speed Multi-CDN Tile Loader
+  // Apply Tile Layer with dedicated configurations for Dark, Street, and Satellite
   const applyTileLayer = (L: any, map: any, theme: MapTheme) => {
     if (tileLayerRef.current) {
       map.removeLayer(tileLayerRef.current);
+      tileLayerRef.current = null;
     }
 
-    // High performance tile configuration with parallel subdomains & cache buffer
-    let url = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-    let options: any = {
-      maxZoom: 19,
-      subdomains: ['a', 'b', 'c'],
-      keepBuffer: 6, // Keeps 6 rows of adjacent tiles cached for instant panning
-      updateWhenIdle: false, // Smooth continuous tile loading
-      updateWhenZooming: true,
-      crossOrigin: true,
-      attribution: '&copy; OpenStreetMap contributors',
-    };
-
-    if (theme === 'dark') {
-      options.className = 'dark-tiles';
+    if (theme === 'satellite') {
+      // 🛰️ Pristine Esri World Imagery Satellite Tiles
+      tileLayerRef.current = L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        {
+          maxZoom: 18,
+          className: 'satellite-tiles',
+          attribution: '&copy; Esri World Imagery',
+          keepBuffer: 6,
+          crossOrigin: true,
+        }
+      ).addTo(map);
     } else if (theme === 'street') {
-      options.className = 'street-tiles';
-    } else if (theme === 'satellite') {
-      url = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
-      options.attribution = '&copy; Esri World Imagery';
-      options.maxZoom = 18;
-      delete options.subdomains;
+      // 🗺️ Clean High-Contrast OpenStreetMap
+      tileLayerRef.current = L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+          maxZoom: 19,
+          subdomains: ['a', 'b', 'c'],
+          className: 'street-tiles',
+          attribution: '&copy; OpenStreetMap contributors',
+          keepBuffer: 6,
+          crossOrigin: true,
+        }
+      ).addTo(map);
+    } else {
+      // 🌙 Dark Civic OpenStreetMap
+      tileLayerRef.current = L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+          maxZoom: 19,
+          subdomains: ['a', 'b', 'c'],
+          className: 'dark-tiles',
+          attribution: '&copy; OpenStreetMap contributors',
+          keepBuffer: 6,
+          crossOrigin: true,
+        }
+      ).addTo(map);
     }
-
-    tileLayerRef.current = L.tileLayer(url, options).addTo(map);
   };
 
-  // Re-apply tile layer when mapTheme changes
+  // Switch Theme on state change
   useEffect(() => {
     if (mapInstanceRef.current && typeof window !== 'undefined') {
       import('leaflet').then((L) => {
@@ -210,7 +224,7 @@ export default function SafetyMap({
     return true;
   });
 
-  // Initialize Leaflet Map
+  // Initialize Map
   useEffect(() => {
     if (typeof window === 'undefined' || !mapContainerRef.current) return;
 
@@ -225,7 +239,7 @@ export default function SafetyMap({
         map = L.map(mapContainerRef.current, {
           zoomControl: false,
           attributionControl: false,
-          preferCanvas: true, // Canvas hardware acceleration for high FPS
+          preferCanvas: true,
         }).setView([defaultLat, defaultLng], 14);
 
         applyTileLayer(L, map, mapTheme);
@@ -242,7 +256,7 @@ export default function SafetyMap({
     }
   }, [filteredHazards]);
 
-  // Render Custom Hazard Markers & Danger Zones
+  // Render Custom Hazard Markers
   const renderMarkers = (L: any, map: any, items: HazardReport[]) => {
     markersRef.current.forEach((m) => map.removeLayer(m));
     markersRef.current = [];
@@ -260,48 +274,48 @@ export default function SafetyMap({
         ? '#f97316'
         : '#eab308';
 
-      // 1. Add Danger Buffer Circle for critical items
+      // Safety perimeter ring
       if (isCritical && !isFixed) {
         const circle = L.circle([hazard.latitude, hazard.longitude], {
           color: '#ef4444',
           fillColor: '#ef4444',
-          fillOpacity: 0.16,
+          fillOpacity: 0.12,
           weight: 1.5,
-          dashArray: '4, 4',
+          dashArray: '3, 4',
           radius: 65,
         }).addTo(map);
         markersRef.current.push(circle);
       }
 
-      // 2. Add Custom Icon
+      // Marker Icon
       const customIcon = L.divIcon({
         className: 'custom-hazard-marker',
         html: `
-          <div style="position: relative; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;">
+          <div style="position: relative; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;">
             ${
               isCritical && !isFixed
-                ? `<div class="hazard-pulse-ring" style="background: rgba(239, 68, 68, 0.45);"></div>`
+                ? `<div class="hazard-pulse-ring" style="background: rgba(239, 68, 68, 0.4);"></div>`
                 : ''
             }
             <div style="
-              width: 34px; 
-              height: 34px; 
+              width: 32px; 
+              height: 32px; 
               border-radius: 50%; 
-              background: #18181b; 
+              background: #0f172a; 
               border: 2px solid ${markerColor}; 
               display: flex; 
               align-items: center; 
               justify-content: center; 
-              font-size: 16px; 
-              box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+              font-size: 15px; 
+              box-shadow: 0 4px 10px rgba(0,0,0,0.5);
               cursor: pointer;
             ">
               ${isFixed ? '✅' : meta.icon}
             </div>
           </div>
         `,
-        iconSize: [38, 38],
-        iconAnchor: [19, 19],
+        iconSize: [34, 34],
+        iconAnchor: [17, 17],
       });
 
       const marker = L.marker([hazard.latitude, hazard.longitude], { icon: customIcon }).addTo(map);
@@ -340,16 +354,16 @@ export default function SafetyMap({
 
       const safePolyline = L.polyline(activeRoutePlan.safeRoute.coordinates, {
         color: '#10b981',
-        weight: 5.5,
+        weight: 5,
         opacity: 0.95,
       }).addTo(map);
 
       routeLayersRef.current.push(safePolyline);
-      map.fitBounds(safePolyline.getBounds(), { padding: [60, 60] });
+      map.fitBounds(safePolyline.getBounds(), { padding: [50, 50] });
     });
   }, [activeRoutePlan]);
 
-  // Handle Walking Simulation
+  // Walking simulation
   const handleStartSimulation = () => {
     if (!activeRoutePlan || !mapInstanceRef.current) return;
 
@@ -368,20 +382,20 @@ export default function SafetyMap({
         className: 'simulation-walker',
         html: `
           <div style="
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             background: #10b981;
-            border: 3px solid #ffffff;
+            border: 2px solid #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.9);
+            font-size: 15px;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.9);
           ">🚶</div>
         `,
-        iconSize: [32, 32],
-        iconAnchor: [16, 16],
+        iconSize: [30, 30],
+        iconAnchor: [15, 15],
       });
 
       const startPos = coords[0];
@@ -399,7 +413,7 @@ export default function SafetyMap({
           return;
         }
         marker.setLatLng(coords[step]);
-      }, 400);
+      }, 350);
     });
   };
 
@@ -423,51 +437,91 @@ export default function SafetyMap({
   };
 
   return (
-    <div className="relative w-full h-full bg-zinc-950 overflow-hidden map-3d-wrapper rounded-3xl border border-zinc-800 shadow-2xl">
-      {/* 3D / 2D MAP CANVAS CONTAINER */}
+    <div className="relative w-full h-full bg-[#080C14] overflow-hidden map-3d-wrapper rounded-3xl border border-white/[0.08] shadow-2xl">
+      {/* 3D / 2D MAP CANVAS */}
       <div
         ref={mapContainerRef}
         className={`w-full h-full z-0 transition-transform duration-500 ${
-          is3DView ? 'map-3d-container' : 'map-2d-container'
+          is3DView ? 'map-3d-tilt' : 'map-2d-flat'
         }`}
       />
 
-      {/* TOP CONTROLS: EXPAND / COLLAPSE & 3D VIEW BUTTON */}
-      <div className="absolute top-4 right-4 z-20 pointer-events-auto flex items-center gap-2">
-        {/* 3D Isometric View Toggle */}
+      {/* TOP UNIFIED CONTROL BAR */}
+      <div className="absolute top-3.5 right-3.5 z-20 pointer-events-auto flex items-center gap-1.5 bg-[#0b101b]/90 backdrop-blur-md border border-white/[0.1] p-1 rounded-2xl shadow-xl">
+        {/* Theme Toggles */}
+        <div className="flex items-center gap-0.5 pr-1 border-r border-white/[0.08]">
+          <button
+            onClick={() => setMapTheme('dark')}
+            className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold transition ${
+              mapTheme === 'dark'
+                ? 'bg-white/[0.1] text-white shadow-sm'
+                : 'text-slate-400 hover:text-white'
+            }`}
+            title="Dark Grid"
+          >
+            🌙 Dark
+          </button>
+          <button
+            onClick={() => setMapTheme('street')}
+            className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold transition ${
+              mapTheme === 'street'
+                ? 'bg-white/[0.1] text-white shadow-sm'
+                : 'text-slate-400 hover:text-white'
+            }`}
+            title="Street Map"
+          >
+            🗺️ Street
+          </button>
+          <button
+            onClick={() => setMapTheme('satellite')}
+            className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold transition ${
+              mapTheme === 'satellite'
+                ? 'bg-white/[0.1] text-white shadow-sm'
+                : 'text-slate-400 hover:text-white'
+            }`}
+            title="Esri Satellite Imagery"
+          >
+            🛰️ Satellite
+          </button>
+        </div>
+
+        {/* 3D Perspective Toggle */}
         <button
           onClick={() => setIs3DView(!is3DView)}
-          className={`px-3 py-2 rounded-2xl text-xs font-bold transition flex items-center gap-1.5 backdrop-blur-md shadow-xl border ${
+          className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
             is3DView
-              ? 'bg-blue-600 text-white border-blue-400 shadow-blue-900/50 ring-2 ring-blue-500/50'
-              : 'bg-zinc-900/90 text-zinc-300 border-zinc-700 hover:text-white hover:bg-zinc-850'
+              ? 'bg-blue-600 text-white shadow-sm'
+              : 'text-slate-300 hover:text-white hover:bg-white/[0.06]'
           }`}
           title="Toggle 3D Drone Perspective"
         >
-          <Box className={`w-3.5 h-3.5 ${is3DView ? 'animate-spin' : ''}`} />
-          <span>{is3DView ? '3D View ON' : '3D View'}</span>
+          <Box className="w-3.5 h-3.5" />
+          <span>3D View</span>
         </button>
 
-        {/* Expand / Minimize Fullscreen Map */}
+        {/* Expand / Minimize */}
         {onToggleExpand && (
           <button
             onClick={onToggleExpand}
-            className="p-2 sm:px-3 sm:py-2 rounded-2xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-700 text-white text-xs font-bold shadow-xl backdrop-blur-md flex items-center gap-1.5 transition active:scale-95"
-            title={isExpanded ? 'Collapse into Side Panel' : 'Expand Full Map'}
+            className="p-1.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/[0.06] transition"
+            title={isExpanded ? 'Collapse into Split View' : 'Expand to Fullscreen'}
           >
             {isExpanded ? (
-              <>
-                <Minimize2 className="w-4 h-4 text-amber-400" />
-                <span className="hidden sm:inline">Split View</span>
-              </>
+              <Minimize2 className="w-4 h-4 text-amber-400" />
             ) : (
-              <>
-                <Maximize2 className="w-4 h-4 text-emerald-400" />
-                <span className="hidden sm:inline">Expand Map</span>
-              </>
+              <Maximize2 className="w-4 h-4 text-emerald-400" />
             )}
           </button>
         )}
+
+        {/* Center GPS */}
+        <button
+          onClick={handleRecenterToUser}
+          className="p-1.5 rounded-xl text-blue-400 hover:text-blue-300 hover:bg-white/[0.06] transition"
+          title="Center on My GPS"
+        >
+          <LocateFixed className="w-4 h-4" />
+        </button>
       </div>
 
       {/* SAFE ROUTE PLANNER FLOATING PANEL */}
@@ -480,15 +534,15 @@ export default function SafetyMap({
         onResetSimulation={handleResetSimulation}
       />
 
-      {/* TOP FLOATING CONTROLS: CATEGORY CHIPS */}
-      <div className="absolute top-4 left-4 right-32 sm:right-56 z-10 flex flex-wrap items-center gap-2 pointer-events-none">
-        <div className="pointer-events-auto flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 scrollbar-none bg-zinc-900/90 backdrop-blur-md p-1.5 rounded-2xl border border-zinc-800 shadow-xl">
+      {/* TOP-LEFT CATEGORY FILTER PILLS */}
+      <div className="absolute top-3.5 left-3.5 right-64 sm:right-96 z-10 flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 scrollbar-none pointer-events-auto">
+        <div className="flex items-center gap-1 bg-[#0b101b]/90 backdrop-blur-md p-1 rounded-2xl border border-white/[0.08] shadow-xl">
           <button
             onClick={() => setSelectedCategoryFilter('all')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition shrink-0 ${
+            className={`px-3 py-1 rounded-xl text-xs font-semibold transition shrink-0 ${
               selectedCategoryFilter === 'all'
-                ? 'bg-red-600 text-white shadow'
-                : 'text-zinc-400 hover:text-white'
+                ? 'bg-rose-600 text-white'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
             All ({hazards.length})
@@ -500,10 +554,10 @@ export default function SafetyMap({
               <button
                 key={cat}
                 onClick={() => setSelectedCategoryFilter(cat)}
-                className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold transition shrink-0 flex items-center gap-1.5 ${
+                className={`px-2.5 py-1 rounded-xl text-xs font-semibold transition shrink-0 flex items-center gap-1.5 ${
                   isSel
-                    ? 'bg-zinc-800 text-white border border-red-500 shadow'
-                    : 'text-zinc-400 hover:text-zinc-200'
+                    ? 'bg-white/[0.12] text-white border border-white/[0.2]'
+                    : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
                 <span>{meta.icon}</span>
@@ -514,70 +568,20 @@ export default function SafetyMap({
         </div>
       </div>
 
-      {/* MAP LAYER SWITCHER & RE-CENTER BUTTON (BOTTOM RIGHT) */}
-      <div className="absolute bottom-6 right-4 z-20 pointer-events-auto flex flex-col items-end gap-2">
-        <div className="bg-zinc-900/90 backdrop-blur-md border border-zinc-800 rounded-2xl p-1 shadow-2xl flex items-center gap-1">
-          <button
-            onClick={() => setMapTheme('dark')}
-            className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-              mapTheme === 'dark'
-                ? 'bg-zinc-800 text-white border border-zinc-700 shadow'
-                : 'text-zinc-400 hover:text-white'
-            }`}
-            title="Dark Civic Theme"
-          >
-            <span>🌙</span>
-            <span className="hidden sm:inline">Dark</span>
-          </button>
-          <button
-            onClick={() => setMapTheme('street')}
-            className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-              mapTheme === 'street'
-                ? 'bg-zinc-800 text-white border border-zinc-700 shadow'
-                : 'text-zinc-400 hover:text-white'
-            }`}
-            title="Standard Street Map"
-          >
-            <span>🗺️</span>
-            <span className="hidden sm:inline">Street</span>
-          </button>
-          <button
-            onClick={() => setMapTheme('satellite')}
-            className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-              mapTheme === 'satellite'
-                ? 'bg-zinc-800 text-white border border-zinc-700 shadow'
-                : 'text-zinc-400 hover:text-white'
-            }`}
-            title="Satellite Aerial"
-          >
-            <span>🛰️</span>
-            <span className="hidden sm:inline">Sat</span>
-          </button>
-        </div>
-
-        <button
-          onClick={handleRecenterToUser}
-          className="p-3 rounded-2xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 text-blue-400 hover:text-blue-300 shadow-2xl backdrop-blur-md transition group"
-          title="Center on My GPS Location"
-        >
-          <LocateFixed className="w-5 h-5 group-hover:scale-110 transition" />
-        </button>
-      </div>
-
       {/* FLOATING ACTION: REPORT BUTTON */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 pointer-events-auto">
+      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 pointer-events-auto">
         <button
           onClick={onRequestReport}
-          className="px-5 py-3 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-bold text-xs sm:text-sm shadow-2xl shadow-red-950/80 flex items-center gap-2 transition active:scale-95 border border-red-400/30"
+          className="px-5 py-2.5 rounded-full bg-gradient-to-r from-rose-600 via-red-600 to-orange-600 hover:from-rose-500 hover:to-orange-500 text-white font-semibold text-xs shadow-xl shadow-rose-950/70 flex items-center gap-2 transition active:scale-95 border border-white/10"
         >
-          <AlertTriangle className="w-4 h-4 text-yellow-300" />
-          <span>Report Hazard (5s)</span>
+          <AlertTriangle className="w-3.5 h-3.5 text-amber-300" />
+          <span>Report Hazard in 5s</span>
         </button>
       </div>
 
       {/* HAZARD DETAIL MODAL / POPUP */}
       {selectedHazardModal && (
-        <div className="absolute bottom-20 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 sm:w-96 z-30 bg-zinc-950/95 backdrop-blur-xl border border-zinc-800 rounded-3xl p-5 shadow-2xl text-white">
+        <div className="absolute bottom-16 left-3.5 right-3.5 sm:left-auto sm:right-5 sm:bottom-5 sm:w-96 z-30 bg-[#0f172a]/95 backdrop-blur-xl border border-white/[0.1] rounded-3xl p-5 shadow-2xl text-white">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-2">
               <span className="text-2xl">
@@ -591,21 +595,21 @@ export default function SafetyMap({
                 >
                   {selectedHazardModal.severity} (Score {selectedHazardModal.severity_score}/100)
                 </span>
-                <h4 className="font-bold text-sm text-zinc-100 line-clamp-1 mt-1">
+                <h4 className="font-bold text-sm text-slate-100 line-clamp-1 mt-1">
                   {selectedHazardModal.title}
                 </h4>
               </div>
             </div>
             <button
               onClick={() => setSelectedHazardModal(null)}
-              className="text-zinc-400 hover:text-white p-1"
+              className="text-slate-400 hover:text-white p-1"
             >
               ✕
             </button>
           </div>
 
           {selectedHazardModal.photo_url && (
-            <div className="mt-3 rounded-2xl overflow-hidden aspect-video bg-zinc-900 border border-zinc-800">
+            <div className="mt-3 rounded-2xl overflow-hidden aspect-video bg-black/40 border border-white/[0.08]">
               <img
                 src={selectedHazardModal.photo_url}
                 alt={selectedHazardModal.title}
@@ -630,31 +634,31 @@ export default function SafetyMap({
                 </div>
               )}
               {selectedHazardModal.fix_notes && (
-                <p className="text-xs text-zinc-300 italic">
+                <p className="text-xs text-slate-300 italic">
                   "{selectedHazardModal.fix_notes}"
                 </p>
               )}
             </div>
           )}
 
-          <p className="text-xs text-zinc-300 mt-2 line-clamp-2">
+          <p className="text-xs text-slate-300 mt-2 line-clamp-2 leading-relaxed">
             {selectedHazardModal.description}
           </p>
 
-          <p className="text-[11px] text-zinc-500 mt-2 flex items-center gap-1">
+          <p className="text-[11px] text-slate-400 mt-2 flex items-center gap-1">
             <span>📍 {selectedHazardModal.address || 'Address logged'}</span>
           </p>
 
-          <div className="mt-4 pt-3 border-t border-zinc-800/80 flex items-center justify-between">
+          <div className="mt-4 pt-3 border-t border-white/[0.08] flex items-center justify-between">
             <button
               onClick={() => handleUpvoteClick(selectedHazardModal.id)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-semibold text-zinc-300 hover:text-white transition"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.08] text-xs font-semibold text-slate-300 hover:text-white transition"
             >
               <ThumbsUp className="w-3.5 h-3.5 text-blue-400" />
               <span>Confirm Hazard ({selectedHazardModal.upvotes_count || 1})</span>
             </button>
 
-            <span className="text-[11px] text-zinc-500 font-mono">
+            <span className="text-[11px] text-slate-400 font-mono">
               {new Date(selectedHazardModal.created_at).toLocaleTimeString([], {
                 hour: '2-digit',
                 minute: '2-digit',

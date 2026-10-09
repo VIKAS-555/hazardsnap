@@ -3,68 +3,58 @@
 @tailwind utilities;
 
 :root {
-  --background: #090d16;
-  --foreground: #f1f5f9;
+  --background: #080c14;
+  --foreground: #f8fafc;
+  --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-inter);
   min-height: 100vh;
   overflow-x: hidden;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Fast hardware-accelerated tile rendering */
+.leaflet-tile {
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  image-rendering: -webkit-optimize-contrast;
 }
 
 /* Custom Leaflet Map styling to match dark theme */
 .leaflet-container {
   width: 100%;
   height: 100%;
-  background: #090d16 !important;
+  background: #080c14 !important;
   font-family: inherit;
+  outline: none;
 }
 
-/* Faster tile rendering with hardware acceleration */
-.leaflet-tile {
-  will-change: transform, opacity;
-  image-rendering: auto;
+/* Zero-API-Key Dark Mode styling for standard OpenStreetMap tiles */
+.dark-tiles img.leaflet-tile {
+  filter: brightness(0.65) invert(1) contrast(2.4) hue-rotate(200deg) saturate(0.2) brightness(0.72) !important;
 }
 
-/* 3D Perspective Isometric Map Transform */
-.map-3d-wrapper {
-  perspective: 1100px;
-  overflow: hidden;
-  position: relative;
+.street-tiles img.leaflet-tile {
+  filter: contrast(1.05) brightness(0.98) !important;
 }
 
-.map-3d-container {
-  transform: perspective(1000px) rotateX(38deg) scale(1.08) !important;
-  transform-origin: 50% 80% !important;
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+/* Satellite tiles remain 100% natural and un-filtered */
+.satellite-tiles img.leaflet-tile {
+  filter: none !important;
 }
 
-.map-2d-container {
-  transform: perspective(1000px) rotateX(0deg) scale(1) !important;
-  transform-origin: 50% 50% !important;
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* 3D Elevated Holographic Markers */
-.map-3d-container .custom-hazard-marker {
-  transform: rotateX(-38deg) translateY(-14px) scale(1.15) !important;
-  filter: drop-shadow(0 16px 8px rgba(0, 0, 0, 0.85)) !important;
-  transition: transform 0.4s ease;
-}
-
-.map-3d-container .user-gps-pulse {
-  transform: rotateX(-38deg) translateY(-10px) !important;
-}
-
+/* Leaflet Popup Styling */
 .leaflet-popup-content-wrapper {
-  background: #111827 !important;
-  color: #f3f4f6 !important;
-  border-radius: 1rem !important;
+  background: #0f172a !important;
+  color: #f8fafc !important;
+  border-radius: 1.25rem !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.7), 0 8px 10px -6px rgba(0, 0, 0, 0.7) !important;
+  box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.8) !important;
   padding: 0 !important;
   overflow: hidden;
 }
@@ -75,47 +65,76 @@ body {
 }
 
 .leaflet-popup-tip {
-  background: #111827 !important;
+  background: #0f172a !important;
 }
 
-/* Pulsing radar ring for critical hazards */
-@keyframes radar-pulse {
+/* High-performance GPU radar ring */
+@keyframes pulse-ring {
   0% {
-    transform: scale(0.9);
-    opacity: 0.9;
+    transform: scale(0.95);
+    opacity: 0.8;
   }
   70% {
-    transform: scale(2.2);
+    transform: scale(2.1);
     opacity: 0;
   }
   100% {
-    transform: scale(2.2);
+    transform: scale(2.1);
     opacity: 0;
   }
 }
 
 .hazard-pulse-ring {
   position: absolute;
-  top: -8px;
-  left: -8px;
-  right: -8px;
-  bottom: -8px;
+  top: -6px;
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
   border-radius: 50%;
-  animation: radar-pulse 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+  will-change: transform, opacity;
+  animation: pulse-ring 2.2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+  pointer-events: none;
 }
 
-/* Custom scrollbars */
+/* 3D Isometric View Mode */
+.map-3d-wrapper {
+  perspective: 1200px;
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+}
+
+.map-3d-tilt {
+  transform: rotateX(32deg) scale(1.06);
+  transform-origin: 50% 85%;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.map-2d-flat {
+  transform: rotateX(0deg) scale(1);
+  transform-origin: 50% 50%;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.map-3d-tilt .custom-hazard-marker {
+  transform: rotateX(-32deg) translateY(-10px) !important;
+  filter: drop-shadow(0 12px 6px rgba(0, 0, 0, 0.75));
+  transition: transform 0.3s ease;
+}
+
+/* Subtle clean scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #090d16;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: rgba(255, 255, 255, 0.22);
 }

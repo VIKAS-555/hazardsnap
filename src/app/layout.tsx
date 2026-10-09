@@ -1,10 +1,18 @@
 import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
 import './globals.css';
 
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+  weight: ['300', '400', '500', '600', '700', '800'],
+});
+
 export const metadata: Metadata = {
-  title: 'HazardSnap | Hyper-Local Photo-First Civic Safety Map',
+  title: 'HazardSnap — Civic Hazard Intelligence & Rapid Response Grid',
   description:
-    'Log hazards in 5 seconds with photo, location pin, or voice note. Real-time safety map for commuters and severity-ranked triage queue for municipal teams with photographic fix verification.',
+    'A hyper-local civic infrastructure network. Log hazardous open manholes, dangling live wires, and road hazards in seconds to power live public safety navigation and verified municipal dispatch.',
   manifest: '/manifest.json',
   icons: {
     icon: '/favicon.ico',
@@ -17,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className={`dark ${inter.variable}`}>
       <head>
         <link rel="preconnect" href="https://tile.openstreetmap.org" crossOrigin="" />
         <link rel="dns-prefetch" href="https://tile.openstreetmap.org" />
@@ -29,9 +37,12 @@ export default function RootLayout({
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
           crossOrigin=""
         />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+        />
       </head>
-      <body className="bg-zinc-950 text-white min-h-screen antialiased selection:bg-red-500 selection:text-white">
+      <body className="font-sans bg-[#080C14] text-slate-100 min-h-screen antialiased selection:bg-rose-500 selection:text-white">
         {children}
       </body>
     </html>
