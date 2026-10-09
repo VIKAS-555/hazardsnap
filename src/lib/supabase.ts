@@ -343,3 +343,30 @@ export async function updateHazardStatus(
 
   return modified;
 }
+
+// Supabase Google Authentication
+export async function signInWithGoogle() {
+  const redirectTo = typeof window !== 'undefined' ? `${window.location.origin}/` : undefined;
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo,
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
+    },
+  });
+  if (error) {
+    throw error;
+  }
+  return data;
+}
+
+export async function signOutUser() {
+  try {
+    await supabase.auth.signOut();
+  } catch (err) {
+    console.warn('Sign out warning:', err);
+  }
+}

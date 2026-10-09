@@ -11,7 +11,7 @@ import Footer from '../components/Footer';
 import ReportHazardModal from '../components/ReportHazardModal';
 import MunicipalQueue from '../components/MunicipalQueue';
 import { HazardReport, CATEGORY_METADATA } from '../lib/types';
-import { getHazards, upvoteHazard } from '../lib/supabase';
+import { getHazards, upvoteHazard, supabase, signOutUser } from '../lib/supabase';
 import {
   AlertTriangle,
   Radio,
@@ -78,6 +78,43 @@ export default function Home() {
           // ignore
         }
       }
+
+      // Check active Supabase Google session
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user) {
+          const userMeta = session.user.user_metadata;
+          const googleName =
+            userMeta?.full_name ||
+            userMeta?.name ||
+            session.user.email?.split('@')[0] ||
+            'Google Citizen';
+          const userObj = { name: googleName, role: 'citizen' as const };
+          setCurrentUser(userObj);
+          localStorage.setItem('hazardsnap_user', JSON.stringify(userObj));
+          setActiveTab('grid');
+        }
+      });
+
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (session?.user) {
+          const userMeta = session.user.user_metadata;
+          const googleName =
+            userMeta?.full_name ||
+            userMeta?.name ||
+            session.user.email?.split('@')[0] ||
+            'Google Citizen';
+          const userObj = { name: googleName, role: 'citizen' as const };
+          setCurrentUser(userObj);
+          localStorage.setItem('hazardsnap_user', JSON.stringify(userObj));
+          setActiveTab('grid');
+        }
+      });
+
+      return () => {
+        subscription.unsubscribe();
+      };
     }
   }, []);
 
@@ -105,11 +142,12 @@ export default function Home() {
     setActiveTab('grid');
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setCurrentUser(null);
     if (typeof window !== 'undefined') {
       localStorage.removeItem('hazardsnap_user');
     }
+    await signOutUser();
     setActiveTab('home');
   };
 
