@@ -15,6 +15,7 @@ import {
   Check,
 } from 'lucide-react';
 import { updateHazardStatus } from '../lib/supabase';
+import { validateUploadedFile, sanitizeInput } from '../lib/security';
 
 interface MunicipalQueueProps {
   hazards: HazardReport[];
@@ -26,6 +27,7 @@ export default function MunicipalQueue({ hazards, onHazardUpdated }: MunicipalQu
   const [selectedFixHazard, setSelectedFixHazard] = useState<HazardReport | null>(null);
   const [fixPhotoPreview, setFixPhotoPreview] = useState<string | null>(null);
   const [fixNotes, setFixNotes] = useState('');
+  const [fixSecurityError, setFixSecurityError] = useState<string | null>(null);
   const [isSubmittingFix, setIsSubmittingFix] = useState(false);
 
   // Filter hazards by status
@@ -47,12 +49,21 @@ export default function MunicipalQueue({ hazards, onHazardUpdated }: MunicipalQu
     setSelectedFixHazard(hazard);
     setFixPhotoPreview(null);
     setFixNotes('');
+    setFixSecurityError(null);
   };
 
-  // Handle fix photo input
-  const handleFixPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle fix photo input with malware scanning
+  const handleFixPhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    setFixSecurityError(null);
+    const validation = await validateUploadedFile(file);
+    if (!validation.isValid) {
+      setFixSecurityError(validation.error || 'Malware threat blocked: File signature rejected by security guard.');
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = () => {
       setFixPhotoPreview(reader.result as string);
@@ -66,11 +77,13 @@ export default function MunicipalQueue({ hazards, onHazardUpdated }: MunicipalQu
     if (!selectedFixHazard) return;
 
     setIsSubmittingFix(true);
+    const cleanNotes = sanitizeInput(fixNotes);
+
     await updateHazardStatus(selectedFixHazard.id, 'verified_fixed', {
       fix_photo_url:
         fixPhotoPreview ||
         'https://images.unsplash.com/photo-1590402494682-cd3fb53b1f70?auto=format&fit=crop&w=600&q=80',
-      fix_notes: fixNotes || 'Field unit verified and completed emergency repair.',
+      fix_notes: cleanNotes || 'Field unit verified and completed emergency repair.',
     });
 
     setIsSubmittingFix(false);
@@ -311,6 +324,13 @@ export default function MunicipalQueue({ hazards, onHazardUpdated }: MunicipalQu
             </p>
 
             <form onSubmit={handleSubmitFix} className="mt-4 space-y-4">
+              {fixSecurityError && (
+                <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 text-xs flex items-center gap-2">
+                  <AlertOctagon className="w-4 h-4 shrink-0" />
+                  <span>{fixSecurityError}</span>
+                </div>
+              )}
+
               {/* Photo Input */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">

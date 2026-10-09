@@ -19,6 +19,7 @@ import {
 import { CATEGORY_METADATA, HazardCategory, HazardReport, HazardSeverity } from '../lib/types';
 import { calculateHybridSeverity, analyzeHazardWithAI } from '../lib/ai-severity';
 import { createHazard } from '../lib/supabase';
+import { validateUploadedFile, sanitizeInput } from '../lib/security';
 
 interface ReportHazardModalProps {
   isOpen: boolean;
@@ -38,6 +39,7 @@ export default function ReportHazardModal({
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isAnalyzingPhoto, setIsAnalyzingPhoto] = useState(false);
   const [aiAnalysisFeedback, setAiAnalysisFeedback] = useState<string | null>(null);
+  const [securityError, setSecurityError] = useState<string | null>(null);
 
   // Location state
   const [coords, setCoords] = useState<{ lat: number; lng: number }>({
@@ -122,10 +124,18 @@ export default function ReportHazardModal({
     );
   };
 
-  // Handle Image Upload & AI Auto-Detection
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle Image Upload with Anti-Malware Inspection & AI Auto-Detection
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    setSecurityError(null);
+    const validation = await validateUploadedFile(file);
+    if (!validation.isValid) {
+      setSecurityError(validation.error || 'Malware threat blocked: Unrecognized or dangerous file signature.');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = async () => {
@@ -228,21 +238,24 @@ export default function ReportHazardModal({
     setIsSubmitting(true);
 
     const categoryMeta = CATEGORY_METADATA[selectedCategory];
-    const generatedTitle = `${categoryMeta.label} at ${address.split(',')[0] || 'Roadside'}`;
+    const cleanAddress = sanitizeInput(address);
+    const cleanDesc = sanitizeInput(description);
+    const cleanTranscript = voiceTranscript ? sanitizeInput(voiceTranscript) : undefined;
+    const generatedTitle = `${categoryMeta.label} at ${cleanAddress.split(',')[0] || 'Roadside'}`;
 
     const newReport = await createHazard({
       title: generatedTitle,
       category: selectedCategory,
-      description: description || categoryMeta.description,
+      description: cleanDesc || categoryMeta.description,
       severity: currentSeverityMeta.severity,
       severity_score: currentSeverityMeta.score,
       status: 'reported',
       latitude: coords.lat,
       longitude: coords.lng,
-      address,
+      address: cleanAddress,
       photo_url: photoPreview || undefined,
       voice_note_url: audioUrl || undefined,
-      voice_transcript: voiceTranscript || undefined,
+      voice_transcript: cleanTranscript,
       reported_by: 'Citizen Commuter',
     });
 
@@ -317,6 +330,16 @@ export default function ReportHazardModal({
                   </span>
                 )}
               </label>
+
+              {securityError && (
+                <div className="mb-2 p-3 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 text-xs flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold block">Malware Protection Alert:</span>
+                    <span>{securityError}</span>
+                  </div>
+                </div>
+              )}
 
               <input
                 ref={fileInputRef}

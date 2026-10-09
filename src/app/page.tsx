@@ -214,22 +214,9 @@ export default function Home() {
           <Footer />
         </div>
       ) : (
-        /* LOGGED IN USER: FULL TABBED CIVIC COMMAND CENTER */
+        /* LOGGED IN USER: FULL TABBED CIVIC COMMAND CENTER (Hero never shown once authenticated) */
         <>
-          {/* TAB 1: HOME */}
-          {activeTab === 'home' && (
-            <div className="flex-1 flex flex-col">
-              <LandingHero
-                onGoToGrid={() => setActiveTab('grid')}
-                onGoToEmergency={() => setActiveTab('emergency')}
-                onOpenReport={() => setIsReportOpen(true)}
-                onGoToMunicipal={() => setActiveTab('municipal')}
-              />
-              <Footer />
-            </div>
-          )}
-
-          {/* TAB 2: EMERGENCY COMPLAINTS LOG */}
+          {/* TAB 1: EMERGENCY COMPLAINTS LOG */}
           {activeTab === 'emergency' && (
             <div className="flex-1 flex flex-col bg-white dark:bg-[#080c14] transition-colors">
               <EmergencyLogSection
@@ -248,8 +235,8 @@ export default function Home() {
             </div>
           )}
 
-          {/* TAB 3: SPATIAL SAFETY GRID & LIVE INCIDENT STREAM */}
-          {activeTab === 'grid' && (
+          {/* TAB 2: SPATIAL SAFETY GRID & LIVE INCIDENT STREAM (Default for authenticated users) */}
+          {(activeTab === 'grid' || activeTab === 'home') && (
             <div className="flex-1 flex flex-col bg-[#f8fafc] dark:bg-[#080c14] text-slate-900 dark:text-white transition-colors">
               <div className="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 sm:px-6 lg:px-8 py-6 transition-colors">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">

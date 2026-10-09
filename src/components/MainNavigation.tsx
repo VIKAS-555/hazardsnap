@@ -44,7 +44,7 @@ export default function MainNavigation({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         {/* Brand Logo Left */}
         <div
-          onClick={() => onTabChange('home')}
+          onClick={() => onTabChange(currentUser ? 'grid' : 'home')}
           className="flex items-center gap-2.5 cursor-pointer select-none group"
         >
           <div className="w-6 h-6 flex items-center justify-center text-slate-900 dark:text-white">
@@ -63,18 +63,6 @@ export default function MainNavigation({
         {/* Center Tabs Navigation (Only visible when user is logged in) */}
         {currentUser && (
           <nav className="hidden md:flex items-center gap-1.5 sm:gap-3 text-[13px] font-medium text-slate-700 dark:text-slate-300">
-            {/* Home Tab */}
-            <button
-              onClick={() => onTabChange('home')}
-              className={`px-3 py-1.5 rounded-full transition ${
-                activeTab === 'home'
-                  ? 'bg-slate-100 dark:bg-slate-800 text-slate-950 dark:text-white font-semibold'
-                  : 'hover:text-black dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-900'
-              }`}
-            >
-              Home
-            </button>
-
             {/* Safety Grid Tab */}
             <button
               onClick={() => onTabChange('grid')}
@@ -201,16 +189,6 @@ export default function MainNavigation({
       {/* Mobile Sub-Navigation Bar for Tabs (Only if logged in) */}
       {currentUser && (
         <div className="md:hidden flex items-center gap-1 overflow-x-auto px-4 py-2 border-t border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80 scrollbar-none text-xs">
-          <button
-            onClick={() => onTabChange('home')}
-            className={`px-3 py-1 rounded-full whitespace-nowrap ${
-              activeTab === 'home'
-                ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold'
-                : 'text-slate-600 dark:text-slate-400'
-            }`}
-          >
-            Home
-          </button>
           <button
             onClick={() => onTabChange('grid')}
             className={`px-3 py-1 rounded-full whitespace-nowrap ${
