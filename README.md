@@ -60,7 +60,7 @@ PHOTOS----
 
 Every year, thousands of pedestrians, cyclists, and motorists suffer severe injuries and fatalities due to neglected street hazards: **uncovered stormwater manholes, dangling 11kV live power wires, road sinkholes, and flash-flooded underpasses**.
 
-### The Real-World Problems
+### The Real-World Problem
 1. **Extreme Citizen Friction**: Existing civic reporting portals (grievance apps, municipal helplines) require 15+ mandatory form fields, bureaucratic department categorization, and cumbersome dropdowns. Frustrated commuters give up in seconds.
 2. **Spatial Blindspots**: Municipal engineers and disaster response squads lack real-time spatial visibility into where hazards are clustered and which ones pose immediate lethal risk.
 3. **The Accountability Void**: Citizen complaints are routinely marked "Resolved" in municipal backends without physical verification, leaving commuters skeptical and lethal hazards active.
