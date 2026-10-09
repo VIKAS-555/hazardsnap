@@ -1754,12 +1754,24 @@ window.initLiquidCanvas = initLiquidCanvas;
 function initSpotlightCards() {
   const cards = document.querySelectorAll('.academic-card');
   cards.forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      card.style.setProperty('--mouse-x', `${x}px`);
-      card.style.setProperty('--mouse-y', `${y}px`);
+    let bounds = null;
+    const updateBounds = () => { bounds = card.getBoundingClientRect(); };
+    window.addEventListener('resize', updateBounds, { passive: true });
+    window.addEventListener('scroll', updateBounds, { passive: true });
+    card.addEventListener('pointerenter', updateBounds, { passive: true });
+
+    let rafId = null;
+    card.addEventListener('pointermove', (e) => {
+      if (!bounds) updateBounds();
+      const x = e.clientX - bounds.left;
+      const y = e.clientY - bounds.top;
+      if (!rafId) {
+        rafId = requestAnimationFrame(() => {
+          card.style.setProperty('--mouse-x', `${x}px`);
+          card.style.setProperty('--mouse-y', `${y}px`);
+          rafId = null;
+        });
+      }
     }, { passive: true });
   });
 }

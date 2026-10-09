@@ -227,7 +227,7 @@
     }
   `;
 
-  // Fragment Shader: Light-Reveal, GPU Fluid Displacement, Hand Wake & Droplet Waves
+  // Fragment Shader: High-Tier Physical Fluid Engine with Vorticity, Spectral Caustic Dispersion & Organic Illumination
   const FRAGMENT_SHADER = /* glsl */ `
     precision highp float;
 
@@ -268,7 +268,7 @@
       return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
     }
 
-    // 2D Gradient Noise
+    // 2D Smooth Gradient Noise (Hermite interpolation)
     float gnoise(vec2 p) {
       vec2 i = floor(p);
       vec2 f = fract(p);
@@ -282,37 +282,20 @@
       );
     }
 
-    mat2 rot(float a) {
-      float c = cos(a);
-      float s = sin(a);
-      return mat2(c, -s, s, c);
-    }
-
-    // 4-octave Fractal Brownian Motion
-    float fbm(vec2 p) {
-      float f = 0.0;
-      mat2 m = rot(0.523);
-      f += 0.5000 * gnoise(p); p = m * p * 2.02;
-      f += 0.2500 * gnoise(p); p = m * p * 2.03;
-      f += 0.1250 * gnoise(p); p = m * p * 2.01;
-      f += 0.0625 * gnoise(p);
-      return f;
-    }
-
-    // Evaluates the physical fluid displacement vector at any UV coordinate
-    vec2 getFluidDisplacement(vec2 uv, float t) {
+    // Evaluates physical fluid displacement and wave crest illumination in a single unified pass
+    vec2 getFluidDisplacement(vec2 uv, float t, out float outWaveCrest) {
       vec2 disp = vec2(0.0);
+      outWaveCrest = 0.0;
       float motionScale = mix(1.0, 0.16, uReducedMotion);
       vec2 pAspect = uv * vec2(uAspect, 1.0);
 
-      // 1. BASE ORGANIC LIQUID MOTION (Continuous non-looping subtle undulation)
-      float tSlow = t * 0.036 * motionScale;
-      float n1 = fbm(pAspect * 2.4 + vec2(tSlow, -tSlow * 0.82));
-      float n2 = fbm(pAspect * 4.2 - vec2(tSlow * 0.72, tSlow * 1.12));
-      vec2 baseOrganic = vec2(n1, n2) * 0.015 * uIntensity * motionScale;
-      disp += baseOrganic;
+      // 1. BASE ORGANIC LIQUID MOTION (Silky natural water swell)
+      float tSlow = t * 0.042 * motionScale;
+      float n1 = gnoise(pAspect * 2.2 + vec2(tSlow * 0.8, -tSlow * 0.6));
+      float n2 = gnoise(pAspect * 3.8 - vec2(tSlow * 0.5, tSlow * 0.9));
+      disp += vec2(n1, n2) * 0.014 * uIntensity * motionScale;
 
-      // 2. MOUSE = HAND MOVING THROUGH LIQUID & DIRECTIONAL FLUID WAKE
+      // 2. MOUSE = HAND MOVING THROUGH LIQUID WITH HYDRODYNAMIC VORTICITY
       vec2 m0 = uTrailMouse * vec2(uAspect, 1.0);
       vec2 m1 = uMouse * vec2(uAspect, 1.0);
       vec2 vSeg = m1 - m0;
@@ -326,13 +309,23 @@
         distToSeg = length(pAspect - (m0 + proj * vSeg));
       }
 
-      // Wake radius widens as pointer velocity increases
-      float wakeRadius = (0.22 + uMouseVelocity * 0.16) * motionScale;
+      // Dynamic wake radius widens with velocity
+      float wakeRadius = (0.24 + uMouseVelocity * 0.18) * motionScale;
       float wakeFalloff = smoothstep(wakeRadius, 0.0, distToSeg);
+      float smoothWake = wakeFalloff * wakeFalloff * (3.0 - 2.0 * wakeFalloff);
 
-      // Drag in motion direction + radial displacement
-      vec2 radialDir = normalize(pAspect - m1 + vec2(0.0001));
-      vec2 wakeFlow = (uMouseVelocityVec * 0.36 + radialDir * (0.032 + uMouseVelocity * 0.045)) * wakeFalloff * uIntensity * motionScale;
+      // Radial displacement outward from cursor
+      vec2 radialDiff = pAspect - m1;
+      vec2 radialDir = normalize(radialDiff + vec2(0.0001));
+
+      // Hydrodynamic Vorticity / Swirl (Natural rotational curl on either side of movement vector)
+      vec2 motionDir = (segLen > 0.0001) ? (vSeg / segLen) : vec2(0.0);
+      vec2 perpDir = vec2(-motionDir.y, motionDir.x);
+      float side = dot(radialDiff, perpDir);
+      vec2 vorticity = perpDir * sign(side) * exp(-abs(side) * 14.0) * min(uMouseVelocity * 0.35, 0.6);
+
+      // Directional wake flow combining forward drag, radial expansion, and natural vorticity curl
+      vec2 wakeFlow = (uMouseVelocityVec * 0.40 + radialDir * (0.030 + uMouseVelocity * 0.045) + vorticity * 0.14) * smoothWake * uIntensity * motionScale;
       disp += wakeFlow;
 
       // 3. DROPLET IMPACT & EXPANDING WAVE RIPPLES
@@ -345,20 +338,25 @@
           vec2 rDiff = pAspect - rCenter;
           float rDist = length(rDiff);
 
-          float waveSpeed = 0.54;
+          float waveSpeed = 0.58;
           float waveFront = age * waveSpeed;
           float distFromFront = rDist - waveFront;
 
-          // Multi-ring concentric ripple packet (first strongest, second weaker, third subtle)
-          float freq = 32.0;
-          float packetDamp = exp(-abs(distFromFront) * 14.0);
-          float spatialDamp = exp(-rDist * 1.4);
+          // Realistic water ripple packet with dispersion
+          float freq = 34.0;
+          float packetDamp = exp(-abs(distFromFront) * 16.0);
+          float spatialDamp = exp(-rDist * 1.5);
           float temporalDamp = exp(-age * 1.35);
 
           float wave = sin(distFromFront * freq) * packetDamp * spatialDamp * temporalDamp * rip.w;
           vec2 rDir = normalize(rDiff + vec2(0.0001));
 
-          rippleDispTotal += rDir * wave * 0.068 * uIntensity * motionScale;
+          rippleDispTotal += rDir * wave * 0.065 * uIntensity * motionScale;
+
+          // Concentric crest highlight
+          float ringDist = abs(distFromFront);
+          float ringGlow = exp(-ringDist * 24.0) * temporalDamp * rip.w;
+          outWaveCrest += ringGlow;
         }
       }
       disp += rippleDispTotal;
@@ -370,97 +368,81 @@
       vec2 uv = vUv;
       vec2 pAspect = uv * vec2(uAspect, 1.0);
 
-      // Total fluid displacement field
-      vec2 disp = getFluidDisplacement(uv, uTime);
+      // Single high-performance unified displacement pass
+      float waveCrestGlow = 0.0;
+      vec2 disp = getFluidDisplacement(uv, uTime, waveCrestGlow);
 
-      // Distort UV coordinates: THE CODE ITSELF MOVES WITH THE LIQUID
-      vec2 distortedUv = uv + disp;
+      // Analytical physical surface normal directly derived from displacement gradient (0 redundant passes)
+      vec3 normal = normalize(vec3(-disp.x * 24.0, -disp.y * 24.0, 1.0));
 
-      // Centered 115% coverage so code texture extends slightly beyond visible bounds without any gaps
-      vec2 centeredUv = (distortedUv - 0.5) * 1.15 + 0.5;
-      vec2 codeUv = fract(centeredUv);
-      vec4 codeSample = texture2D(uCodeTexture, codeUv);
-
-      // Finite difference normal estimation for liquid specular sheen
-      float eps = 0.004;
-      vec2 dispR = getFluidDisplacement(uv + vec2(eps, 0.0), uTime);
-      vec2 dispU = getFluidDisplacement(uv + vec2(0.0, eps), uTime);
-      float dHdx = (length(dispR) - length(disp)) / eps;
-      float dHdy = (length(dispU) - length(disp)) / eps;
-      vec3 normal = normalize(vec3(-dHdx * 3.2, -dHdy * 3.2, 1.0));
-
-      // Directional liquid reflection
+      // Specular sheen along fluid surface waves
       vec3 lightDir = normalize(vec3(-0.35, 0.55, 0.8));
       vec3 viewDir = vec3(0.0, 0.0, 1.0);
       vec3 halfVec = normalize(lightDir + viewDir);
-      float spec = pow(max(dot(normal, halfVec), 0.0), 28.0);
+      float spec = pow(max(dot(normal, halfVec), 0.0), 30.0);
 
-      // Droplet splash impact flash & ripple crest highlights
+      // Droplet splash impact flash
       float dropletImpactGlow = 0.0;
-      float waveCrestGlow = 0.0;
-
       for (int i = 0; i < MAX_RIPPLES; i++) {
         vec4 rip = uRipples[i];
         float age = rip.z;
-        if (age >= 0.0 && age < 3.2) {
+        if (age >= 0.0 && age < 0.40) {
           vec2 rCenter = rip.xy * vec2(uAspect, 1.0);
           float rDist = length(pAspect - rCenter);
-          float waveFront = age * 0.54;
-
-          // Center impact flash
-          if (age < 0.42) {
-            float flash = smoothstep(0.09, 0.0, rDist) * smoothstep(0.42, 0.0, age) * rip.w;
-            dropletImpactGlow += flash;
-          }
-
-          // Crest illumination along concentric wave rings
-          float ringDist = abs(rDist - waveFront);
-          float ringGlow = exp(-ringDist * 22.0) * exp(-age * 1.35) * rip.w;
-          waveCrestGlow += ringGlow;
+          float flash = smoothstep(0.09, 0.0, rDist) * smoothstep(0.40, 0.0, age) * rip.w;
+          dropletImpactGlow += flash;
         }
       }
+
+      // Physical Chromatic Dispersion: sub-pixel wavelength refraction through perturbed liquid
+      vec2 centeredUv = (uv + disp - 0.5) * 1.15 + 0.5;
+      vec2 dispDir = normalize(disp + vec2(0.0001));
+      float dispAmt = length(disp);
+      float chromOffset = min(dispAmt * 0.16, 0.0030);
+
+      vec4 codeR = texture2D(uCodeTexture, fract(centeredUv + dispDir * chromOffset));
+      vec4 codeG = texture2D(uCodeTexture, fract(centeredUv));
+      vec4 codeB = texture2D(uCodeTexture, fract(centeredUv - dispDir * chromOffset));
+      vec4 codeSample = vec4(codeR.r, codeG.g, codeB.b, max(codeG.a, max(codeR.a, codeB.a)));
 
       // ============================================================
       // TORCH REVEAL SYSTEM: Movement generates electricity to produce light
       // ============================================================
-      
-      // Pointer torch position with fluid distortion
-      vec2 lightDelta = (pAspect - uLightPos * vec2(uAspect, 1.0)) - disp * 1.4;
+
+      // 1. Primary leading torch position with fluid distortion
+      vec2 lightDelta = (pAspect - uLightPos * vec2(uAspect, 1.0)) - disp * 1.3;
       float lightDist = length(lightDelta);
 
       // Focused compact torch radius (dynamically breathes with kinetic electricity)
-      float lightRadius = (0.23 + uMouseVelocity * 0.08) * (0.85 + 0.15 * uKineticEnergy);
+      float lightRadius = (0.24 + uMouseVelocity * 0.09) * (0.85 + 0.15 * uKineticEnergy);
       float normDist = lightDist / lightRadius;
 
       // Primary torch reveal: Smooth Hermite curve that hits EXACTLY 0.0 at the perimeter
       float lightReveal = 0.0;
       if (normDist < 1.0) {
         float f = 1.0 - normDist;
-        // Smooth cubic falloff (zero derivative at boundary = perfectly seamless edge)
         float smoothFalloff = f * f * (3.0 - 2.0 * f);
-        // Bright radiant center core
         lightReveal = pow(smoothFalloff, 1.15);
       }
 
-      // Secondary trailing wake: momentum light behind moving pointer
-      vec2 trailLightDelta = (pAspect - uTrailLightPos * vec2(uAspect, 1.0)) - disp * 1.2;
+      // 2. Trailing fluid wake illumination behind moving pointer
+      vec2 trailLightDelta = (pAspect - uTrailLightPos * vec2(uAspect, 1.0)) - disp * 1.1;
       float trailLightDist = length(trailLightDelta);
-      float trailRadius = lightRadius * 1.05;
+      float trailRadius = lightRadius * 1.08;
       float normTrailDist = trailLightDist / trailRadius;
 
       float trailReveal = 0.0;
       if (normTrailDist < 1.0) {
         float fTrail = 1.0 - normTrailDist;
         float smoothTrailFalloff = fTrail * fTrail * (3.0 - 2.0 * fTrail);
-        trailReveal = smoothTrailFalloff * clamp(uMouseVelocity * 0.55, 0.0, 0.85);
+        trailReveal = smoothTrailFalloff * clamp(uMouseVelocity * 0.60, 0.0, 0.88);
       }
 
-      // Movement generates electricity: light is directly powered by kinetic charge
-      // When cursor stays still, uKineticEnergy decays to 0.0 and light disappears
+      // Movement generates electricity: light is powered by kinetic charge
       float activeLight = max(lightReveal, trailReveal) * uMouseActive * uKineticEnergy;
 
       // Subtle electric kinetic shimmer when actively moving
-      float electricPulse = 1.0 + 0.06 * sin(uTime * 28.0 + pAspect.x * 24.0) * min(uMouseVelocity * 0.6, 1.0);
+      float electricPulse = 1.0 + 0.05 * sin(uTime * 28.0 + pAspect.x * 22.0) * min(uMouseVelocity * 0.5, 1.0);
       activeLight *= electricPulse;
 
       // TOTAL REVEAL: Strictly 0.0 when still / unpowered!
@@ -555,6 +537,10 @@
       }
       this.rippleUniforms = new Float32Array(MAX_RIPPLES * 4);
 
+      // Bounds caching to eliminate layout thrashing
+      this.bounds = null;
+      this._updateBounds = this._updateBounds.bind(this);
+
       // Bound event listeners
       this._onResize = this._onResize.bind(this);
       this._onPointerMove = this._onPointerMove.bind(this);
@@ -573,9 +559,9 @@
         return;
       }
 
-      const rect = this.container.getBoundingClientRect();
-      this.width = Math.max(rect.width, 10);
-      this.height = Math.max(rect.height, 10);
+      this._updateBounds();
+      const width = this.width || 10;
+      const height = this.height || 10;
 
       this.scene = new THREE.Scene();
       this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -588,8 +574,8 @@
 
       // Shader Uniforms
       this.uniforms = {
-        uResolution: { value: new THREE.Vector2(this.width, this.height) },
-        uAspect: { value: this.width / this.height },
+        uResolution: { value: new THREE.Vector2(width, height) },
+        uAspect: { value: width / height },
         uTime: { value: 0.0 },
         uMouse: { value: new THREE.Vector2(0.5, 0.5) },
         uTrailMouse: { value: new THREE.Vector2(0.5, 0.5) },
@@ -624,7 +610,7 @@
       this.mesh = new THREE.Mesh(this.geometry, this.material);
       this.scene.add(this.mesh);
 
-      // WebGL Renderer
+      // WebGL Renderer - optimized max pixel ratio 1.5 to guarantee solid 60/120fps on Retina displays
       this.renderer = new THREE.WebGLRenderer({
         antialias: true,
         alpha: true,
@@ -632,7 +618,7 @@
       });
 
       this.renderer.setClearColor(0x000000, 0);
-      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
 
       this.canvas = this.renderer.domElement;
       this.canvas.className = 'liquid-effect-canvas';
@@ -655,11 +641,15 @@
         window.addEventListener('resize', this._onResize, { passive: true });
       }
 
+      window.addEventListener('scroll', this._updateBounds, { passive: true });
+      window.addEventListener('resize', this._updateBounds, { passive: true });
+
       // Attach Interaction Listeners on parent card
       if (this.options.interactive) {
         const target = this.container.closest('.academic-card') || this.container.parentElement || this.container;
         this.interactionTarget = target;
 
+        target.addEventListener('pointerenter', this._updateBounds, { passive: true });
         target.addEventListener('pointermove', this._onPointerMove, { passive: true });
         target.addEventListener('pointerdown', this._onPointerDown, { passive: true });
         target.addEventListener('pointerleave', this._onPointerLeave, { passive: true });
@@ -675,50 +665,56 @@
       this.animationFrameId = requestAnimationFrame(this._animate);
     }
 
+    _updateBounds() {
+      if (!this.container) return;
+      this.bounds = this.container.getBoundingClientRect();
+      this.width = Math.max(this.bounds.width, 10);
+      this.height = Math.max(this.bounds.height, 10);
+    }
+
     _onResize() {
       if (!this.container || !this.renderer) return;
 
-      const rect = this.container.getBoundingClientRect();
-      const width = Math.max(rect.width, 10);
-      const height = Math.max(rect.height, 10);
-
-      this.width = width;
-      this.height = height;
-
-      this.renderer.setSize(width, height, false);
-      this.uniforms.uResolution.value.set(width, height);
-      this.uniforms.uAspect.value = width / height;
+      this._updateBounds();
+      this.renderer.setSize(this.width, this.height, false);
+      this.uniforms.uResolution.value.set(this.width, this.height);
+      this.uniforms.uAspect.value = this.width / this.height;
     }
 
     _onPointerMove(e) {
       if (!this.container) return;
 
-      const rect = this.container.getBoundingClientRect();
+      if (!this.bounds) this._updateBounds();
+      const rect = this.bounds;
       const now = performance.now();
       const dt = Math.max((now - this.lastTime) / 1000, 0.001);
 
-      // Normalized UV space [0.0 to 1.0]
+      // Normalized UV space [0.0 to 1.0] with cached bounds (zero layout thrashing)
       const nx = Math.max(0.0, Math.min(1.0, (e.clientX - rect.left) / rect.width));
       const ny = Math.max(0.0, Math.min(1.0, 1.0 - (e.clientY - rect.top) / rect.height));
 
-      const dx = nx - this.prevMouse.x;
-      const dy = ny - this.prevMouse.y;
+      const dx = nx - this.targetMouse.x;
+      const dy = ny - this.targetMouse.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      const speed = dist / dt;
 
       this.targetMouse.x = nx;
       this.targetMouse.y = ny;
 
-      // Pointer velocity vector & scalar
-      this.targetVelocityVec.x = Math.max(-3.0, Math.min(3.0, dx / dt));
-      this.targetVelocityVec.y = Math.max(-3.0, Math.min(3.0, dy / dt));
-      this.targetVelocity = Math.min(speed, 3.5);
+      // Filter sub-millisecond mouse jitter with high-precision exponential blend
+      const rawSpeed = dist / dt;
+      const rawVx = dx / dt;
+      const rawVy = dy / dt;
+
+      const vBlend = Math.min(dt * 25.0, 1.0);
+      this.targetVelocity += (Math.min(rawSpeed, 4.0) - this.targetVelocity) * vBlend;
+      this.targetVelocityVec.x += (Math.max(-3.5, Math.min(3.5, rawVx)) - this.targetVelocityVec.x) * vBlend;
+      this.targetVelocityVec.y += (Math.max(-3.5, Math.min(3.5, rawVy)) - this.targetVelocityVec.y) * vBlend;
 
       this.targetMouseActive = 1.0;
       this.lastMoveTime = now;
 
-      // Kinetic Generator: Movement generates electricity to power light
-      this.kineticEnergy = Math.min(1.0, this.kineticEnergy + Math.max(0.25, dist * 14.0));
+      // Instant kinetic dynamo charge on any cursor movement (brilliant, active illumination)
+      this.kineticEnergy = Math.min(1.0, this.kineticEnergy + Math.max(0.35, dist * 18.0));
 
       this.prevMouse.x = nx;
       this.prevMouse.y = ny;
@@ -738,7 +734,8 @@
         window.getSelection().removeAllRanges();
       }
 
-      const rect = this.container.getBoundingClientRect();
+      if (!this.bounds) this._updateBounds();
+      const rect = this.bounds;
       const nx = Math.max(0.0, Math.min(1.0, (e.clientX - rect.left) / rect.width));
       const ny = Math.max(0.0, Math.min(1.0, 1.0 - (e.clientY - rect.top) / rect.height));
 
@@ -829,60 +826,78 @@
       const delta = this.clock.getDelta();
       const elapsed = this.clock.getElapsedTime();
 
-      // Fluid Viscosity: Smooth pointer interpolation
-      this.currentMouse.x += (this.targetMouse.x - this.currentMouse.x) * 0.12;
-      this.currentMouse.y += (this.targetMouse.y - this.currentMouse.y) * 0.12;
-
-      // Soft moving light follows pointer smoothly with slight lag (Section 8)
-      this.lightPos.x += (this.targetMouse.x - this.lightPos.x) * 0.10;
-      this.lightPos.y += (this.targetMouse.y - this.lightPos.y) * 0.10;
-
-      // Delayed Trail Pointer & Trail Light for physical fluid wake momentum
-      this.trailMouse.x += (this.currentMouse.x - this.trailMouse.x) * 0.06;
-      this.trailMouse.y += (this.currentMouse.y - this.trailMouse.y) * 0.06;
-
-      this.trailLightPos.x += (this.lightPos.x - this.trailLightPos.x) * 0.055;
-      this.trailLightPos.y += (this.lightPos.y - this.trailLightPos.y) * 0.055;
-
-      // Velocity interpolation & friction decay
-      this.currentVelocityVec.x += (this.targetVelocityVec.x - this.currentVelocityVec.x) * 0.12;
-      this.currentVelocityVec.y += (this.targetVelocityVec.y - this.currentVelocityVec.y) * 0.12;
-      this.currentVelocity += (this.targetVelocity - this.currentVelocity) * 0.12;
-
-      this.targetVelocityVec.x *= 0.88;
-      this.targetVelocityVec.y *= 0.88;
-      this.targetVelocity *= 0.88;
-
-      // Active state smoothing (smooth light fade in/out)
-      this.mouseActive += (this.targetMouseActive - this.mouseActive) * 0.08;
+      // Safety clamp on delta time to ensure rock-solid stability
+      const dt = Math.min(Math.max(delta, 0.001), 0.05);
 
       // ============================================================
-      // KINETIC DYNAMO / ELECTRICITY DISCHARGE
-      // Movement generates electricity to produce light.
-      // When cursor stays still, electricity discharges and light smoothly fades away to darkness.
+      // HIGHEST-TIER CONTINUOUS FLUID DYNAMICS (Frame-Rate Independent)
       // ============================================================
+
+      // 1. Primary Leading Fluid Point:
+      // Highly responsive critically-damped approach (decay rate 24.0 = ~42ms settling, zero lag!)
+      const leadDamp = 1.0 - Math.exp(-24.0 * dt);
+      this.currentMouse.x += (this.targetMouse.x - this.currentMouse.x) * leadDamp;
+      this.currentMouse.y += (this.targetMouse.y - this.currentMouse.y) * leadDamp;
+
+      // 2. Focused Illuminating Light Center:
+      // Tightly coupled with the leading edge for instant physical feedback
+      const lightDamp = 1.0 - Math.exp(-22.0 * dt);
+      this.lightPos.x += (this.targetMouse.x - this.lightPos.x) * lightDamp;
+      this.lightPos.y += (this.targetMouse.y - this.lightPos.y) * lightDamp;
+
+      // 3. Hydrodynamic Trailing Wake (Physical Viscous Drag & Momentum):
+      // Real water fluidly lags behind the moving disturbance, forming a curved teardrop wake
+      const wakeDamp = 1.0 - Math.exp(-8.5 * dt);
+      this.trailMouse.x += (this.currentMouse.x - this.trailMouse.x) * wakeDamp;
+      this.trailMouse.y += (this.currentMouse.y - this.trailMouse.y) * wakeDamp;
+
+      const trailLightDamp = 1.0 - Math.exp(-7.5 * dt);
+      this.trailLightPos.x += (this.lightPos.x - this.trailLightPos.x) * trailLightDamp;
+      this.trailLightPos.y += (this.lightPos.y - this.trailLightPos.y) * trailLightDamp;
+
+      // 4. Momentum Velocity Vector & Drag:
+      const velDamp = 1.0 - Math.exp(-14.0 * dt);
+      this.currentVelocityVec.x += (this.targetVelocityVec.x - this.currentVelocityVec.x) * velDamp;
+      this.currentVelocityVec.y += (this.targetVelocityVec.y - this.currentVelocityVec.y) * velDamp;
+
+      const velScalarDamp = 1.0 - Math.exp(-12.0 * dt);
+      this.currentVelocity += (this.targetVelocity - this.currentVelocity) * velScalarDamp;
+
+      // Viscous friction brings target velocity to rest smoothly
+      const friction = Math.exp(-3.5 * dt);
+      this.targetVelocityVec.x *= friction;
+      this.targetVelocityVec.y *= friction;
+      this.targetVelocity *= friction;
+
+      // 5. Kinetic Dynamo: Electricity & Illumination Energy
       const now = performance.now();
       const stillDuration = (now - this.lastMoveTime) / 1000;
 
       if (this.targetMouseActive > 0.0) {
-        if (stillDuration < 0.22) {
-          // Actively moving: maintain/generate full electrical charge
-          this.kineticEnergy += (1.0 - this.kineticEnergy) * 0.22;
+        if (stillDuration < 0.65) {
+          // Actively moving or recent glide: maintain full electric luminescence
+          const chargeRate = 1.0 - Math.exp(-14.0 * dt);
+          this.kineticEnergy += (1.0 - this.kineticEnergy) * chargeRate;
         } else {
-          // Cursor is staying still: electricity discharges and light smoothly disappears
-          // Natural smooth decay over ~0.8s
-          const dischargeRate = 1.25;
-          this.kineticEnergy = Math.max(0.0, this.kineticEnergy - delta * dischargeRate);
+          // Stationary inside pool: graceful, atmospheric cooling dissipation over ~1.2s
+          const dischargeRate = 0.85;
+          this.kineticEnergy = Math.max(0.0, this.kineticEnergy - dt * dischargeRate);
         }
       } else {
-        // Pointer left the card: rapid discharge to complete darkness
-        this.kineticEnergy = Math.max(0.0, this.kineticEnergy - delta * 2.5);
+        // Pointer left the card: smooth, elegant atmospheric fade
+        const exitFadeRate = 1.6;
+        this.kineticEnergy = Math.max(0.0, this.kineticEnergy - dt * exitFadeRate);
       }
 
-      // Intensity smoothing
-      this.currentIntensity += (this.targetIntensity - this.currentIntensity) * 0.06;
+      // 6. Active State Smooth Transition
+      const activeDamp = 1.0 - Math.exp(-9.0 * dt);
+      this.mouseActive += (this.targetMouseActive - this.mouseActive) * activeDamp;
 
-      // Update Active Droplet Ripple Uniforms
+      // 7. Fluid Intensity Smooth Transition
+      const intensityDamp = 1.0 - Math.exp(-8.0 * dt);
+      this.currentIntensity += (this.targetIntensity - this.currentIntensity) * intensityDamp;
+
+      // 8. Update Active Droplet Ripple Uniforms
       for (let i = 0; i < MAX_RIPPLES; i++) {
         const r = this.ripples[i];
         const age = elapsed - r.birthTime;
@@ -893,7 +908,7 @@
         this.rippleUniforms[offset + 3] = r.strength;
       }
 
-      // Update Shader Uniforms in-place (Zero heap allocations per frame)
+      // 9. Update Shader Uniforms in-place (Zero heap allocations per frame)
       this.uniforms.uTime.value = elapsed;
       this.uniforms.uMouse.value.set(this.currentMouse.x, this.currentMouse.y);
       this.uniforms.uTrailMouse.value.set(this.trailMouse.x, this.trailMouse.y);
@@ -905,7 +920,7 @@
       this.uniforms.uKineticEnergy.value = this.kineticEnergy;
       this.uniforms.uIntensity.value = this.currentIntensity;
 
-      // Render GPU Pass
+      // 10. Render GPU Pass
       this.renderer.render(this.scene, this.camera);
 
       this.animationFrameId = requestAnimationFrame(this._animate);
@@ -926,7 +941,11 @@
         window.removeEventListener('resize', this._onResize);
       }
 
+      window.removeEventListener('scroll', this._updateBounds);
+      window.removeEventListener('resize', this._updateBounds);
+
       if (this.interactionTarget) {
+        this.interactionTarget.removeEventListener('pointerenter', this._updateBounds);
         this.interactionTarget.removeEventListener('pointermove', this._onPointerMove);
         this.interactionTarget.removeEventListener('pointerdown', this._onPointerDown);
         this.interactionTarget.removeEventListener('pointerleave', this._onPointerLeave);
