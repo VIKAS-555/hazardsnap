@@ -2,7 +2,14 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { HazardReport, CATEGORY_METADATA, HazardCategory } from '../lib/types';
-import { ThumbsUp, CheckCircle2, AlertTriangle, Filter, Navigation, Eye } from 'lucide-react';
+import {
+  ThumbsUp,
+  CheckCircle2,
+  AlertTriangle,
+  LocateFixed,
+  Layers,
+  Sparkles,
+} from 'lucide-react';
 import { upvoteHazard } from '../lib/supabase';
 import SafeRoutePlanner from './SafeRoutePlanner';
 import { SafeNavigationPlan } from '../lib/routing';
@@ -14,6 +21,8 @@ interface SafetyMapProps {
   onRequestReport?: () => void;
 }
 
+type MapTheme = 'dark' | 'street' | 'satellite';
+
 export default function SafetyMap({
   hazards,
   onSelectHazard,
@@ -22,7 +31,9 @@ export default function SafetyMap({
 }: SafetyMapProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<any>(null);
+  const tileLayerRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
+  const userMarkerRef = useRef<any>(null);
   const routeLayersRef = useRef<any[]>([]);
   const simulationMarkerRef = useRef<any>(null);
   const simulationIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -30,8 +41,9 @@ export default function SafetyMap({
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('all');
   const [filterFixed, setFilterFixed] = useState<boolean>(false);
   const [selectedHazardModal, setSelectedHazardModal] = useState<HazardReport | null>(null);
+  const [mapTheme, setMapTheme] = useState<MapTheme>('dark');
 
-  // User location for navigation
+  // User location for navigation & centering
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number }>({
     lat: 12.9716,
     lng: 77.5946,
@@ -45,16 +57,115 @@ export default function SafetyMap({
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          setUserLocation({
+          const loc = {
             lat: pos.coords.latitude,
             lng: pos.coords.longitude,
-          });
+          };
+          setUserLocation(loc);
+
+          // If map is already initialized, pan to user
+          if (mapInstanceRef.current) {
+            updateUserMarker(loc.lat, loc.lng);
+          }
         },
-        () => {},
+        (err) => console.warn('Location query fallback:', err),
         { enableHighAccuracy: true }
       );
     }
   }, []);
+
+  // Update user pulse marker on map
+  const updateUserMarker = (lat: number, lng: number) => {
+    if (!mapInstanceRef.current || typeof window === 'undefined') return;
+
+    import('leaflet').then((L) => {
+      const map = mapInstanceRef.current;
+      if (userMarkerRef.current) {
+        map.removeLayer(userMarkerRef.current);
+      }
+
+      const userIcon = L.divIcon({
+        className: 'user-gps-pulse',
+        html: `
+          <div style="position: relative; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+            <div style="
+              position: absolute;
+              width: 24px;
+              height: 24px;
+              border-radius: 50%;
+              background: rgba(59, 130, 246, 0.4);
+              animation: radar-pulse 2s infinite;
+            "></div>
+            <div style="
+              width: 14px;
+              height: 14px;
+              border-radius: 50%;
+              background: #3b82f6;
+              border: 3px solid #ffffff;
+              box-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+            "></div>
+          </div>
+        `,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+      });
+
+      userMarkerRef.current = L.marker([lat, lng], { icon: userIcon }).addTo(map);
+    });
+  };
+
+  // Center to user GPS
+  const handleRecenterToUser = () => {
+    if (navigator.geolocation && mapInstanceRef.current) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          setUserLocation({ lat, lng });
+          updateUserMarker(lat, lng);
+          mapInstanceRef.current.flyTo([lat, lng], 16, { animate: true, duration: 1.2 });
+        },
+        () => {
+          mapInstanceRef.current.flyTo([userLocation.lat, userLocation.lng], 15, { animate: true });
+        },
+        { enableHighAccuracy: true }
+      );
+    }
+  };
+
+  // Switch Map Theme Tiles (100% Free, NO API Key needed)
+  const applyTileLayer = (L: any, map: any, theme: MapTheme) => {
+    if (tileLayerRef.current) {
+      map.removeLayer(tileLayerRef.current);
+    }
+
+    let url = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+    let options: any = {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors',
+    };
+
+    if (theme === 'dark') {
+      options.className = 'dark-tiles';
+    } else if (theme === 'street') {
+      options.className = 'street-tiles';
+    } else if (theme === 'satellite') {
+      url = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+      options.attribution = '&copy; Esri World Imagery';
+      options.maxZoom = 18;
+    }
+
+    tileLayerRef.current = L.tileLayer(url, options).addTo(map);
+  };
+
+  // Re-apply tile layer when mapTheme changes
+  useEffect(() => {
+    if (mapInstanceRef.current && typeof window !== 'undefined') {
+      import('leaflet').then((L) => {
+        applyTileLayer(L, mapInstanceRef.current, mapTheme);
+      });
+    }
+  }, [mapTheme]);
 
   // Filter hazards
   const filteredHazards = hazards.filter((h) => {
@@ -72,24 +183,22 @@ export default function SafetyMap({
       import('leaflet').then((L) => {
         if (!mapContainerRef.current || mapInstanceRef.current) return;
 
-        const defaultLat = userLocation.lat || hazards[0]?.latitude || 12.9716;
-        const defaultLng = userLocation.lng || hazards[0]?.longitude || 77.5946;
+        const defaultLat = hazards[0]?.latitude || userLocation.lat || 12.9716;
+        const defaultLng = hazards[0]?.longitude || userLocation.lng || 77.5946;
 
         map = L.map(mapContainerRef.current, {
           zoomControl: false,
           attributionControl: false,
         }).setView([defaultLat, defaultLng], 14);
 
-        // Dark theme tiles (CartoDB Dark Matter)
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-          maxZoom: 19,
-          subdomains: 'abcd',
-        }).addTo(map);
+        // Apply free reliable OpenStreetMap tile layer
+        applyTileLayer(L, map, mapTheme);
 
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
         mapInstanceRef.current = map;
         renderMarkers(L, map, filteredHazards);
+        updateUserMarker(userLocation.lat, userLocation.lng);
       });
     } else {
       import('leaflet').then((L) => {
@@ -121,8 +230,8 @@ export default function SafetyMap({
         const circle = L.circle([hazard.latitude, hazard.longitude], {
           color: '#ef4444',
           fillColor: '#ef4444',
-          fillOpacity: 0.15,
-          weight: 1,
+          fillOpacity: 0.16,
+          weight: 1.5,
           dashArray: '4, 4',
           radius: 65, // 65-meter safety buffer
         }).addTo(map);
@@ -136,7 +245,7 @@ export default function SafetyMap({
           <div style="position: relative; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;">
             ${
               isCritical && !isFixed
-                ? `<div class="hazard-pulse-ring" style="background: rgba(239, 68, 68, 0.4);"></div>`
+                ? `<div class="hazard-pulse-ring" style="background: rgba(239, 68, 68, 0.45);"></div>`
                 : ''
             }
             <div style="
@@ -178,34 +287,32 @@ export default function SafetyMap({
     import('leaflet').then((L) => {
       const map = mapInstanceRef.current;
 
-      // Clear previous route layers
       routeLayersRef.current.forEach((layer) => map.removeLayer(layer));
       routeLayersRef.current = [];
 
       if (!activeRoutePlan) return;
 
-      // 1. Direct Unsafe Path (Dashed Red Line) if detour was required
+      // 1. Direct Unsafe Path (Dashed Red Line)
       if (activeRoutePlan.isDetourRequired) {
         const directPolyline = L.polyline(activeRoutePlan.directRoute.coordinates, {
           color: '#ef4444',
           weight: 3.5,
-          opacity: 0.7,
+          opacity: 0.75,
           dashArray: '6, 8',
         }).addTo(map);
 
         routeLayersRef.current.push(directPolyline);
       }
 
-      // 2. Safe Avoidance Path (Solid Glowing Emerald / Teal)
+      // 2. Safe Avoidance Path (Solid Emerald)
       const safePolyline = L.polyline(activeRoutePlan.safeRoute.coordinates, {
         color: '#10b981',
         weight: 5.5,
-        opacity: 0.9,
+        opacity: 0.95,
       }).addTo(map);
 
       routeLayersRef.current.push(safePolyline);
 
-      // Fit map bounds to encompass the safe route
       map.fitBounds(safePolyline.getBounds(), { padding: [60, 60] });
     });
   }, [activeRoutePlan]);
@@ -301,7 +408,7 @@ export default function SafetyMap({
       {/* TOP FLOATING CONTROLS: CATEGORY CHIPS */}
       <div className="absolute top-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
         {/* Category Filter Pills */}
-        <div className="pointer-events-auto flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 scrollbar-none bg-zinc-900/85 backdrop-blur-md p-1.5 rounded-2xl border border-zinc-800 shadow-xl">
+        <div className="pointer-events-auto flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 scrollbar-none bg-zinc-900/90 backdrop-blur-md p-1.5 rounded-2xl border border-zinc-800 shadow-xl">
           <button
             onClick={() => setSelectedCategoryFilter('all')}
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition shrink-0 ${
@@ -333,7 +440,7 @@ export default function SafetyMap({
         </div>
 
         {/* Toggle Show Fixed */}
-        <div className="pointer-events-auto flex items-center gap-2 bg-zinc-900/85 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-zinc-800 shadow-xl text-xs">
+        <div className="pointer-events-auto flex items-center gap-2 bg-zinc-900/90 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-zinc-800 shadow-xl text-xs">
           <label className="flex items-center gap-2 cursor-pointer text-zinc-300">
             <input
               type="checkbox"
@@ -344,6 +451,58 @@ export default function SafetyMap({
             <span>Show Fixed ({hazards.filter((h) => h.status === 'verified_fixed').length})</span>
           </label>
         </div>
+      </div>
+
+      {/* MAP LAYER SWITCHER & RE-CENTER BUTTON (BOTTOM RIGHT) */}
+      <div className="absolute bottom-6 right-4 z-20 pointer-events-auto flex flex-col items-end gap-2">
+        {/* Layer Theme Selector */}
+        <div className="bg-zinc-900/90 backdrop-blur-md border border-zinc-800 rounded-2xl p-1 shadow-2xl flex items-center gap-1">
+          <button
+            onClick={() => setMapTheme('dark')}
+            className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+              mapTheme === 'dark'
+                ? 'bg-zinc-800 text-white border border-zinc-700 shadow'
+                : 'text-zinc-400 hover:text-white'
+            }`}
+            title="Dark Civic Theme"
+          >
+            <span>🌙</span>
+            <span className="hidden sm:inline">Dark</span>
+          </button>
+          <button
+            onClick={() => setMapTheme('street')}
+            className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+              mapTheme === 'street'
+                ? 'bg-zinc-800 text-white border border-zinc-700 shadow'
+                : 'text-zinc-400 hover:text-white'
+            }`}
+            title="Standard Street Map"
+          >
+            <span>🗺️</span>
+            <span className="hidden sm:inline">Street</span>
+          </button>
+          <button
+            onClick={() => setMapTheme('satellite')}
+            className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+              mapTheme === 'satellite'
+                ? 'bg-zinc-800 text-white border border-zinc-700 shadow'
+                : 'text-zinc-400 hover:text-white'
+            }`}
+            title="Satellite Aerial"
+          >
+            <span>🛰️</span>
+            <span className="hidden sm:inline">Satellite</span>
+          </button>
+        </div>
+
+        {/* Re-center to GPS */}
+        <button
+          onClick={handleRecenterToUser}
+          className="p-3 rounded-2xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 text-blue-400 hover:text-blue-300 shadow-2xl backdrop-blur-md transition group"
+          title="Center on My GPS Location"
+        >
+          <LocateFixed className="w-5 h-5 group-hover:scale-110 transition" />
+        </button>
       </div>
 
       {/* FLOATING ACTION: REPORT BUTTON */}

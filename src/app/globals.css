@@ -23,6 +23,15 @@ body {
   font-family: inherit;
 }
 
+/* Zero-API-Key Dark Mode styling for standard OpenStreetMap tiles */
+.dark-tiles img.leaflet-tile {
+  filter: brightness(0.6) invert(1) contrast(2.5) hue-rotate(200deg) saturate(0.25) brightness(0.75) !important;
+}
+
+.street-tiles img.leaflet-tile {
+  filter: contrast(1.05) brightness(0.95) !important;
+}
+
 .leaflet-popup-content-wrapper {
   background: #111827 !important;
   color: #f3f4f6 !important;
