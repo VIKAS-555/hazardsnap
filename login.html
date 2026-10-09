@@ -1908,6 +1908,8 @@
 
       const activeSession = window.AuthEngine ? window.AuthEngine.getActiveSession() : null;
       const isViewerRoot = window.AuthEngine && typeof window.AuthEngine.isRootArchitect === 'function' ? window.AuthEngine.isRootArchitect(activeSession) : false;
+      const isViewerMaintainer = window.AuthEngine && typeof window.AuthEngine.isMaintainer === 'function' ? window.AuthEngine.isMaintainer(activeSession) : false;
+      const isGovernanceViewer = isViewerRoot || isViewerMaintainer;
 
       // Count members per role
       let countAll = members.length;
@@ -2032,18 +2034,44 @@
         const isTargetSelf = (activeSession && activeSession.techClubId === m.techClubId);
         const mContrib = window.AuthEngine && typeof window.AuthEngine.calculateMemberContribution === 'function'
           ? window.AuthEngine.calculateMemberContribution(m)
-          : { totalPoints: 0, referralCount: m.referralCount || 0 };
+          : {
+              totalPoints: 0,
+              referralCount: m.referralCount || 0,
+              referralPoints: (m.referralCount || 0) * 20,
+              rsvpCount: 0,
+              rsvpPoints: 0,
+              projectCount: 0,
+              projectPoints: 0,
+              isStaffEligible: false,
+              isStaffMaintained: false
+            };
+
+        let joinDateStr = null;
+        if (m.joinedAt) {
+          try {
+            const d = new Date(m.joinedAt);
+            if (!isNaN(d.getTime())) {
+              joinDateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            }
+          } catch (e) {}
+        }
 
         let badgeHtml = '';
         if (mRank === 'Root Architect') {
-          badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-mono text-[9px] font-extrabold border border-amber-300 dark:border-amber-700 flex items-center gap-1 shadow-sm"><i data-lucide="terminal" class="w-3 h-3"></i> LEAD ADMIN</span>`;
+          badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-mono text-[9px] font-extrabold border border-amber-300 dark:border-amber-700 flex items-center gap-1 shadow-xs"><i data-lucide="terminal" class="w-3 h-3"></i> LEAD ADMIN</span>`;
         } else if (mRank === 'Core Maintainer') {
-          badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/80 text-purple-800 dark:text-purple-300 font-mono text-[9px] font-extrabold border border-purple-300 dark:border-purple-700 flex items-center gap-1 shadow-sm"><i data-lucide="git-branch" class="w-3 h-3"></i> CORE MAINTAINER</span>`;
+          badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/80 text-purple-800 dark:text-purple-300 font-mono text-[9px] font-extrabold border border-purple-300 dark:border-purple-700 flex items-center gap-1 shadow-xs"><i data-lucide="git-branch" class="w-3 h-3"></i> CORE MAINTAINER</span>`;
         } else if (mRank === 'Staff Contributor') {
-          badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 font-mono text-[9px] font-extrabold border border-emerald-300 dark:border-emerald-700 flex items-center gap-1 shadow-sm"><i data-lucide="code-2" class="w-3 h-3"></i> STAFF CONTRIBUTOR</span>`;
+          badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 font-mono text-[9px] font-extrabold border border-emerald-300 dark:border-emerald-700 flex items-center gap-1 shadow-xs"><i data-lucide="code-2" class="w-3 h-3"></i> STAFF CONTRIBUTOR</span>`;
         } else {
           badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono text-[9px] font-semibold border border-blue-200 dark:border-blue-800 flex items-center gap-1"><i data-lucide="cpu" class="w-3 h-3"></i> ACTIVE DEV</span>`;
         }
+
+        const pointsBadgeClass = mRankLevel >= 3 
+          ? 'text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900/60' 
+          : (mContrib.totalPoints >= 100 
+            ? 'text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-900/60' 
+            : 'text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-900/60');
 
         let adminControlHtml = '';
         if (isViewerRoot) {
@@ -2054,7 +2082,7 @@
             adminControlHtml = `
               <div class="flex items-center gap-1.5">
                 <span class="text-[9px] font-mono text-amber-700 dark:text-amber-300 font-extrabold uppercase bg-amber-100/80 dark:bg-amber-950/80 px-1.5 py-0.5 rounded border border-amber-300 dark:border-amber-700">YOU</span>
-                <select onchange="handleRankChange('${m.techClubId}', this.value)" title="${leadAdminCount <= 1 ? 'Sole Lead Administrator: Promote another member before stepping down' : 'Manage Your Role / Step Down'}" class="text-[10px] font-mono font-semibold py-1 px-1.5 rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50/70 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500 shadow-sm cursor-pointer">
+                <select onchange="handleRankChange('${m.techClubId}', this.value)" title="${leadAdminCount <= 1 ? 'Sole Lead Administrator: Promote another member before stepping down' : 'Manage Your Role / Step Down'}" class="text-[10px] font-mono font-semibold py-1 px-2 rounded-lg border border-amber-300 dark:border-amber-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500 shadow-xs cursor-pointer">
                   <option value="Root Architect" selected>${selfAdminLabel}</option>
                   <option value="Core Maintainer">⬇️ Step Down: Maintainer</option>
                   <option value="Staff Contributor">⬇️ Step Down: Staff</option>
@@ -2068,7 +2096,7 @@
               : '⭐ Promote to Lead Admin';
             adminControlHtml = `
               <div class="flex items-center gap-1">
-                <select onchange="handleRankChange('${m.techClubId}', this.value)" title="Assign Role / Demote or Promote" class="text-[10px] font-mono font-semibold py-1 px-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500 shadow-sm cursor-pointer">
+                <select onchange="handleRankChange('${m.techClubId}', this.value)" title="Assign Role / Demote or Promote" class="text-[10px] font-mono font-semibold py-1 px-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500 shadow-xs cursor-pointer">
                   <option value="Active Developer" ${mRank === 'Active Developer' ? 'selected' : ''}>${mRankLevel > 1 ? '⬇️ Demote: Active Dev' : 'Active Dev'}</option>
                   <option value="Staff Contributor" ${mRank === 'Staff Contributor' ? 'selected' : ''}>${mRankLevel > 2 ? '⬇️ Demote: Staff' : (mRankLevel < 2 ? '⬆️ Promote: Staff' : 'Staff Contributor')}</option>
                   <option value="Core Maintainer" ${mRank === 'Core Maintainer' ? 'selected' : ''}>${mRankLevel > 3 ? '⬇️ Demote: Maintainer' : (mRankLevel < 3 ? '⬆️ Promote: Maintainer' : 'Core Maintainer')}</option>
@@ -2079,38 +2107,148 @@
           }
         }
 
-        return `
-          <div class="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 transition hover:border-blue-500/50">
-            <div class="flex items-center gap-3 min-w-0">
-              <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 font-mono font-bold text-xs flex items-center justify-center shrink-0">
-                ${index + 1}
+        // Tier A: Regular Members (Clean, focused, uncluttered essentials)
+        if (!isGovernanceViewer) {
+          return `
+            <div class="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/90 transition hover:border-blue-500/50 shadow-xs">
+              <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 font-mono font-bold text-xs flex items-center justify-center shrink-0">
+                    ${index + 1}
+                  </div>
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span class="font-bold text-xs sm:text-sm text-slate-900 dark:text-white truncate">${m.name || 'Member'}</span>
+                      ${isTargetSelf ? '<span class="text-[9px] font-mono font-extrabold uppercase bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 px-1.5 py-0.2 rounded border border-blue-300 dark:border-blue-800">YOU</span>' : ''}
+                      ${badgeHtml}
+                      <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-semibold">${m.section || 'AIML'}</span>
+                    </div>
+                    <div class="text-[10px] font-mono text-slate-500 dark:text-slate-400 flex items-center gap-1.5 mt-0.5">
+                      <span>USN: <span class="font-semibold text-slate-700 dark:text-slate-300">${m.usn || 'N/A'}</span></span>
+                      <span>•</span>
+                      <span>Dept of CSE (AI & ML)</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-2 shrink-0">
+                  <span class="text-[10px] font-mono font-bold ${pointsBadgeClass} px-2 py-1 rounded-lg flex items-center gap-1 shrink-0" title="Total Merit Points">
+                    <i data-lucide="${mRankLevel >= 3 ? 'shield' : 'award'}" class="w-3 h-3"></i> ${mContrib.totalPoints} pts
+                  </span>
+                  <span class="font-mono text-xs font-extrabold text-blue-600 dark:text-blue-400 bg-blue-50/70 dark:bg-blue-950/60 px-2.5 py-1 rounded-lg border border-blue-200/50 dark:border-blue-900/50 shrink-0">
+                    ${m.techClubId}
+                  </span>
+                </div>
               </div>
-              <div class="min-w-0">
-                <div class="flex items-center gap-2 flex-wrap">
-                  <span class="font-bold text-xs text-slate-900 dark:text-white truncate">${m.name || 'Member'}</span>
-                  ${badgeHtml}
-                  <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-semibold">${m.section || 'AIML'}</span>
+            </div>
+          `;
+        }
+
+        // Tier B: Lead Administrator & Core Maintainer (Elevated Governance Insights & Full Diagnostics)
+        let statusDiagnosticHtml = '';
+        if (mRank === 'Root Architect') {
+          statusDiagnosticHtml = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 text-[9px] font-bold"><i data-lucide="shield" class="w-2.5 h-2.5"></i> Lead Admin (Exempt)</span>`;
+        } else if (mRank === 'Core Maintainer') {
+          statusDiagnosticHtml = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-[9px] font-bold"><i data-lucide="git-branch" class="w-2.5 h-2.5"></i> Maintainer (Exempt)</span>`;
+        } else if (mRank === 'Staff Contributor') {
+          const isOk = mContrib.totalPoints >= 60;
+          statusDiagnosticHtml = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md ${isOk ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' : 'bg-red-50 dark:bg-red-950/60 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800'} text-[9px] font-bold" title="${isOk ? 'Active standing: Meets ≥60 pts requirement' : 'Low points warning: Demotion risk below 60 pts'}"><i data-lucide="code-2" class="w-2.5 h-2.5"></i> Staff Standing (${isOk ? '≥60 pts' : 'Risk <60 pts'})</span>`;
+        } else {
+          if (mContrib.isStaffEligible) {
+            statusDiagnosticHtml = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-700 text-[9px] font-extrabold animate-pulse"><i data-lucide="zap" class="w-2.5 h-2.5"></i> Staff Eligible (≥100 pts)</span>`;
+          } else {
+            const needed = Math.max(0, 100 - mContrib.totalPoints);
+            statusDiagnosticHtml = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 text-[9px] font-semibold"><i data-lucide="trending-up" class="w-2.5 h-2.5"></i> ${needed} pts to Staff</span>`;
+          }
+        }
+
+        return `
+          <div class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/90 transition hover:border-blue-500/50 shadow-xs">
+            <!-- Top Identity Row -->
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 font-mono font-bold text-xs flex items-center justify-center shrink-0">
+                  ${index + 1}
                 </div>
-                <div class="text-[11px] font-mono text-slate-500 dark:text-slate-400 truncate">
-                  USN: <span class="font-semibold text-slate-700 dark:text-slate-300">${m.usn || 'N/A'}</span> • ${m.email || ''}
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="font-bold text-xs sm:text-sm text-slate-900 dark:text-white truncate">${m.name || 'Member'}</span>
+                    ${isTargetSelf ? '<span class="text-[9px] font-mono font-extrabold uppercase bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 px-1.5 py-0.5 rounded border border-amber-300 dark:border-amber-700">YOU</span>' : ''}
+                    ${badgeHtml}
+                    <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-semibold">${m.section || 'AIML'}</span>
+                  </div>
                 </div>
+              </div>
+
+              <!-- Top Right: Points + Tech Club ID -->
+              <div class="flex items-center gap-2 shrink-0">
+                <span class="text-[10px] font-mono font-bold ${pointsBadgeClass} px-2 py-1 rounded-lg flex items-center gap-1 shrink-0" title="${mRankLevel >= 3 ? 'Governance Tier: Exempt from contribution decay' : 'Total Merit Points'}">
+                  <i data-lucide="${mRankLevel >= 3 ? 'shield' : 'award'}" class="w-3 h-3"></i> ${mContrib.totalPoints} pts
+                </span>
+                <span class="font-mono text-xs font-extrabold text-blue-600 dark:text-blue-400 bg-blue-50/70 dark:bg-blue-950/60 px-2.5 py-1 rounded-lg border border-blue-200/50 dark:border-blue-900/50 shrink-0">
+                  ${m.techClubId}
+                </span>
               </div>
             </div>
 
-            <div class="flex items-center justify-between sm:justify-end gap-2 shrink-0 pt-1 sm:pt-0 border-t sm:border-0 border-slate-100 dark:border-slate-800/80">
-              ${adminControlHtml}
-              <span class="text-[10px] font-mono font-bold ${mRankLevel >= 3 ? 'text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900/60' : (mContrib.totalPoints >= 100 ? 'text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-900/60' : 'text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-900/60')} px-2 py-0.5 rounded flex items-center gap-1" title="${mRankLevel >= 3 ? 'Governance Tier: Exempt from contribution decay' : 'Total Merit Points'}">
-                <i data-lucide="${mRankLevel >= 3 ? 'shield' : 'award'}" class="w-3 h-3"></i> ${mContrib.totalPoints} pts
-              </span>
-              <span class="font-mono text-xs font-extrabold text-blue-600 dark:text-blue-400 bg-blue-50/70 dark:bg-blue-950/60 px-2.5 py-1 rounded-lg border border-blue-200/50 dark:border-blue-900/50">
-                ${m.techClubId}
-              </span>
-              ${(mContrib.referralCount || 0) > 0 ? `
-                <span class="text-[10px] font-mono font-bold text-purple-600 dark:text-purple-400 flex items-center gap-1" title="Invited ${mContrib.referralCount} peers">
-                  <i data-lucide="share-2" class="w-3 h-3"></i> ${mContrib.referralCount} ref
+            <!-- Administrative Credentials Row -->
+            <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-mono text-slate-600 dark:text-slate-300">
+              <div class="flex items-center gap-1">
+                <i data-lucide="badge-check" class="w-3.5 h-3.5 text-emerald-500 shrink-0"></i>
+                <span>USN: <b class="text-slate-800 dark:text-slate-100">${m.usn || 'N/A'}</b></span>
+              </div>
+              <span class="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
+              <div class="flex items-center gap-1 truncate max-w-[240px]">
+                <i data-lucide="mail" class="w-3.5 h-3.5 text-blue-500 shrink-0"></i>
+                <a href="mailto:${m.email || ''}" class="text-blue-600 dark:text-blue-400 hover:underline truncate" title="Email: ${m.email || 'N/A'}">${m.email || 'No email registered'}</a>
+              </div>
+              ${joinDateStr ? `
+                <span class="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
+                <div class="flex items-center gap-1 text-slate-500 dark:text-slate-400 text-[10px]">
+                  <i data-lucide="calendar" class="w-3 h-3 text-slate-400 shrink-0"></i>
+                  <span>Joined ${joinDateStr}</span>
+                </div>
+              ` : ''}
+              ${m.referredBy ? `
+                <span class="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
+                <span class="text-[9px] font-mono text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/50 px-1.5 py-0.2 rounded border border-purple-200/60 dark:border-purple-800/60 flex items-center gap-1">
+                  <i data-lucide="user-plus" class="w-2.5 h-2.5"></i> Invited by: ${m.referredBy}
                 </span>
               ` : ''}
             </div>
+
+            <!-- Contribution Pillars (3 Tracks) & Diagnostic Progression -->
+            <div class="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-1.5 text-[10px] font-mono">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200/50 dark:border-purple-900/40 font-semibold" title="Peer Referrals: ${mContrib.referralCount} peers (+${mContrib.referralPoints} pts)">
+                  <i data-lucide="share-2" class="w-3 h-3 text-purple-500"></i> ${mContrib.referralCount} Ref <span class="text-[9px] opacity-75">(+${mContrib.referralPoints})</span>
+                </span>
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200/50 dark:border-blue-900/40 font-semibold" title="Workshop/Event RSVPs: ${mContrib.rsvpCount} events (+${mContrib.rsvpPoints} pts)">
+                  <i data-lucide="calendar" class="w-3 h-3 text-blue-500"></i> ${mContrib.rsvpCount} Events <span class="text-[9px] opacity-75">(+${mContrib.rsvpPoints})</span>
+                </span>
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/50 dark:border-emerald-900/40 font-semibold" title="Project Submissions: ${mContrib.projectCount} code contributions (+${mContrib.projectPoints} pts)">
+                  <i data-lucide="folder-git-2" class="w-3 h-3 text-emerald-500"></i> ${mContrib.projectCount} Proj <span class="text-[9px] opacity-75">(+${mContrib.projectPoints})</span>
+                </span>
+              </div>
+
+              <div>
+                ${statusDiagnosticHtml}
+              </div>
+            </div>
+
+            <!-- Dedicated Lead Admin Governance Footer -->
+            ${isViewerRoot ? `
+              <div class="mt-2.5 pt-2 border-t border-amber-200/50 dark:border-amber-900/40 bg-amber-50/50 dark:bg-amber-950/30 -mx-3.5 -mb-3.5 px-3.5 py-2 rounded-b-xl flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 text-[10px] font-mono text-amber-900 dark:text-amber-200 font-bold">
+                  <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-amber-600 shrink-0"></i>
+                  <span>Governance Authority:</span>
+                  <span class="text-[9px] font-normal text-slate-500 dark:text-slate-400">Promote or demote</span>
+                </div>
+                <div>
+                  ${adminControlHtml}
+                </div>
+              </div>
+            ` : ''}
           </div>
         `;
       }).join('');
