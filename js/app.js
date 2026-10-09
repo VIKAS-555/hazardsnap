@@ -1997,6 +1997,12 @@ function setupEventListeners() {
     });
   }
 
+  function closeMobileMenu() {
+    const m = document.getElementById('mobile-menu');
+    if (m) m.classList.add('hidden');
+  }
+  window.closeMobileMenu = closeMobileMenu;
+
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       closeRsvpModal();

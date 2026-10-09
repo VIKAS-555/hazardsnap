@@ -832,6 +832,93 @@ async function promoteMember(targetClubId, newRank) {
   return updateMemberRank(targetClubId, newRank);
 }
 
+/**
+ * Admin action: Permanently kick out / remove a member from the BST Tech Club roster.
+ * Authorized for Lead Administrator [UID 0] only.
+ */
+async function kickOutMember(targetClubId) {
+  const activeSession = getActiveSession();
+  if (!activeSession || !isRootArchitect(activeSession)) {
+    throw new Error('Administrative Access Required: Only a Lead Administrator can kick out members from the club.');
+  }
+
+  if (activeSession.techClubId === targetClubId) {
+    throw new Error('Action Denied: You cannot kick out your own administrator account. Step down or transfer ownership first.');
+  }
+
+  const vault = getMembersVault();
+  const target = vault[targetClubId];
+  if (!target) {
+    throw new Error(`Member with ID ${targetClubId} not found in the club roster.`);
+  }
+
+  // Foundational Lead Admin protection (UID 0 Arnav Patel, UID 1 Vikas N)
+  if (targetClubId === 'BST-2026-8166' || target.usn === '2392608031') {
+    throw new Error('Protected Account: Arnav Patel [UID 0] is the foundational club creator and cannot be removed.');
+  }
+
+  const currentRank = normalizeMemberRank(target.role);
+  if (currentRank === 'Root Architect') {
+    const allMembers = Object.values(vault);
+    const leadAdminCount = allMembers.filter(m => normalizeMemberRank(m.role) === 'Root Architect').length;
+    if (leadAdminCount <= 1) {
+      throw new Error('Club Governance Rule: You cannot kick out the sole remaining Lead Administrator.');
+    }
+  }
+
+  // Delete from local vault
+  delete vault[targetClubId];
+  saveMembersVault(vault);
+
+  // Clean up any RSVPs stored for this member
+  try {
+    const rsvps = JSON.parse(localStorage.getItem('devsphere_event_rsvps') || '[]');
+    const cleanedRsvps = rsvps.filter(r => r.clubId !== targetClubId && r.techClubId !== targetClubId && r.email !== target.email);
+    localStorage.setItem('devsphere_event_rsvps', JSON.stringify(cleanedRsvps));
+  } catch (e) {}
+
+  // Clean up team memberships from hackathon teams
+  try {
+    const teams = JSON.parse(localStorage.getItem('bst_hackathon_teams') || '[]');
+    let teamsModified = false;
+    teams.forEach(t => {
+      if (Array.isArray(t.members)) {
+        const initLen = t.members.length;
+        t.members = t.members.filter(m => m.techClubId !== targetClubId && m.email !== target.email);
+        if (t.members.length !== initLen) teamsModified = true;
+      }
+      if (t.leaderTechClubId === targetClubId) {
+        if (t.members && t.members.length > 0) {
+          t.leaderTechClubId = t.members[0].techClubId;
+          t.leaderName = t.members[0].name;
+          t.members[0].isLeader = true;
+        } else {
+          t.leaderTechClubId = null;
+          t.leaderName = '(Vacant)';
+        }
+        teamsModified = true;
+      }
+    });
+    if (teamsModified) {
+      localStorage.setItem('bst_hackathon_teams', JSON.stringify(teams));
+    }
+  } catch (e) {}
+
+  // Clean up from Supabase Cloud if configured
+  if (window.SupabaseEngine && window.SupabaseEngine.isConfigured()) {
+    try {
+      const client = window.SupabaseEngine.getClient();
+      if (client) {
+        await client.from('members').delete().eq('tech_club_id', targetClubId);
+      }
+    } catch (e) {
+      console.warn('[AuthEngine] Cloud kick-out notice:', e.message);
+    }
+  }
+
+  return { success: true, removedMember: target };
+}
+
 function isFaculty(member) {
   if (!member) member = getActiveSession();
   if (!member) return false;
@@ -866,5 +953,6 @@ window.AuthEngine = {
   updateMemberRank,
   demoteMember,
   promoteMember,
+  kickOutMember,
   updateMemberProfile
 };

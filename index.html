@@ -66,16 +66,16 @@
       <div class="flex items-center justify-between h-16">
         
         <!-- Brand Logo & College Title -->
-        <a href="#" class="flex items-center gap-3 group">
-          <div class="w-9 h-9 rounded-lg bg-blue-600 dark:bg-blue-500 text-white flex items-center justify-center font-mono font-bold text-lg shadow-sm group-hover:scale-105 transition-transform">
-            <i data-lucide="terminal" class="w-5 h-5"></i>
+        <a href="#" class="flex items-center gap-2.5 sm:gap-3 group shrink-0">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-blue-600 dark:bg-blue-500 text-white flex items-center justify-center font-mono font-bold text-base sm:text-lg shadow-sm group-hover:scale-105 transition-transform shrink-0">
+            <i data-lucide="terminal" class="w-4 h-4 sm:w-5 sm:h-5"></i>
           </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="font-bold text-base tracking-tight club-name-text text-slate-900 dark:text-white">BST Tech Club</span>
-              <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/80 text-blue-600 dark:text-blue-400 font-semibold uppercase border border-blue-100 dark:border-blue-900">CSE (AI & ML)</span>
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5 sm:gap-2">
+              <span class="font-bold text-sm sm:text-base tracking-tight club-name-text text-slate-900 dark:text-white truncate">BST Tech Club</span>
+              <span class="text-[9px] sm:text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/80 text-blue-600 dark:text-blue-400 font-semibold uppercase border border-blue-100 dark:border-blue-900 shrink-0">CSE (AI & ML)</span>
             </div>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium college-name-text">Bosscoder School Of Technology</p>
+            <p class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium college-name-text hidden sm:block truncate">Bosscoder School Of Technology</p>
           </div>
         </a>
 
@@ -92,7 +92,7 @@
         </nav>
 
         <!-- Right Controls: Theme Toggle & Portal Link -->
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 sm:gap-3">
           <!-- Dark/Light Theme Button -->
           <button onclick="toggleTheme()" aria-label="Toggle Dark/Light Mode" class="theme-toggle-btn p-2 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
             <i data-lucide="moon" class="w-4 h-4"></i>
@@ -110,12 +110,13 @@
           </button>
 
           <!-- Member Portal Button / Session Badge -->
-          <a href="login.html" id="nav-auth-link" class="holographic-id-badge inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700 transition shadow-sm border border-blue-500/40">
+          <a href="login.html" id="nav-auth-link" class="holographic-id-badge inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700 transition shadow-sm border border-blue-500/40 shrink-0">
             <div class="relative flex items-center justify-center">
               <i data-lucide="shield-check" class="w-3.5 h-3.5 text-blue-200 badge-shield-icon"></i>
               <span id="nav-verified-dot" class="verified-pulse-dot hidden"></span>
             </div>
-            <span id="nav-auth-text">BST Member Portal</span>
+            <span id="nav-auth-text" class="hidden sm:inline">BST Member Portal</span>
+            <span class="sm:hidden font-bold">Portal</span>
           </a>
 
           <!-- Mobile Hamburger -->
@@ -128,18 +129,24 @@
     </div>
 
     <!-- Mobile Drawer Menu -->
-    <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 pt-3 pb-5 space-y-3 text-sm font-medium">
-      <a href="#about" class="block py-1.5 text-slate-700 dark:text-slate-200">About</a>
-      <a href="#domains" class="block py-1.5 text-slate-700 dark:text-slate-200">Domains</a>
-      <a href="#events" class="block py-1.5 text-slate-700 dark:text-slate-200">Events & Workshops</a>
-      <a href="#projects" class="block py-1.5 text-slate-700 dark:text-slate-200">Projects</a>
-      <a href="#faqs" class="block py-1.5 text-slate-700 dark:text-slate-200">FAQ</a>
-      <button onclick="openCloudConfigModal()" class="w-full text-left py-1.5 text-slate-700 dark:text-slate-200 flex items-center gap-2">
-        <i data-lucide="database" class="w-4 h-4 text-blue-600 dark:text-blue-400"></i> Cloud Database Setup
-      </button>
-      <div class="pt-2 border-t border-slate-100 dark:border-slate-900 flex justify-center">
-        <a href="login.html" class="w-full py-2 text-center text-xs font-semibold rounded-lg bg-blue-600 text-white">
-          Open BST Member Portal
+    <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md px-4 pt-3 pb-5 space-y-2 text-sm font-medium shadow-xl">
+      <a href="#about" onclick="closeMobileMenu()" class="block py-2 text-slate-700 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 transition">About</a>
+      <a href="#domains" onclick="closeMobileMenu()" class="block py-2 text-slate-700 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 transition">Domains</a>
+      <a href="#events" onclick="closeMobileMenu()" class="block py-2 text-slate-700 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 transition flex items-center justify-between">
+        <span>Events & Workshops</span>
+        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      </a>
+      <a href="#projects" onclick="closeMobileMenu()" class="block py-2 text-slate-700 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 transition">Student Projects</a>
+      <a href="#faqs" onclick="closeMobileMenu()" class="block py-2 text-slate-700 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 transition">FAQ</a>
+      <div class="pt-3 border-t border-slate-100 dark:border-slate-900 flex flex-col gap-2">
+        <button onclick="closeMobileMenu(); openJoinTeamModal();" class="w-full py-2.5 px-4 text-center text-xs font-bold rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 flex items-center justify-center gap-2 cursor-pointer">
+          <i data-lucide="users" class="w-4 h-4"></i> Join a Hackathon Team
+        </button>
+        <button onclick="closeMobileMenu(); openCloudConfigModal();" class="w-full py-2 px-3 text-left text-xs font-mono rounded-lg border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 flex items-center gap-2 cursor-pointer">
+          <i data-lucide="database" class="w-4 h-4 text-blue-600 dark:text-blue-400"></i> Cloud Database Setup
+        </button>
+        <a href="login.html" class="w-full py-2.5 px-4 text-center text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-md flex items-center justify-center gap-2">
+          <i data-lucide="shield-check" class="w-4 h-4"></i> Open BST Member Portal
         </a>
       </div>
     </div>

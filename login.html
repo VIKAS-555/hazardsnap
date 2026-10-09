@@ -92,8 +92,8 @@
 
       <div class="flex items-center gap-3">
         <!-- Return to Home -->
-        <a href="index.html" class="text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 transition">
-          <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back to Main Site
+        <a href="index.html" class="text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 transition shrink-0">
+          <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Back to Main Site</span><span class="sm:hidden">Main Site</span>
         </a>
 
         <!-- Dark/Light Theme Button -->
@@ -1637,66 +1637,11 @@
   </div>
 
   <!-- Scripts -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
-    window.switchProfileTab = switchProfileTab;
-    window.openAvatarModal = openAvatarModal;
-    window.closeAvatarModal = closeAvatarModal;
-    window.selectPresetAvatar = selectPresetAvatar;
-    window.handleAvatarFileUpload = handleAvatarFileUpload;
-    window.applyAvatarUrl = applyAvatarUrl;
-    window.removeProfileAvatar = removeProfileAvatar;
-    window.saveAvatarSelection = saveAvatarSelection;
-    window.handleProfileDetailsSubmit = handleProfileDetailsSubmit;
-
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-    window.switchProfileTab = switchProfileTab;
-    window.openAvatarModal = openAvatarModal;
-    window.closeAvatarModal = closeAvatarModal;
-    window.selectPresetAvatar = selectPresetAvatar;
-    window.handleAvatarFileUpload = handleAvatarFileUpload;
-    window.applyAvatarUrl = applyAvatarUrl;
-    window.removeProfileAvatar = removeProfileAvatar;
-    window.saveAvatarSelection = saveAvatarSelection;
-    window.handleProfileDetailsSubmit = handleProfileDetailsSubmit;
-
-  </script>
-  <script src="js/supabase-config.js">
-    window.switchProfileTab = switchProfileTab;
-    window.openAvatarModal = openAvatarModal;
-    window.closeAvatarModal = closeAvatarModal;
-    window.selectPresetAvatar = selectPresetAvatar;
-    window.handleAvatarFileUpload = handleAvatarFileUpload;
-    window.applyAvatarUrl = applyAvatarUrl;
-    window.removeProfileAvatar = removeProfileAvatar;
-    window.saveAvatarSelection = saveAvatarSelection;
-    window.handleProfileDetailsSubmit = handleProfileDetailsSubmit;
-
-  </script>
-  <script src="js/supabase-client.js">
-    window.switchProfileTab = switchProfileTab;
-    window.openAvatarModal = openAvatarModal;
-    window.closeAvatarModal = closeAvatarModal;
-    window.selectPresetAvatar = selectPresetAvatar;
-    window.handleAvatarFileUpload = handleAvatarFileUpload;
-    window.applyAvatarUrl = applyAvatarUrl;
-    window.removeProfileAvatar = removeProfileAvatar;
-    window.saveAvatarSelection = saveAvatarSelection;
-    window.handleProfileDetailsSubmit = handleProfileDetailsSubmit;
-
-  </script>
-  <script src="js/auth.js">
-    window.switchProfileTab = switchProfileTab;
-    window.openAvatarModal = openAvatarModal;
-    window.closeAvatarModal = closeAvatarModal;
-    window.selectPresetAvatar = selectPresetAvatar;
-    window.handleAvatarFileUpload = handleAvatarFileUpload;
-    window.applyAvatarUrl = applyAvatarUrl;
-    window.removeProfileAvatar = removeProfileAvatar;
-    window.saveAvatarSelection = saveAvatarSelection;
-    window.handleProfileDetailsSubmit = handleProfileDetailsSubmit;
-
-  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
   <script>
     /* ============================================================
        LOGIN & REGISTRATION CONTROLLER
@@ -1704,6 +1649,7 @@
 
     document.addEventListener('DOMContentLoaded', async () => {
       initTheme();
+      initInteractiveWelcomeCanvas();
       checkActiveSessionState();
       handleReferralUrlParam();
       updateMemberCountBadges();
@@ -1749,6 +1695,292 @@
       if (window.lucide) window.lucide.createIcons();
     }
 
+    /* ============================================================
+       INTERACTIVE BACKGROUND CANVAS (Touch & Pointer Particle Mesh)
+       ============================================================ */
+    function initInteractiveWelcomeCanvas() {
+      const canvas = document.getElementById('welcome-interactive-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      let width = 0;
+      let height = 0;
+      let dpr = 1;
+
+      const pointer = {
+        x: null,
+        y: null,
+        radius: 160,
+        active: false,
+        fadeTimeout: null
+      };
+
+      let particles = [];
+
+      function resize() {
+        dpr = window.devicePixelRatio || 1;
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = Math.floor(width * dpr);
+        canvas.height = Math.floor(height * dpr);
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        initParticles();
+      }
+
+      function initParticles() {
+        particles = [];
+        const isMobile = width < 768;
+        const particleCount = isMobile ? 32 : 65;
+
+        for (let i = 0; i < particleCount; i++) {
+          particles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            vx: (Math.random() - 0.5) * 0.7,
+            vy: (Math.random() - 0.5) * 0.7,
+            radius: Math.random() * 1.8 + 1.2,
+            type: Math.floor(Math.random() * 3), // 0: blue, 1: indigo, 2: purple
+            baseAlpha: Math.random() * 0.4 + 0.35
+          });
+        }
+      }
+
+      function onPointerMove(x, y) {
+        pointer.x = x;
+        pointer.y = y;
+        pointer.active = true;
+        if (pointer.fadeTimeout) clearTimeout(pointer.fadeTimeout);
+      }
+
+      function onPointerLeave() {
+        if (pointer.fadeTimeout) clearTimeout(pointer.fadeTimeout);
+        pointer.fadeTimeout = setTimeout(() => {
+          pointer.active = false;
+          pointer.x = null;
+          pointer.y = null;
+        }, 1200);
+      }
+
+      window.addEventListener('mousemove', (e) => {
+        onPointerMove(e.clientX, e.clientY);
+      }, { passive: true });
+
+      window.addEventListener('mouseleave', () => {
+        onPointerLeave();
+      });
+
+      window.addEventListener('touchstart', (e) => {
+        if (e.touches && e.touches[0]) {
+          onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      }, { passive: true });
+
+      window.addEventListener('touchmove', (e) => {
+        if (e.touches && e.touches[0]) {
+          onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      }, { passive: true });
+
+      window.addEventListener('touchend', () => {
+        onPointerLeave();
+      }, { passive: true });
+
+      let resizeTimer = null;
+      window.addEventListener('resize', () => {
+        if (resizeTimer) clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(resize, 150);
+      });
+
+      resize();
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+
+        const isDark = document.documentElement.classList.contains('dark');
+        const maxDist = width < 768 ? 90 : 125;
+
+        // Draw soft ambient pointer aura if interacting
+        if (pointer.active && pointer.x !== null && pointer.y !== null) {
+          const radial = ctx.createRadialGradient(
+            pointer.x, pointer.y, 0,
+            pointer.x, pointer.y, pointer.radius
+          );
+          if (isDark) {
+            radial.addColorStop(0, 'rgba(59, 130, 246, 0.12)');
+            radial.addColorStop(0.5, 'rgba(99, 102, 241, 0.05)');
+            radial.addColorStop(1, 'rgba(0, 0, 0, 0)');
+          } else {
+            radial.addColorStop(0, 'rgba(59, 130, 246, 0.08)');
+            radial.addColorStop(0.5, 'rgba(99, 102, 241, 0.03)');
+            radial.addColorStop(1, 'rgba(255, 255, 255, 0)');
+          }
+          ctx.beginPath();
+          ctx.arc(pointer.x, pointer.y, pointer.radius, 0, Math.PI * 2);
+          ctx.fillStyle = radial;
+          ctx.fill();
+        }
+
+        // Update & Render Particles
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.x < 0) { p.x = 0; p.vx *= -1; }
+          else if (p.x > width) { p.x = width; p.vx *= -1; }
+          if (p.y < 0) { p.y = 0; p.vy *= -1; }
+          else if (p.y > height) { p.y = height; p.vy *= -1; }
+
+          // Pointer interaction physics (repulsion & connector line)
+          if (pointer.active && pointer.x !== null && pointer.y !== null) {
+            const dx = pointer.x - p.x;
+            const dy = pointer.y - p.y;
+            const dist = Math.hypot(dx, dy);
+
+            if (dist < pointer.radius && dist > 0) {
+              const force = (pointer.radius - dist) / pointer.radius;
+              const angle = Math.atan2(dy, dx);
+              p.x -= Math.cos(angle) * force * 1.8;
+              p.y -= Math.sin(angle) * force * 1.8;
+
+              // Elastic tether to pointer
+              const lineAlpha = (1 - dist / pointer.radius) * (isDark ? 0.35 : 0.22);
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(pointer.x, pointer.y);
+              ctx.strokeStyle = isDark
+                ? `rgba(96, 165, 250, ${lineAlpha})`
+                : `rgba(37, 99, 235, ${lineAlpha})`;
+              ctx.lineWidth = 1.2;
+              ctx.stroke();
+            }
+          }
+
+          // Draw Particle Node
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          let nodeColor;
+          if (isDark) {
+            nodeColor = p.type === 0 
+              ? `rgba(56, 189, 248, ${p.baseAlpha})` 
+              : p.type === 1 
+                ? `rgba(129, 140, 248, ${p.baseAlpha})` 
+                : `rgba(192, 132, 252, ${p.baseAlpha})`;
+          } else {
+            nodeColor = p.type === 0 
+              ? `rgba(37, 99, 235, ${p.baseAlpha})` 
+              : p.type === 1 
+                ? `rgba(79, 70, 229, ${p.baseAlpha})` 
+                : `rgba(124, 58, 237, ${p.baseAlpha})`;
+          }
+          ctx.fillStyle = nodeColor;
+          ctx.fill();
+        }
+
+        // Draw Inter-Particle Constellation Network
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const p1 = particles[i];
+            const p2 = particles[j];
+            const dx = p1.x - p2.x;
+            const dy = p1.y - p2.y;
+            const dist = Math.hypot(dx, dy);
+
+            if (dist < maxDist) {
+              const alpha = (1 - dist / maxDist) * (isDark ? 0.22 : 0.12);
+              ctx.beginPath();
+              ctx.moveTo(p1.x, p1.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.strokeStyle = isDark
+                ? `rgba(147, 197, 253, ${alpha})`
+                : `rgba(59, 130, 246, ${alpha})`;
+              ctx.lineWidth = 0.8;
+              ctx.stroke();
+            }
+          }
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    }
+
+    /* ============================================================
+       GATEWAY VIEW ROUTING (Welcome Landing vs Auth Forms)
+       ============================================================ */
+    function showWelcomeView() {
+      const welcomeView = document.getElementById('welcome-portal-view');
+      const authContainer = document.getElementById('auth-forms-container');
+      const dashContainer = document.getElementById('member-dashboard-container');
+
+      if (welcomeView) welcomeView.classList.remove('hidden');
+      if (authContainer) authContainer.classList.add('hidden');
+      if (dashContainer) dashContainer.classList.add('hidden');
+
+      if (window.lucide) window.lucide.createIcons();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function openAuthView(mode = 'signin') {
+      const welcomeView = document.getElementById('welcome-portal-view');
+      const authContainer = document.getElementById('auth-forms-container');
+      const dashContainer = document.getElementById('member-dashboard-container');
+
+      if (welcomeView) welcomeView.classList.add('hidden');
+      if (authContainer) authContainer.classList.remove('hidden');
+      if (dashContainer) dashContainer.classList.add('hidden');
+
+      switchAuthTab(mode);
+      if (window.lucide) window.lucide.createIcons();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Focus first relevant input
+      setTimeout(() => {
+        if (mode === 'signin') {
+          const input = document.getElementById('signin-identifier');
+          if (input) input.focus();
+        } else {
+          const input = document.getElementById('reg-name');
+          if (input) input.focus();
+        }
+      }, 100);
+    }
+
+    function openForgotPasswordModal() {
+      const modal = document.getElementById('forgot-password-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        if (window.lucide) window.lucide.createIcons();
+      }
+    }
+
+    function closeForgotPasswordModal() {
+      const modal = document.getElementById('forgot-password-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function copyAdminSupportContact() {
+      const supportInfo = "BST Tech Club Lead Admins: Arnav Patel (UID 0), Vikas N (UID 1) | CSE (AI & ML) Department | Email: 2392608031@svyasa-sas.edu.in";
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(supportInfo).then(() => {
+          showToast("Lead Administrator contact details copied to clipboard!", "check-circle-2");
+        }).catch(() => {
+          prompt("Copy Lead Admin Contact:", supportInfo);
+        });
+      } else {
+        prompt("Copy Lead Admin Contact:", supportInfo);
+      }
+    }
+
     // Toggle tab between Sign In and Register
     function switchAuthTab(tab) {
       const signinBtn = document.getElementById('tab-btn-signin');
@@ -1775,30 +2007,28 @@
       const params = new URLSearchParams(window.location.search);
       const refCode = params.get('ref');
       if (refCode) {
-        // Automatically switch to registration tab
-        switchAuthTab('register');
         const refInput = document.getElementById('register-referred-by');
         if (refInput) refInput.value = refCode;
         
-        const banner = document.getElementById('referral-banner');
-        const bannerText = document.getElementById('referral-banner-text');
-        if (banner && bannerText) {
-          banner.classList.remove('hidden');
-          // Lookup referrer name if cached in vault
-          const vault = window.AuthEngine && window.AuthEngine.getMembersVault ? window.AuthEngine.getMembersVault() : {};
-          const referrer = vault[refCode];
-          const inviterName = referrer ? referrer.name : `Member ${refCode}`;
-          bannerText.innerHTML = `You've been personally invited by <b>${inviterName}</b> (<span class="font-mono font-semibold text-blue-600 dark:text-blue-400">${refCode}</span>)! Complete your registration below to mint your official Tech Club ID and access all workshops, hackathons, and project showcases.`;
+        const vault = window.AuthEngine && window.AuthEngine.getMembersVault ? window.AuthEngine.getMembersVault() : {};
+        const referrer = vault[refCode];
+        const inviterName = referrer ? referrer.name : `Member ${refCode}`;
+
+        // 1. Update Welcome Landing banner (User lands on welcome view first)
+        const welcomeBanner = document.getElementById('welcome-referral-banner');
+        const welcomeBannerText = document.getElementById('welcome-referral-text');
+        if (welcomeBanner && welcomeBannerText) {
+          welcomeBanner.classList.remove('hidden');
+          welcomeBannerText.innerHTML = `You've been personally invited by <b>${inviterName}</b> (<span class="font-mono font-semibold text-indigo-600 dark:text-indigo-400">${refCode}</span>)!`;
         }
 
-        // Smooth autofocus to the full name field
-        setTimeout(() => {
-          const nameInput = document.getElementById('reg-name');
-          if (nameInput) {
-            nameInput.focus();
-            nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
-        }, 300);
+        // 2. Prepopulate form banner for when they click "Join Tech Club / Mint ID"
+        const regBanner = document.getElementById('referral-banner');
+        const regBannerText = document.getElementById('referral-banner-text');
+        if (regBanner && regBannerText) {
+          regBanner.classList.remove('hidden');
+          regBannerText.innerHTML = `You've been personally invited by <b>${inviterName}</b> (<span class="font-mono font-semibold text-blue-600 dark:text-blue-400">${refCode}</span>)! Complete your registration below to mint your official Tech Club ID and access all workshops, hackathons, and project showcases.`;
+        }
       }
     }
 
@@ -1850,7 +2080,7 @@
     }
 
     function showForgotPasswordHint() {
-      alert('Security note: For password recovery, please contact your Faculty Advisor or Core Tech Lead with your college ID verification.');
+      openForgotPasswordModal();
     }
 
     // --- SUBMIT: SIGN IN ---
@@ -2216,9 +2446,11 @@
     }
 
     function checkActiveSessionState() {
-      const session = window.AuthEngine.getActiveSession();
+      const session = window.AuthEngine ? window.AuthEngine.getActiveSession() : null;
       if (session) {
         renderMemberDashboard(session);
+      } else {
+        showWelcomeView();
       }
     }
 
@@ -2226,9 +2458,11 @@
     function renderMemberDashboard(session) {
       const authContainer = document.getElementById('auth-forms-container');
       const dashContainer = document.getElementById('member-dashboard-container');
+      const welcomeView = document.getElementById('welcome-portal-view');
 
-      authContainer.classList.add('hidden');
-      dashContainer.classList.remove('hidden');
+      if (welcomeView) welcomeView.classList.add('hidden');
+      if (authContainer) authContainer.classList.add('hidden');
+      if (dashContainer) dashContainer.classList.remove('hidden');
 
       const vault = window.AuthEngine.getMembersVault();
       const currentMemberRecord = vault[session.techClubId] || session;
@@ -2805,6 +3039,11 @@
       const vault = window.AuthEngine ? window.AuthEngine.getMembersVault() : {};
       const count = Object.keys(vault || {}).length;
 
+      const welcomeBadge = document.getElementById('welcome-member-count-badge');
+      if (welcomeBadge) {
+        welcomeBadge.textContent = `${count} Registered Member${count === 1 ? '' : 's'}`;
+      }
+
       const loginBadge = document.getElementById('login-member-count-badge');
       if (loginBadge) {
         loginBadge.textContent = `${count} Registered Member${count === 1 ? '' : 's'}`;
@@ -2956,6 +3195,47 @@
       } catch (e) {
         showToast(e.message, 'alert-circle');
         renderDirectoryList();
+      }
+    }
+
+    // --- ADMINISTRATIVE KICK OUT MEMBER CONTROLLER (Lead Admin Only) ---
+    async function handleKickOutMember(clubId, memberName) {
+      const active = window.AuthEngine ? window.AuthEngine.getActiveSession() : null;
+      const isRoot = window.AuthEngine && typeof window.AuthEngine.isRootArchitect === 'function' ? window.AuthEngine.isRootArchitect(active) : false;
+      if (!isRoot) {
+        showToast('Administrative privileges required: Only Lead Administrators can kick out members.', 'shield-alert');
+        return;
+      }
+
+      if (active.techClubId === clubId) {
+        showToast('You cannot kick out your own account.', 'alert-circle');
+        return;
+      }
+
+      const confirmed = confirm(
+        `⚠️ KICK OUT MEMBER FROM TECH CLUB?\n\n` +
+        `Are you sure you want to kick out "${memberName}" (${clubId}) from BST Tech Club?\n\n` +
+        `• Their digital ID pass and profile will be permanently revoked.\n` +
+        `• All workshop/event RSVP passes and team memberships will be deleted.\n` +
+        `• They will lose all access to the member portal.\n\n` +
+        `This action is permanent and cannot be undone.`
+      );
+
+      if (!confirmed) return;
+
+      try {
+        await window.AuthEngine.kickOutMember(clubId);
+        showToast(`Member "${memberName}" (${clubId}) was kicked out of the club.`, 'user-x');
+        updateMemberCountBadges();
+        renderDirectoryList();
+
+        const updatedActive = window.AuthEngine.getActiveSession();
+        if (updatedActive) {
+          const updatedVault = window.AuthEngine.getMembersVault();
+          renderMemberDashboard(updatedVault[updatedActive.techClubId] || updatedActive);
+        }
+      } catch (err) {
+        showToast(err.message, 'alert-circle');
       }
     }
 
@@ -3373,10 +3653,20 @@
               <div class="mt-2.5 pt-2 border-t border-amber-200/50 dark:border-amber-900/40 bg-amber-50/50 dark:bg-amber-950/30 -mx-3.5 -mb-3.5 px-3.5 py-2 rounded-b-xl flex flex-wrap items-center justify-between gap-2">
                 <div class="flex items-center gap-1.5 text-[10px] font-mono text-amber-900 dark:text-amber-200 font-bold">
                   <i data-lucide="shield" class="w-3.5 h-3.5 text-amber-600 shrink-0"></i>
-                  <span>Manage Role:</span>
+                  <span>Governance Controls:</span>
                 </div>
-                <div>
+                <div class="flex items-center gap-2 flex-wrap">
                   ${adminControlHtml}
+                  ${!isTargetSelf && m.techClubId !== 'BST-2026-8166' ? `
+                    <button 
+                      type="button" 
+                      onclick="handleKickOutMember('${m.techClubId}', '${(m.name || 'Member').replace(/'/g, "\\'")}')" 
+                      class="px-2.5 py-1 rounded-lg text-[10px] font-bold font-mono text-rose-700 dark:text-rose-300 bg-rose-100/90 hover:bg-rose-200 dark:bg-rose-950/80 dark:hover:bg-rose-900/80 border border-rose-300 dark:border-rose-800 transition flex items-center gap-1 cursor-pointer shadow-xs active:scale-95"
+                      title="Kick out member: permanently revoke membership, ID pass, and registrations">
+                      <i data-lucide="user-x" class="w-3 h-3 text-rose-600 dark:text-rose-400"></i>
+                      <span>Kick Out</span>
+                    </button>
+                  ` : ''}
                 </div>
               </div>
             ` : ''}
@@ -3399,6 +3689,12 @@
     window.removeProfileAvatar = removeProfileAvatar;
     window.saveAvatarSelection = saveAvatarSelection;
     window.handleProfileDetailsSubmit = handleProfileDetailsSubmit;
+    window.showWelcomeView = showWelcomeView;
+    window.openAuthView = openAuthView;
+    window.openForgotPasswordModal = openForgotPasswordModal;
+    window.closeForgotPasswordModal = closeForgotPasswordModal;
+    window.copyAdminSupportContact = copyAdminSupportContact;
+    window.handleKickOutMember = handleKickOutMember;
 
   </script>
   <!-- ============================================================
