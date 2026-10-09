@@ -655,7 +655,7 @@
               Registered Members Directory
             </h3>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Official registry of verified Department of CSE (AI & ML) students. Access the real-time roster to view member Tech Club IDs, assigned governance ranks, peer referral stats, and live merit points.
+              Verified member roster with assigned governance ranks and live merit points.
             </p>
           </div>
           <button 
@@ -903,7 +903,7 @@
           </div>
           <div>
             <h3 class="text-base font-bold text-slate-900 dark:text-white">Registered Members Directory</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400 font-mono" id="modal-member-total-text">Department of CSE (AI & ML) • Cohort 2026</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 font-mono" id="modal-member-total-text">0 Registered Members</p>
           </div>
         </div>
         <button onclick="closeMemberDirectoryModal()" class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">
@@ -919,85 +919,75 @@
             type="text" 
             id="directory-search-input" 
             oninput="renderDirectoryList()" 
-            placeholder="Search by student name, USN, section, or Tech Club ID..." 
-            class="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            placeholder="Search by name, USN, section, or ID..." 
+            class="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
-        <button onclick="syncAndRefreshDirectory()" title="Refresh Roster" class="p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition">
+        <button onclick="syncAndRefreshDirectory()" title="Refresh Roster" class="p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition shrink-0">
           <i data-lucide="refresh-cw" class="w-4 h-4"></i>
         </button>
       </div>
 
-      <!-- Community Roles Interactive Filter Bar -->
-      <div class="px-4 py-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/70 flex items-center justify-between text-[10px] font-mono overflow-x-auto gap-2">
-        <div class="flex items-center gap-1.5 shrink-0">
-          <span class="text-slate-400 uppercase font-bold text-[9px] flex items-center gap-1">
-            <i data-lucide="filter" class="w-3 h-3 text-blue-500"></i> Roles:
-          </span>
-          <button 
-            type="button" 
-            id="role-filter-ALL" 
-            onclick="setDirectoryRoleFilter('ALL')" 
-            class="px-2 py-0.5 rounded-md text-[10px] font-bold transition-all duration-200 cursor-pointer flex items-center gap-1 shadow-xs"
-            title="Show all registered members">
-            All (<span id="role-count-ALL">0</span>)
-          </button>
-        </div>
+      <!-- Role Filter Bar -->
+      <div class="px-3 py-2 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/60 dark:bg-slate-950/60 flex items-center gap-1.5 overflow-x-auto text-[10px] font-mono">
+        <button 
+          type="button" 
+          id="role-filter-ALL" 
+          onclick="setDirectoryRoleFilter('ALL')" 
+          class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0"
+          title="Show all registered members">
+          <i data-lucide="users" class="w-3 h-3"></i>
+          <span>All</span>
+          <span id="role-count-ALL" class="px-1.5 py-0.2 rounded-full text-[9px] font-extrabold">0</span>
+        </button>
 
-        <div class="flex items-center gap-1.5 shrink-0">
-          <button 
-            type="button" 
-            id="role-filter-Root Architect" 
-            onclick="setDirectoryRoleFilter('Root Architect')" 
-            class="px-2 py-0.5 rounded-md text-[10px] font-bold transition-all duration-200 cursor-pointer flex items-center gap-1 shadow-xs" 
-            title="Filter: Lead Administrators (Club Admins)">
-            <i data-lucide="terminal" class="w-2.5 h-2.5"></i>
-            Lead Admin (≥1)
-            <span id="role-count-Root Architect" class="text-[9px] px-1 py-0.2 rounded font-extrabold ml-0.5">0</span>
-          </button>
+        <button 
+          type="button" 
+          id="role-filter-Root Architect" 
+          onclick="setDirectoryRoleFilter('Root Architect')" 
+          class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0" 
+          title="Filter: Lead Administrators">
+          <i data-lucide="terminal" class="w-3 h-3"></i>
+          <span>Lead Admin</span>
+          <span id="role-count-Root Architect" class="px-1.5 py-0.2 rounded-full text-[9px] font-extrabold">0</span>
+        </button>
 
-          <button 
-            type="button" 
-            id="role-filter-Core Maintainer" 
-            onclick="setDirectoryRoleFilter('Core Maintainer')" 
-            class="px-2 py-0.5 rounded-md text-[10px] font-bold transition-all duration-200 cursor-pointer flex items-center gap-1 shadow-xs" 
-            title="Filter: Core Maintainers">
-            <i data-lucide="git-branch" class="w-2.5 h-2.5"></i>
-            Maintainer
-            <span id="role-count-Core Maintainer" class="text-[9px] px-1 py-0.2 rounded font-extrabold ml-0.5">0</span>
-          </button>
+        <button 
+          type="button" 
+          id="role-filter-Core Maintainer" 
+          onclick="setDirectoryRoleFilter('Core Maintainer')" 
+          class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0" 
+          title="Filter: Core Maintainers">
+          <i data-lucide="git-branch" class="w-3 h-3"></i>
+          <span>Maintainer</span>
+          <span id="role-count-Core Maintainer" class="px-1.5 py-0.2 rounded-full text-[9px] font-extrabold">0</span>
+        </button>
 
-          <button 
-            type="button" 
-            id="role-filter-Staff Contributor" 
-            onclick="setDirectoryRoleFilter('Staff Contributor')" 
-            class="px-2 py-0.5 rounded-md text-[10px] font-bold transition-all duration-200 cursor-pointer flex items-center gap-1 shadow-xs" 
-            title="Filter: Staff Contributors">
-            <i data-lucide="code-2" class="w-2.5 h-2.5"></i>
-            Staff
-            <span id="role-count-Staff Contributor" class="text-[9px] px-1 py-0.2 rounded font-extrabold ml-0.5">0</span>
-          </button>
+        <button 
+          type="button" 
+          id="role-filter-Staff Contributor" 
+          onclick="setDirectoryRoleFilter('Staff Contributor')" 
+          class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0" 
+          title="Filter: Staff Contributors">
+          <i data-lucide="code-2" class="w-3 h-3"></i>
+          <span>Staff</span>
+          <span id="role-count-Staff Contributor" class="px-1.5 py-0.2 rounded-full text-[9px] font-extrabold">0</span>
+        </button>
 
-          <button 
-            type="button" 
-            id="role-filter-Active Developer" 
-            onclick="setDirectoryRoleFilter('Active Developer')" 
-            class="px-2 py-0.5 rounded-md text-[10px] font-semibold transition-all duration-200 cursor-pointer flex items-center gap-1 shadow-xs" 
-            title="Filter: Active Developers">
-            <i data-lucide="cpu" class="w-2.5 h-2.5"></i>
-            Active Dev
-            <span id="role-count-Active Developer" class="text-[9px] px-1 py-0.2 rounded font-extrabold ml-0.5">0</span>
-          </button>
-        </div>
+        <button 
+          type="button" 
+          id="role-filter-Active Developer" 
+          onclick="setDirectoryRoleFilter('Active Developer')" 
+          class="px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0" 
+          title="Filter: Active Developers">
+          <i data-lucide="cpu" class="w-3 h-3"></i>
+          <span>Active Dev</span>
+          <span id="role-count-Active Developer" class="px-1.5 py-0.2 rounded-full text-[9px] font-extrabold">0</span>
+        </button>
       </div>
 
       <!-- Member List Table / Container -->
       <div id="modal-members-list" class="flex-1 overflow-y-auto p-4 space-y-2">
         <!-- Rendered dynamically -->
-      </div>
-      
-      <div class="px-4 py-2.5 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 flex items-center justify-between text-[11px] text-slate-500 font-mono">
-        <span>Authorized USN: 2392608001–2392608302</span>
-        <span class="text-[10px] text-slate-400">Department of CSE (AI & ML)</span>
       </div>
     </div>
   </div>
@@ -1749,7 +1739,7 @@
 
       const modalTotal = document.getElementById('modal-member-total-text');
       if (modalTotal) {
-        modalTotal.textContent = `${count} Total Registered • Dept of CSE (AI & ML) • Cohort 2026`;
+        modalTotal.textContent = `${count} Registered Member${count === 1 ? '' : 's'}`;
       }
     }
 
@@ -1947,34 +1937,46 @@
       const btnStaff = document.getElementById('role-filter-Staff Contributor');
       const btnActive = document.getElementById('role-filter-Active Developer');
 
+      const updateBadgeStyle = (el, isActive) => {
+        if (!el) return;
+        el.className = isActive 
+          ? 'px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-black/20 dark:bg-white/20 text-inherit'
+          : 'px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-slate-200/80 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300';
+      };
+      updateBadgeStyle(elCountAll, currentDirectoryRoleFilter === 'ALL');
+      updateBadgeStyle(elCountLead, currentDirectoryRoleFilter === 'Root Architect');
+      updateBadgeStyle(elCountMaintainer, currentDirectoryRoleFilter === 'Core Maintainer');
+      updateBadgeStyle(elCountStaff, currentDirectoryRoleFilter === 'Staff Contributor');
+      updateBadgeStyle(elCountActive, currentDirectoryRoleFilter === 'Active Developer');
+
       if (btnAll) {
         btnAll.className = currentDirectoryRoleFilter === 'ALL'
-          ? 'px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-blue-600 text-white shadow-md shadow-blue-500/30 ring-2 ring-blue-400/50 scale-105 transition-all duration-200 cursor-pointer flex items-center gap-1'
-          : 'px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer flex items-center gap-1';
+          ? 'px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-blue-600 text-white shadow-sm ring-1 ring-blue-400/50 scale-[1.02] transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0'
+          : 'px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700/80 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700/60 hover:scale-[1.02] active:scale-95 transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0';
       }
 
       if (btnLead) {
         btnLead.className = currentDirectoryRoleFilter === 'Root Architect'
-          ? 'px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-amber-500 text-slate-950 border-2 border-amber-300 ring-2 ring-amber-400/50 shadow-lg shadow-amber-500/30 scale-105 transition-all duration-200 cursor-pointer flex items-center gap-1'
-          : 'px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50/70 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300/60 dark:border-amber-700/60 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer flex items-center gap-1';
+          ? 'px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-amber-500 text-slate-950 border border-amber-300 ring-2 ring-amber-400/50 shadow-sm shadow-amber-500/20 scale-[1.02] transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0'
+          : 'px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-slate-100 hover:bg-amber-50 dark:bg-slate-800 dark:hover:bg-amber-950/40 text-slate-600 dark:text-slate-300 hover:text-amber-800 dark:hover:text-amber-300 border border-slate-200 dark:border-slate-700/60 hover:border-amber-300 dark:hover:border-amber-700 hover:scale-[1.02] active:scale-95 transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0';
       }
 
       if (btnMaintainer) {
         btnMaintainer.className = currentDirectoryRoleFilter === 'Core Maintainer'
-          ? 'px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-purple-600 text-white border-2 border-purple-400 ring-2 ring-purple-400/50 shadow-lg shadow-purple-500/30 scale-105 transition-all duration-200 cursor-pointer flex items-center gap-1'
-          : 'px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-50/70 hover:bg-purple-100 dark:bg-purple-950/40 dark:hover:bg-purple-950 text-purple-800 dark:text-purple-300 border border-purple-300/60 dark:border-purple-700/60 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer flex items-center gap-1';
+          ? 'px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-purple-600 text-white border border-purple-400 ring-2 ring-purple-400/50 shadow-sm shadow-purple-500/20 scale-[1.02] transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0'
+          : 'px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-slate-100 hover:bg-purple-50 dark:bg-slate-800 dark:hover:bg-purple-950/40 text-slate-600 dark:text-slate-300 hover:text-purple-800 dark:hover:text-purple-300 border border-slate-200 dark:border-slate-700/60 hover:border-purple-300 dark:hover:border-purple-700 hover:scale-[1.02] active:scale-95 transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0';
       }
 
       if (btnStaff) {
         btnStaff.className = currentDirectoryRoleFilter === 'Staff Contributor'
-          ? 'px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-emerald-600 text-white border-2 border-emerald-400 ring-2 ring-emerald-400/50 shadow-lg shadow-emerald-500/30 scale-105 transition-all duration-200 cursor-pointer flex items-center gap-1'
-          : 'px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50/70 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300/60 dark:border-emerald-700/60 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer flex items-center gap-1';
+          ? 'px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-emerald-600 text-white border border-emerald-400 ring-2 ring-emerald-400/50 shadow-sm shadow-emerald-500/20 scale-[1.02] transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0'
+          : 'px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-slate-100 hover:bg-emerald-50 dark:bg-slate-800 dark:hover:bg-emerald-950/40 text-slate-600 dark:text-slate-300 hover:text-emerald-800 dark:hover:text-emerald-300 border border-slate-200 dark:border-slate-700/60 hover:border-emerald-300 dark:hover:border-emerald-700 hover:scale-[1.02] active:scale-95 transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0';
       }
 
       if (btnActive) {
         btnActive.className = currentDirectoryRoleFilter === 'Active Developer'
-          ? 'px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-blue-600 text-white border-2 border-blue-400 ring-2 ring-blue-400/50 shadow-lg shadow-blue-500/30 scale-105 transition-all duration-200 cursor-pointer flex items-center gap-1'
-          : 'px-2 py-0.5 rounded-md text-[10px] font-semibold bg-blue-50/70 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/60 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer flex items-center gap-1';
+          ? 'px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-blue-600 text-white border border-blue-400 ring-2 ring-blue-400/50 shadow-sm shadow-blue-500/20 scale-[1.02] transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0'
+          : 'px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-slate-100 hover:bg-blue-50 dark:bg-slate-800 dark:hover:bg-blue-950/40 text-slate-600 dark:text-slate-300 hover:text-blue-700 dark:hover:text-blue-300 border border-slate-200 dark:border-slate-700/60 hover:border-blue-300 dark:hover:border-blue-700 hover:scale-[1.02] active:scale-95 transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0';
       }
 
       const filtered = members.filter(m => {
@@ -1998,7 +2000,7 @@
 
       if (filtered.length === 0) {
         const roleLabelMap = {
-          'Root Architect': 'Lead Administrators (Club Admins)',
+          'Root Architect': 'Lead Administrators',
           'Core Maintainer': 'Core Maintainers',
           'Staff Contributor': 'Staff Contributors',
           'Active Developer': 'Active Developers'
@@ -2006,15 +2008,15 @@
         const currentCategoryLabel = roleLabelMap[currentDirectoryRoleFilter] || 'members';
 
         container.innerHTML = `
-          <div class="text-center py-10 px-4">
-            <div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto mb-3">
+          <div class="text-center py-12 px-4">
+            <div class="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto mb-3 shadow-inner">
               <i data-lucide="users" class="w-6 h-6"></i>
             </div>
-            <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">
-              ${query ? `No ${currentCategoryLabel} match "${query}"` : `No ${currentCategoryLabel} registered yet.`}
+            <p class="text-sm font-bold text-slate-800 dark:text-slate-200">
+              ${query ? `No ${currentCategoryLabel} matching "${query}"` : `No ${currentCategoryLabel} registered yet.`}
             </p>
             <p class="text-xs text-slate-400 mt-1 mb-4">
-              ${currentDirectoryRoleFilter !== 'ALL' ? 'Try switching the category filter or searching all members.' : 'Be the first to claim your official club ID!'}
+              ${currentDirectoryRoleFilter !== 'ALL' ? 'Select another role or clear search.' : 'No members registered yet.'}
             </p>
             ${currentDirectoryRoleFilter !== 'ALL' ? `
               <button onclick="setDirectoryRoleFilter('ALL')" class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold inline-flex items-center gap-1.5 transition shadow-sm cursor-pointer">
@@ -2236,9 +2238,8 @@
             ${isViewerRoot ? `
               <div class="mt-2.5 pt-2 border-t border-amber-200/50 dark:border-amber-900/40 bg-amber-50/50 dark:bg-amber-950/30 -mx-3.5 -mb-3.5 px-3.5 py-2 rounded-b-xl flex flex-wrap items-center justify-between gap-2">
                 <div class="flex items-center gap-1.5 text-[10px] font-mono text-amber-900 dark:text-amber-200 font-bold">
-                  <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-amber-600 shrink-0"></i>
-                  <span>Governance Authority:</span>
-                  <span class="text-[9px] font-normal text-slate-500 dark:text-slate-400">Promote or demote</span>
+                  <i data-lucide="shield" class="w-3.5 h-3.5 text-amber-600 shrink-0"></i>
+                  <span>Manage Role:</span>
                 </div>
                 <div>
                   ${adminControlHtml}
