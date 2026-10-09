@@ -83,18 +83,27 @@ flowchart TD
   | 🌳 **Fallen Tree / Branch** | **High** | `72 / 100` | Road blockage, snapped overhead utility lines |
   | 🚧 **Broken Footpath** | **Medium** | `62 / 100` | Tripping hazard, forces pedestrians into vehicular traffic |
 
-### 2. Commuter Public Safety Map
+### 2. Commuter Public Safety Map & Live Threat Grid
 - **Pulsing Radar Wave**: Critical dangers emit animated red radar pulses directly on the map so users spot them at a glance.
 - **One-Tap Community Validation**: Commuters can tap *"Confirm Hazard"* to upvote, boosting priority and verifying the hazard in real time.
+- **Danger Buffer Radii**: Red translucent 65-meter safety buffer perimeters around active high-voltage lines and open manholes.
 - **Filter Controls**: Filter by hazard categories or toggle resolved items.
 
-### 3. Municipal Priority Queue & Photographic Fix Proof
+### 3. 🧭 Safe Route Navigator (Automated Hazard Avoidance)
+- **Real-Time Danger Interception**: Evaluates user path coordinates against active hazards using spatial distance algorithms.
+- **Dynamic Detour Generation**: Automatically calculates an alternate pedestrian/driving path routing commuters safely 100m+ away from red-flagged hazard zones.
+- **Route Comparison Matrix**:
+  - 🚫 *Direct Unsafe Path*: Displayed as a dashed red line highlighting intercepted critical hazards.
+  - 🛡️ *Protected Safe Path*: Rendered as a glowing emerald corridor with extra time/distance estimates.
+- **Interactive Walking Simulation**: Step-by-step animated pedestrian simulation (`🚶`) walking along the safe path for live hackathon judge demos!
+
+### 4. Municipal Priority Queue & Photographic Fix Proof
 - **Severity-Ranked Triage**: Automatically orders tasks by danger score so emergency crews tackle high-voltage wires and open pits before cosmetic repairs.
 - **Crew Dispatch Workflow**: Transition items seamlessly from `Reported` ➔ `Crew Dispatched` ➔ `Verified Fixed`.
 - **Mandatory Photo-Proof**: Municipal workers must upload an **"After-Fix" photo** showing the repaired manhole or insulated cable.
 - **Before & After Visuals**: Commuters and municipal supervisors can inspect side-by-side Before/After photos for total accountability.
 
-### 4. Smart Hybrid AI Engine
+### 5. Smart Hybrid AI Engine
 - **Pre-calibrated Risk Weights**: Physical danger algorithms calibrated for urban traffic scenarios.
 - **Google Gemini 1.5 Flash Vision**: Evaluates uploaded images and contextual notes to auto-detect hazard classes, calculate confidence, and generate commuter safety advisories.
 - **Zero-Downtime Architecture**: Backed by a seamless local storage caching layer that ensures **100% demo uptime** even during network dropouts during live judging.

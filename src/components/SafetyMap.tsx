@@ -4,6 +4,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { HazardReport, CATEGORY_METADATA, HazardCategory } from '../lib/types';
 import { ThumbsUp, CheckCircle2, AlertTriangle, Filter, Navigation, Eye } from 'lucide-react';
 import { upvoteHazard } from '../lib/supabase';
+import SafeRoutePlanner from './SafeRoutePlanner';
+import { SafeNavigationPlan } from '../lib/routing';
 
 interface SafetyMapProps {
   hazards: HazardReport[];
@@ -21,10 +23,38 @@ export default function SafetyMap({
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
+  const routeLayersRef = useRef<any[]>([]);
+  const simulationMarkerRef = useRef<any>(null);
+  const simulationIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('all');
   const [filterFixed, setFilterFixed] = useState<boolean>(false);
   const [selectedHazardModal, setSelectedHazardModal] = useState<HazardReport | null>(null);
+
+  // User location for navigation
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number }>({
+    lat: 12.9716,
+    lng: 77.5946,
+  });
+
+  const [activeRoutePlan, setActiveRoutePlan] = useState<SafeNavigationPlan | null>(null);
+  const [isSimulating, setIsSimulating] = useState(false);
+
+  // Fetch initial user geolocation
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setUserLocation({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          });
+        },
+        () => {},
+        { enableHighAccuracy: true }
+      );
+    }
+  }, []);
 
   // Filter hazards
   const filteredHazards = hazards.filter((h) => {
@@ -39,13 +69,11 @@ export default function SafetyMap({
 
     let map = mapInstanceRef.current;
     if (!map) {
-      // Import Leaflet dynamically
       import('leaflet').then((L) => {
         if (!mapContainerRef.current || mapInstanceRef.current) return;
 
-        // Default center: Bangalore tech corridor or first hazard
-        const defaultLat = hazards[0]?.latitude || 12.9716;
-        const defaultLng = hazards[0]?.longitude || 77.5946;
+        const defaultLat = userLocation.lat || hazards[0]?.latitude || 12.9716;
+        const defaultLng = userLocation.lng || hazards[0]?.longitude || 77.5946;
 
         map = L.map(mapContainerRef.current, {
           zoomControl: false,
@@ -58,7 +86,6 @@ export default function SafetyMap({
           subdomains: 'abcd',
         }).addTo(map);
 
-        // Add zoom control in bottom right
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
         mapInstanceRef.current = map;
@@ -71,9 +98,8 @@ export default function SafetyMap({
     }
   }, [filteredHazards]);
 
-  // Render Custom Markers
+  // Render Custom Hazard Markers & Danger Zones
   const renderMarkers = (L: any, map: any, items: HazardReport[]) => {
-    // Clear previous markers
     markersRef.current.forEach((m) => map.removeLayer(m));
     markersRef.current = [];
 
@@ -90,6 +116,20 @@ export default function SafetyMap({
         ? '#f97316'
         : '#eab308';
 
+      // 1. Add Danger Buffer Circle for critical items
+      if (isCritical && !isFixed) {
+        const circle = L.circle([hazard.latitude, hazard.longitude], {
+          color: '#ef4444',
+          fillColor: '#ef4444',
+          fillOpacity: 0.15,
+          weight: 1,
+          dashArray: '4, 4',
+          radius: 65, // 65-meter safety buffer
+        }).addTo(map);
+        markersRef.current.push(circle);
+      }
+
+      // 2. Add Custom Icon
       const customIcon = L.divIcon({
         className: 'custom-hazard-marker',
         html: `
@@ -122,7 +162,6 @@ export default function SafetyMap({
 
       const marker = L.marker([hazard.latitude, hazard.longitude], { icon: customIcon }).addTo(map);
 
-      // On marker click
       marker.on('click', () => {
         setSelectedHazardModal(hazard);
         if (onSelectHazard) onSelectHazard(hazard);
@@ -130,6 +169,108 @@ export default function SafetyMap({
 
       markersRef.current.push(marker);
     });
+  };
+
+  // Render Route Polylines
+  useEffect(() => {
+    if (!mapInstanceRef.current || typeof window === 'undefined') return;
+
+    import('leaflet').then((L) => {
+      const map = mapInstanceRef.current;
+
+      // Clear previous route layers
+      routeLayersRef.current.forEach((layer) => map.removeLayer(layer));
+      routeLayersRef.current = [];
+
+      if (!activeRoutePlan) return;
+
+      // 1. Direct Unsafe Path (Dashed Red Line) if detour was required
+      if (activeRoutePlan.isDetourRequired) {
+        const directPolyline = L.polyline(activeRoutePlan.directRoute.coordinates, {
+          color: '#ef4444',
+          weight: 3.5,
+          opacity: 0.7,
+          dashArray: '6, 8',
+        }).addTo(map);
+
+        routeLayersRef.current.push(directPolyline);
+      }
+
+      // 2. Safe Avoidance Path (Solid Glowing Emerald / Teal)
+      const safePolyline = L.polyline(activeRoutePlan.safeRoute.coordinates, {
+        color: '#10b981',
+        weight: 5.5,
+        opacity: 0.9,
+      }).addTo(map);
+
+      routeLayersRef.current.push(safePolyline);
+
+      // Fit map bounds to encompass the safe route
+      map.fitBounds(safePolyline.getBounds(), { padding: [60, 60] });
+    });
+  }, [activeRoutePlan]);
+
+  // Handle Walking Simulation
+  const handleStartSimulation = () => {
+    if (!activeRoutePlan || !mapInstanceRef.current) return;
+
+    import('leaflet').then((L) => {
+      const map = mapInstanceRef.current;
+      const coords = activeRoutePlan.safeRoute.coordinates;
+      if (!coords || coords.length === 0) return;
+
+      setIsSimulating(true);
+
+      if (simulationMarkerRef.current) {
+        map.removeLayer(simulationMarkerRef.current);
+      }
+
+      const walkerIcon = L.divIcon({
+        className: 'simulation-walker',
+        html: `
+          <div style="
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #10b981;
+            border: 3px solid #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.9);
+          ">🚶</div>
+        `,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+      });
+
+      const startPos = coords[0];
+      const marker = L.marker(startPos, { icon: walkerIcon }).addTo(map);
+      simulationMarkerRef.current = marker;
+
+      let step = 0;
+      if (simulationIntervalRef.current) clearInterval(simulationIntervalRef.current);
+
+      simulationIntervalRef.current = setInterval(() => {
+        step++;
+        if (step >= coords.length) {
+          if (simulationIntervalRef.current) clearInterval(simulationIntervalRef.current);
+          setIsSimulating(false);
+          return;
+        }
+        marker.setLatLng(coords[step]);
+      }, 400);
+    });
+  };
+
+  const handleResetSimulation = () => {
+    if (simulationIntervalRef.current) clearInterval(simulationIntervalRef.current);
+    if (simulationMarkerRef.current && mapInstanceRef.current) {
+      mapInstanceRef.current.removeLayer(simulationMarkerRef.current);
+      simulationMarkerRef.current = null;
+    }
+    setIsSimulating(false);
   };
 
   const handleUpvoteClick = async (hazardId: string) => {
@@ -146,6 +287,16 @@ export default function SafetyMap({
     <div className="relative w-full h-[calc(100vh-4rem)] bg-zinc-950 overflow-hidden">
       {/* MAP CANVAS */}
       <div ref={mapContainerRef} className="w-full h-full z-0" />
+
+      {/* SAFE ROUTE PLANNER FLOATING PANEL */}
+      <SafeRoutePlanner
+        userLocation={userLocation}
+        hazards={hazards}
+        onRouteCalculated={setActiveRoutePlan}
+        onStartSimulation={handleStartSimulation}
+        isSimulating={isSimulating}
+        onResetSimulation={handleResetSimulation}
+      />
 
       {/* TOP FLOATING CONTROLS: CATEGORY CHIPS */}
       <div className="absolute top-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
