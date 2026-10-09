@@ -18,6 +18,17 @@
         }
       } catch(e) {}
     })();
+  
+    window.switchProfileTab = switchProfileTab;
+    window.openAvatarModal = openAvatarModal;
+    window.closeAvatarModal = closeAvatarModal;
+    window.selectPresetAvatar = selectPresetAvatar;
+    window.handleAvatarFileUpload = handleAvatarFileUpload;
+    window.applyAvatarUrl = applyAvatarUrl;
+    window.removeProfileAvatar = removeProfileAvatar;
+    window.saveAvatarSelection = saveAvatarSelection;
+    window.handleProfileDetailsSubmit = handleProfileDetailsSubmit;
+
   </script>
 
   <!-- Open Graph / WhatsApp Rich Link Preview -->
@@ -29,7 +40,18 @@
   <meta name="theme-color" content="#2563eb">
 
   <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com">
+    window.switchProfileTab = switchProfileTab;
+    window.openAvatarModal = openAvatarModal;
+    window.closeAvatarModal = closeAvatarModal;
+    window.selectPresetAvatar = selectPresetAvatar;
+    window.handleAvatarFileUpload = handleAvatarFileUpload;
+    window.applyAvatarUrl = applyAvatarUrl;
+    window.removeProfileAvatar = removeProfileAvatar;
+    window.saveAvatarSelection = saveAvatarSelection;
+    window.handleProfileDetailsSubmit = handleProfileDetailsSubmit;
+
+  </script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -47,10 +69,32 @@
         }
       }
     }
+  
+    window.switchProfileTab = switchProfileTab;
+    window.openAvatarModal = openAvatarModal;
+    window.closeAvatarModal = closeAvatarModal;
+    window.selectPresetAvatar = selectPresetAvatar;
+    window.handleAvatarFileUpload = handleAvatarFileUpload;
+    window.applyAvatarUrl = applyAvatarUrl;
+    window.removeProfileAvatar = removeProfileAvatar;
+    window.saveAvatarSelection = saveAvatarSelection;
+    window.handleProfileDetailsSubmit = handleProfileDetailsSubmit;
+
   </script>
 
   <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/lucide@latest">
+    window.switchProfileTab = switchProfileTab;
+    window.openAvatarModal = openAvatarModal;
+    window.closeAvatarModal = closeAvatarModal;
+    window.selectPresetAvatar = selectPresetAvatar;
+    window.handleAvatarFileUpload = handleAvatarFileUpload;
+    window.applyAvatarUrl = applyAvatarUrl;
+    window.removeProfileAvatar = removeProfileAvatar;
+    window.saveAvatarSelection = saveAvatarSelection;
+    window.handleProfileDetailsSubmit = handleProfileDetailsSubmit;
+
+  </script>
 
   <!-- Custom Stylesheet -->
   <link rel="stylesheet" href="css/styles.css">
@@ -404,592 +448,969 @@
 
     </div>
 
-    <!-- VIEW B: AUTHENTICATED MEMBER DASHBOARD & DIGITAL ID CARD -->
-    <!-- (Rendered dynamically when session is active) -->
+        <!-- VIEW B: AUTHENTICATED MEMBER DASHBOARD & DIGITAL ID CARD -->
+    <!-- (Structured Profile Experience with Tabbed Hub) -->
     <div id="member-dashboard-container" class="hidden w-full max-w-7xl mx-auto space-y-6">
       
-      <!-- Top Welcome Header -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
-        <div>
-          <div id="dash-role-pill" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-xs font-mono font-medium mb-1">
-            <i id="dash-role-icon" data-lucide="badge-check" class="w-3.5 h-3.5"></i> <span id="dash-role-title">Active Tech Club Member</span>
-          </div>
-          <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-            Welcome, <span id="dash-user-name">Member</span>
-          </h2>
-          <p class="text-xs text-slate-500 dark:text-slate-400">
-            Official BST Tech Club Member Badge & Cryptographic Vault
-          </p>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <button type="button" onclick="openMemberDirectoryModal()" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-xs font-mono font-semibold rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition">
-            <i data-lucide="users" class="w-3.5 h-3.5 text-blue-500"></i>
-            <span id="dash-total-members-badge">0 Members</span>
-          </button>
-          <a href="index.html#events" class="px-3.5 py-2 text-xs font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-sm flex items-center gap-1.5 transition">
-            <i data-lucide="calendar" class="w-3.5 h-3.5"></i> Browse Workshops
-          </a>
-          <button onclick="handleLogout()" class="px-3.5 py-2 text-xs font-semibold rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/40 dark:hover:text-rose-400 text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition">
-            <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Sign Out
-          </button>
-        </div>
-      </div>
-
-      <!-- LEAD ADMINISTRATOR COMMAND SUITE (ONLY SHOWN FOR LEAD ADMIN) -->
-      <div id="admin-suite-card" class="hidden academic-card p-6 rounded-2xl shadow-sm border-2 border-amber-500/60 bg-gradient-to-br from-amber-50/50 via-white to-amber-50/20 dark:from-amber-950/20 dark:via-slate-900 dark:to-amber-950/10">
-        <div class="flex items-start justify-between gap-3 mb-4">
-          <div>
-            <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-amber-600 dark:text-amber-400">
-              <i data-lucide="terminal" class="w-4 h-4 text-amber-500"></i> Lead Administrator Operations [UID 0]
-            </div>
-            <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">
-              Lead Administration & Member Governance
-            </h3>
-            <p class="text-xs text-slate-600 dark:text-slate-300 mt-0.5 leading-relaxed">
-              Root / UID 0. Head of platform infrastructure and club governance. Multi-admin enabled (≥1 active Lead Admin required). Holds exclusive authority to promote members to Core Maintainer or Lead Admin, and manage member demotions across all tiers. Exempt from contribution points and auto-demotion.
-            </p>
-          </div>
-          <span class="px-2.5 py-1 rounded-lg bg-amber-500 text-slate-950 text-xs font-mono font-extrabold uppercase shadow-sm flex items-center gap-1">
-            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> LEAD ADMIN [UID 0]
-          </span>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-          <button 
-            type="button" 
-            onclick="openMemberDirectoryModal()" 
-            class="p-3.5 rounded-xl border border-amber-200 dark:border-amber-900/60 bg-white dark:bg-slate-900 hover:border-amber-500 text-left transition shadow-sm group">
-            <div class="flex items-center justify-between mb-1">
-              <i data-lucide="users" class="w-4 h-4 text-amber-500 group-hover:scale-110 transition"></i>
-              <span id="admin-member-count-stat" class="font-mono text-xs font-bold text-slate-700 dark:text-slate-300">0 Members</span>
-            </div>
-            <div class="text-xs font-bold text-slate-900 dark:text-white">Member Roster & Governance</div>
-            <div class="text-[10px] text-slate-400 mt-0.5">Filter roles, promote & manage demotions</div>
-          </button>
-
-          <a 
-            href="index.html#events" 
-            class="p-3.5 rounded-xl border border-amber-200 dark:border-amber-900/60 bg-white dark:bg-slate-900 hover:border-amber-500 text-left transition shadow-sm group">
-            <div class="flex items-center justify-between mb-1">
-              <i data-lucide="calendar-plus" class="w-4 h-4 text-blue-500 group-hover:scale-110 transition"></i>
-              <span class="font-mono text-xs font-bold text-blue-600">LIVE</span>
-            </div>
-            <div class="text-xs font-bold text-slate-900 dark:text-white">Workshops & Hackathons</div>
-            <div class="text-[10px] text-slate-400 mt-0.5">Schedule events, RSVP tracks & sessions</div>
-          </a>
-
-          <a 
-            href="index.html#projects" 
-            class="p-3.5 rounded-xl border border-amber-200 dark:border-amber-900/60 bg-white dark:bg-slate-900 hover:border-amber-500 text-left transition shadow-sm group">
-            <div class="flex items-center justify-between mb-1">
-              <i data-lucide="folder-git-2" class="w-4 h-4 text-emerald-500 group-hover:scale-110 transition"></i>
-              <span class="font-mono text-xs font-bold text-emerald-600">GALLERY</span>
-            </div>
-            <div class="text-xs font-bold text-slate-900 dark:text-white">Student Project Showcases</div>
-            <div class="text-[10px] text-slate-400 mt-0.5">Review domain builds & student repositories</div>
-          </a>
-        </div>
-      </div>
-
-      <!-- TEACHER / FACULTY EVALUATOR OPERATIONS SUITE (ONLY SHOWN FOR FACULTY & ADMINS) -->
-      <div id="teacher-section-card" class="hidden academic-card p-6 rounded-2xl shadow-sm border-2 border-indigo-500/60 bg-gradient-to-br from-indigo-50/50 via-white to-indigo-50/20 dark:from-indigo-950/20 dark:via-slate-900 dark:to-indigo-950/10">
-        <div class="flex items-start justify-between gap-3 mb-4">
-          <div>
-            <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-indigo-600 dark:text-indigo-400">
-              <i data-lucide="graduation-cap" class="w-4 h-4 text-indigo-500"></i> Faculty Evaluator Operations Suite
-            </div>
-            <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">
-              Teacher Oversight & Academic Assessment Console
-            </h3>
-            <p class="text-xs text-slate-600 dark:text-slate-300 mt-0.5 leading-relaxed">
-              Academic Faculty Portal. Review student repositories, evaluate project submissions with rubric marks & feedback, and inspect hackathon team logs across all domains. Exempt from point-based demotions.
-            </p>
-          </div>
-          <span class="px-2.5 py-1 rounded-lg bg-indigo-600 text-white text-xs font-mono font-extrabold uppercase shadow-sm flex items-center gap-1">
-            <i data-lucide="award" class="w-3.5 h-3.5"></i> FACULTY EVALUATOR
-          </span>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-          <a 
-            href="index.html#projects" 
-            class="p-3.5 rounded-xl border border-indigo-200 dark:border-indigo-900/60 bg-white dark:bg-slate-900 hover:border-indigo-500 text-left transition shadow-sm group">
-            <div class="flex items-center justify-between mb-1">
-              <i data-lucide="check-square" class="w-4 h-4 text-indigo-500 group-hover:scale-110 transition"></i>
-              <span class="font-mono text-xs font-bold text-indigo-600">GRADE</span>
-            </div>
-            <div class="text-xs font-bold text-slate-900 dark:text-white">Student Projects & Marks</div>
-            <div class="text-[10px] text-slate-400 mt-0.5">Evaluate builds and record official feedback</div>
-          </a>
-
-          <a 
-            href="index.html#events" 
-            class="p-3.5 rounded-xl border border-indigo-200 dark:border-indigo-900/60 bg-white dark:bg-slate-900 hover:border-indigo-500 text-left transition shadow-sm group">
-            <div class="flex items-center justify-between mb-1">
-              <i data-lucide="table" class="w-4 h-4 text-indigo-500 group-hover:scale-110 transition"></i>
-              <span class="font-mono text-xs font-bold text-indigo-600">SUBMISSIONS</span>
-            </div>
-            <div class="text-xs font-bold text-slate-900 dark:text-white">Hackathon Teams & PPTs</div>
-            <div class="text-[10px] text-slate-400 mt-0.5">View logged teams, PPT slides & status</div>
-          </a>
-
-          <button 
-            type="button" 
-            onclick="openMemberDirectoryModal()" 
-            class="p-3.5 rounded-xl border border-indigo-200 dark:border-indigo-900/60 bg-white dark:bg-slate-900 hover:border-indigo-500 text-left transition shadow-sm group">
-            <div class="flex items-center justify-between mb-1">
-              <i data-lucide="users" class="w-4 h-4 text-indigo-500 group-hover:scale-110 transition"></i>
-              <span class="font-mono text-xs font-bold text-indigo-600">ROSTER</span>
-            </div>
-            <div class="text-xs font-bold text-slate-900 dark:text-white">Department Roster</div>
-            <div class="text-[10px] text-slate-400 mt-0.5">Review registered students and mentors</div>
-          </button>
-        </div>
-      </div>
-
-      <!-- RESPONSIVE 2-COLUMN GRID (Expansive layout on laptops/desktops, clean single-column on mobile) -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        
-        <!-- LEFT COLUMN: PRIMARY IDENTITY, METRICS & GOVERNANCE (lg:col-span-7 xl:col-span-8 space-y-6) -->
-        <div class="lg:col-span-7 xl:col-span-8 space-y-6">
-
-          <!-- DIGITAL TECH CLUB ID CARD (Modern Academic Minimalist) -->
-          <div id="digital-id-card" class="ticket-pass p-6 sm:p-7 rounded-2xl bg-gradient-to-br from-white via-slate-50 to-blue-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/20 border-2 border-blue-500 shadow-xl">
-        
-        <!-- ID Header -->
-        <div class="flex items-start justify-between border-b border-slate-200 dark:border-slate-800 pb-4 mb-4">
-          <div class="flex items-center gap-3">
-            <div id="card-avatar-badge" class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-mono font-extrabold text-base shadow-sm">
-              BST
-            </div>
-            <div>
-              <div id="card-type-label" class="text-xs font-mono font-extrabold tracking-wider uppercase text-blue-600 dark:text-blue-400">BST TECH CLUB ID</div>
-              <div class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Department of CSE (AI & ML)</div>
-            </div>
-          </div>
-
-          <div class="text-right">
-            <span id="card-pass-label" class="text-[10px] text-slate-400 uppercase font-mono font-semibold">MEMBER PASS ID</span>
-            <div id="card-club-id" class="font-mono text-sm sm:text-base font-extrabold text-blue-600 dark:text-blue-400">
-              BST-2026-XXXX
-            </div>
-          </div>
-        </div>
-
-        <!-- ID Card Body -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 items-center">
+      <!-- HERO PROFILE HEADER BANNER -->
+      <div class="relative overflow-hidden rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-gradient-to-br from-white via-slate-50 to-blue-50/40 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/20 shadow-xl p-6 sm:p-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           
-          <div class="sm:col-span-2 space-y-3">
-            <div>
-              <span class="text-[10px] uppercase font-mono text-slate-400">MEMBER NAME</span>
-              <div id="card-name" class="text-base font-extrabold text-slate-900 dark:text-white leading-tight">Student Name</div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3 text-xs">
-              <div>
-                <span class="text-[10px] uppercase font-mono text-slate-400">USN NUMBER</span>
-                <div id="card-usn" class="font-mono font-semibold text-slate-800 dark:text-slate-200">2392608001</div>
+          <!-- Avatar + Member Identity -->
+          <div class="flex items-start sm:items-center gap-5">
+            <!-- Avatar with Edit Trigger -->
+            <div class="relative group cursor-pointer" onclick="openAvatarModal()" title="Click to Change Profile Picture">
+              <div id="dash-avatar-container" class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-mono font-extrabold text-2xl sm:text-3xl shadow-lg ring-4 ring-white dark:ring-slate-900 overflow-hidden">
+                BST
               </div>
-              <div>
-                <span class="text-[10px] uppercase font-mono text-slate-400">SECTION</span>
-                <div id="card-section" class="font-mono font-semibold text-slate-800 dark:text-slate-200">AIML-A</div>
+              <!-- Camera Overlay Badge -->
+              <div class="absolute -bottom-1.5 -right-1.5 w-8 h-8 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 flex items-center justify-center shadow-md transition group-hover:scale-110">
+                <i data-lucide="camera" class="w-4 h-4"></i>
               </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 text-xs">
-              <div>
-                <span class="text-[10px] uppercase font-mono text-slate-400">ACADEMIC BRANCH</span>
-                <div id="card-dept" class="font-medium text-slate-700 dark:text-slate-300 truncate">CSE (AI & ML)</div>
-              </div>
-              <div>
-                <span class="text-[10px] uppercase font-mono text-slate-400">COLLEGE EMAIL</span>
-                <div id="card-email" class="font-mono text-slate-700 dark:text-slate-300 truncate">1234567890@svyasa-sas.edu.in</div>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3 text-xs">
-              <div>
-                <span class="text-[10px] uppercase font-mono text-slate-400">ACADEMIC COHORT</span>
-                <div class="font-mono font-semibold text-blue-600 dark:text-blue-400">Cohort 2026</div>
-              </div>
-              <div>
-                <span class="text-[10px] uppercase font-mono text-slate-400">STATUS / ROLE</span>
-                <div id="card-status-badge" class="font-mono font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                  <span id="card-status-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> <span id="card-status-text">ACTIVE MEMBER</span>
+            <!-- Identity Details -->
+            <div class="space-y-1.5 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <div id="dash-role-pill" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-xs font-mono font-medium">
+                  <i id="dash-role-icon" data-lucide="badge-check" class="w-3.5 h-3.5"></i> <span id="dash-role-title">Active Tech Club Member</span>
                 </div>
+                <span id="dash-club-id-badge" class="font-mono text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/70 px-2 py-0.5 rounded border border-blue-200/60 dark:border-blue-900/60">
+                  BST-2026-XXXX
+                </span>
+              </div>
+
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                <span id="dash-user-name">Member Name</span>
+              </h2>
+
+              <p id="dash-bio-preview" class="text-xs text-slate-600 dark:text-slate-400 font-medium max-w-xl truncate">
+                Department of CSE (AI & ML) • BST Tech Club Member
+              </p>
+
+              <div class="flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400 font-mono flex-wrap pt-0.5">
+                <span id="dash-usn-badge">USN: 2392608XXX</span>
+                <span>•</span>
+                <span id="dash-dept-badge">CSE (AI & ML)</span>
+                <span>•</span>
+                <span class="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Active Vault
+                </span>
               </div>
             </div>
           </div>
 
-          <!-- Dynamic Member Referral & Verification QR Code -->
-          <div class="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm relative group">
-            <div id="card-qr-container" class="w-28 h-28 flex items-center justify-center p-1 bg-white rounded-lg border border-slate-100">
-              <!-- Rendered by JS in 0ms -->
+          <!-- Quick Actions & Stats -->
+          <div class="flex flex-wrap md:flex-col items-start md:items-end justify-between md:justify-center gap-3 shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-slate-200/60 dark:border-slate-800">
+            <div class="flex items-center gap-2">
+              <button 
+                type="button" 
+                onclick="switchProfileTab('profile')" 
+                class="px-3.5 py-2 text-xs font-semibold rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center gap-1.5 transition cursor-pointer">
+                <i data-lucide="user-cog" class="w-3.5 h-3.5"></i> Edit Profile
+              </button>
+              <a 
+                href="index.html#events" 
+                class="px-3.5 py-2 text-xs font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-sm flex items-center gap-1.5 transition">
+                <i data-lucide="calendar" class="w-3.5 h-3.5"></i> Events
+              </a>
+              <button 
+                type="button" 
+                onclick="handleLogout()" 
+                class="px-3.5 py-2 text-xs font-semibold rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/50 flex items-center gap-1.5 transition cursor-pointer"
+                title="Log out of current session">
+                <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Sign Out
+              </button>
             </div>
-            <div class="mt-2 flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span class="text-[10px] font-mono font-semibold text-slate-500 dark:text-slate-400">Scan via Mobile Camera</span>
+
+            <div class="flex items-center gap-3 text-xs font-mono">
+              <span class="text-slate-500 dark:text-slate-400">Total Members: <b id="dash-total-members-badge" class="text-slate-800 dark:text-slate-200">0</b></span>
             </div>
-            <button type="button" onclick="downloadReferralQr()" title="Save QR Image" class="mt-1 text-[10px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
-              <i data-lucide="download" class="w-3 h-3"></i> Save QR Badge
-            </button>
           </div>
 
         </div>
-
       </div>
 
-      <!-- MEMBER ACTIONS: 1. CONTRIBUTION & ADVANCEMENT ENGINE -->
-      <div id="dash-contribution-card" class="academic-card p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
-          <div>
-            <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-blue-600 dark:text-blue-400">
-              <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> Contribution & Advancement Engine
-            </div>
-            <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">
-              Merit Score & Rank Progression
-            </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Live score calculated from verified referrals (+20 pts), workshop RSVPs (+15 pts), and project showcases (+25 pts).
-            </p>
-          </div>
-          <div class="text-left sm:text-right shrink-0 bg-blue-50/70 dark:bg-blue-950/40 px-4 py-2.5 rounded-xl border border-blue-100 dark:border-blue-900/50">
-            <span class="text-[10px] uppercase font-mono text-slate-500 dark:text-slate-400 block font-semibold">TOTAL MERIT POINTS</span>
-            <div id="dash-contrib-total-pts" class="text-2xl font-mono font-extrabold text-blue-600 dark:text-blue-400">0 pts</div>
-          </div>
-        </div>
-
-        <!-- 3 Metric Pillars -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 my-4">
-          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-            <div class="flex items-center justify-between text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
-              <span class="flex items-center gap-1"><i data-lucide="users" class="w-3.5 h-3.5 text-purple-500"></i> Peer Invites</span>
-              <span class="font-mono text-purple-600 dark:text-purple-400 font-bold" id="dash-contrib-ref-pts">+0 pts</span>
-            </div>
-            <div class="text-sm font-mono font-bold text-slate-800 dark:text-slate-200" id="dash-contrib-ref-count">0 peers</div>
-            <div class="text-[10px] text-slate-400 font-mono mt-0.5">20 pts per verified join</div>
-          </div>
-
-          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-            <div class="flex items-center justify-between text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
-              <span class="flex items-center gap-1"><i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-500"></i> Events & RSVPs</span>
-              <span class="font-mono text-emerald-600 dark:text-emerald-400 font-bold" id="dash-contrib-rsvp-pts">+0 pts</span>
-            </div>
-            <div class="text-sm font-mono font-bold text-slate-800 dark:text-slate-200" id="dash-contrib-rsvp-count">0 events</div>
-            <div class="text-[10px] text-slate-400 font-mono mt-0.5">15 pts per workshop / hackathon</div>
-          </div>
-
-          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-            <div class="flex items-center justify-between text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
-              <span class="flex items-center gap-1"><i data-lucide="git-pull-request" class="w-3.5 h-3.5 text-blue-500"></i> Projects & Code</span>
-              <span class="font-mono text-blue-600 dark:text-blue-400 font-bold" id="dash-contrib-proj-pts">+0 pts</span>
-            </div>
-            <div class="text-sm font-mono font-bold text-slate-800 dark:text-slate-200" id="dash-contrib-proj-count">0 projects</div>
-            <div class="text-[10px] text-slate-400 font-mono mt-0.5">25 pts per approved showcase</div>
-          </div>
-        </div>
-
-        <!-- Dynamic Advancement Status Box -->
-        <div id="dash-contrib-advancement-box" class="mt-2"></div>
-      </div>
-
-      <!-- MEMBER ACTIONS: 3. TECHNICAL CONTRIBUTION TRACKS & COMMUNITY ROLES -->
-      <div class="academic-card p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
-        <div class="flex items-start justify-between gap-3 mb-4">
-          <div>
-            <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-purple-600 dark:text-purple-400">
-              <i data-lucide="git-merge" class="w-3.5 h-3.5"></i> Community Architecture
-            </div>
-            <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">
-              Technical Roles & Contribution Tracks
-            </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Club governance model for the Department of CSE (AI & ML). Earn 100 points to auto-promote from Active Developer to Staff Contributor (maintain ≥60 pts). Leadership ranks (Core Maintainer & Lead Admin) are appointed manually and exempt from points.
-            </p>
-          </div>
-          <span class="px-2.5 py-1 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 text-xs font-mono font-bold border border-purple-200 dark:border-purple-800">
-            4 COMMUNITY ROLES
-          </span>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <!-- Role 4: Lead Administrator -->
-          <div class="p-4 rounded-xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/40 dark:bg-amber-950/20 flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between mb-2">
-                <span class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-amber-800 dark:text-amber-300">
-                  <i data-lucide="terminal" class="w-3.5 h-3.5"></i> Lead Administrator (Club Admin)
-                </span>
-                <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200 font-extrabold border border-amber-300/60">
-                  LEAD ADMIN PASS
-                </span>
-              </div>
-              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-2.5">
-                <b>Root / UID 0.</b> Highest tier in club administration and platform infrastructure. Operates under multi-admin governance (there can be multiple Lead Admins, but never less than one).
-              </p>
-              <div class="space-y-1 text-[11px] text-slate-600 dark:text-slate-400 font-mono">
-                <div class="flex items-start gap-1.5">
-                  <span class="text-amber-600 dark:text-amber-400 font-bold shrink-0">▸ Authority:</span>
-                  <span>Exclusive authority to manually promote members to Core Maintainer or Lead Admin, and demote any lower rank.</span>
-                </div>
-                <div class="flex items-start gap-1.5">
-                  <span class="text-amber-600 dark:text-amber-400 font-bold shrink-0">▸ Auto-System:</span>
-                  <span class="text-amber-700 dark:text-amber-300 font-semibold">Exempt from contribution points, auto-promotion, and auto-demotion.</span>
-                </div>
-              </div>
-            </div>
-            <div class="mt-3 pt-2 border-t border-amber-200/60 dark:border-amber-900/40 text-[10px] font-mono font-bold text-amber-700 dark:text-amber-400 flex items-center justify-between">
-              <span>Tier 4 • Platform Governance</span>
-              <span class="px-1.5 py-0.5 rounded bg-amber-200/60 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 text-[9px]">EXEMPT FROM DECAY</span>
-            </div>
-          </div>
-
-          <!-- Role 3: Core Maintainer -->
-          <div class="p-4 rounded-xl border border-purple-200 dark:border-purple-900/60 bg-purple-50/40 dark:bg-purple-950/20 flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between mb-2">
-                <span class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-purple-800 dark:text-purple-300">
-                  <i data-lucide="git-branch" class="w-3.5 h-3.5"></i> Core Maintainer
-                </span>
-                <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-900/60 text-purple-900 dark:text-purple-200 font-extrabold border border-purple-300/60">
-                  CORE MAINTAINER PASS
-                </span>
-              </div>
-              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-2.5">
-                <b>Main Branch Authority.</b> Oversees domain tracks (Competitive Programming, Robotics, AI & ML), coordinates technical project architecture, and reviews code submissions.
-              </p>
-              <div class="space-y-1 text-[11px] text-slate-600 dark:text-slate-400 font-mono">
-                <div class="flex items-start gap-1.5">
-                  <span class="text-purple-600 dark:text-purple-400 font-bold shrink-0">▸ Promotion:</span>
-                  <span>Appointed exclusively by Lead Administrators. Cannot be unlocked through automated contribution points.</span>
-                </div>
-                <div class="flex items-start gap-1.5">
-                  <span class="text-purple-600 dark:text-purple-400 font-bold shrink-0">▸ Auto-System:</span>
-                  <span class="text-purple-700 dark:text-purple-300 font-semibold">Exempt from contribution points, auto-promotion, and auto-demotion.</span>
-                </div>
-              </div>
-            </div>
-            <div class="mt-3 pt-2 border-t border-purple-200/60 dark:border-purple-900/40 text-[10px] font-mono font-bold text-purple-700 dark:text-purple-400 flex items-center justify-between">
-              <span>Tier 3 • Technical Leadership</span>
-              <span class="px-1.5 py-0.5 rounded bg-purple-200/60 dark:bg-purple-900/40 text-purple-900 dark:text-purple-200 text-[9px]">EXEMPT FROM DECAY</span>
-            </div>
-          </div>
-
-          <!-- Role 2: Staff Contributor -->
-          <div class="p-4 rounded-xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/40 dark:bg-emerald-950/20 flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between mb-2">
-                <span class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-emerald-800 dark:text-emerald-300">
-                  <i data-lucide="code-2" class="w-3.5 h-3.5"></i> Staff Contributor
-                </span>
-                <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-200 font-extrabold border border-emerald-300/60">
-                  STAFF CONTRIBUTOR PASS
-                </span>
-              </div>
-              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-2.5">
-                <b>Senior Peer Mentor.</b> Guides junior developers, assists in workshops, and conducts initial code reviews across active repositories.
-              </p>
-              <div class="space-y-1 text-[11px] text-slate-600 dark:text-slate-400 font-mono">
-                <div class="flex items-start gap-1.5">
-                  <span class="text-emerald-600 dark:text-emerald-400 font-bold shrink-0">▸ Auto-Promote:</span>
-                  <span>Unlocked automatically when an Active Developer reaches <b>100+ merit points</b>.</span>
-                </div>
-                <div class="flex items-start gap-1.5">
-                  <span class="text-emerald-600 dark:text-emerald-400 font-bold shrink-0">▸ Maintenance:</span>
-                  <span>Must maintain <b>≥60 points</b>. Falling below 60 points triggers <b>auto-demotion</b> to Active Dev.</span>
-                </div>
-                <div class="flex items-start gap-1.5">
-                  <span class="text-emerald-600 dark:text-emerald-400 font-bold shrink-0">▸ System Ceiling:</span>
-                  <span class="text-slate-700 dark:text-slate-300 font-semibold">Auto-promotion strictly caps here. Advancement to higher tiers is by Lead Admin only.</span>
-                </div>
-              </div>
-            </div>
-            <div class="mt-3 pt-2 border-t border-emerald-200/60 dark:border-emerald-900/40 text-[10px] font-mono font-bold text-emerald-700 dark:text-emerald-400 flex items-center justify-between">
-              <span>Tier 2 • Senior Contributor</span>
-              <span class="px-1.5 py-0.5 rounded bg-emerald-200/60 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-200 text-[9px]">MAINTAIN ≥60 PTS</span>
-            </div>
-          </div>
-
-          <!-- Role 1: Active Developer -->
-          <div class="p-4 rounded-xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/40 dark:bg-blue-950/20 flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between mb-2">
-                <span class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-blue-800 dark:text-blue-300">
-                  <i data-lucide="cpu" class="w-3.5 h-3.5"></i> Active Developer
-                </span>
-                <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/60 text-blue-900 dark:text-blue-200 font-extrabold border border-blue-300/60">
-                  ACTIVE DEVELOPER PASS
-                </span>
-              </div>
-              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-2.5">
-                <b>Verified Student Member.</b> Entry tier for CSE (AI & ML) undergraduates who claim their official Tech Club ID. Participates in hackathons, workshops, and team builds.
-              </p>
-              <div class="space-y-1 text-[11px] text-slate-600 dark:text-slate-400 font-mono">
-                <div class="flex items-start gap-1.5">
-                  <span class="text-blue-600 dark:text-blue-400 font-bold shrink-0">▸ Merit Points:</span>
-                  <span>+20 pts per verified peer referral • +15 pts per workshop RSVP • +25 pts per project showcase.</span>
-                </div>
-                <div class="flex items-start gap-1.5">
-                  <span class="text-blue-600 dark:text-blue-400 font-bold shrink-0">▸ Auto-Promote:</span>
-                  <span class="text-blue-700 dark:text-blue-300 font-semibold">Reaching 100 points automatically promotes you to Staff Contributor rank!</span>
-                </div>
-              </div>
-            </div>
-            <div class="mt-3 pt-2 border-t border-blue-200/60 dark:border-blue-900/40 text-[10px] font-mono font-bold text-blue-700 dark:text-blue-400 flex items-center justify-between">
-              <span>Tier 1 • Member Registry</span>
-              <span class="px-1.5 py-0.5 rounded bg-blue-200/60 dark:bg-blue-900/40 text-blue-900 dark:text-blue-200 text-[9px]">TARGET: 100 PTS</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div> <!-- End Left Column -->
-
-    <!-- RIGHT COLUMN: SIDEBAR, ROSTER & OPERATIONS (lg:col-span-5 xl:col-span-4 space-y-6) -->
-    <div class="lg:col-span-5 xl:col-span-4 space-y-6">
-
-      <!-- MEMBER ACTIONS: 2. REGISTERED MEMBERS ROSTER & DIRECTORY -->
-      <div class="academic-card p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-blue-600 dark:text-blue-400">
-              <i data-lucide="users" class="w-3.5 h-3.5"></i> Department Community
-            </div>
-            <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">
-              Registered Members Directory
-            </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Verified member roster with assigned governance ranks and live merit points.
-            </p>
-          </div>
+      <!-- HORIZONTAL TAB NAVIGATION BAR -->
+      <div class="border-b border-slate-200 dark:border-slate-800 pb-2">
+        <div class="flex items-center gap-2 overflow-x-auto py-1 scrollbar-none" id="profile-tabs-nav">
           <button 
             type="button" 
-            onclick="openMemberDirectoryModal()" 
-            class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-sm shrink-0">
-            <i data-lucide="list" class="w-3.5 h-3.5"></i> View Member Roster (<span id="dash-roster-count">0</span>)
+            id="tab-btn-overview" 
+            onclick="switchProfileTab('overview')" 
+            class="profile-nav-tab px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-2 transition shrink-0 cursor-pointer bg-blue-600 text-white shadow-sm">
+            <i data-lucide="id-card" class="w-4 h-4"></i> ID Card & Passes
+          </button>
+
+          <button 
+            type="button" 
+            id="tab-btn-profile" 
+            onclick="switchProfileTab('profile')" 
+            class="profile-nav-tab px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 transition shrink-0 cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">
+            <i data-lucide="user" class="w-4 h-4"></i> Edit Profile & Bio
+          </button>
+
+          <button 
+            type="button" 
+            id="tab-btn-security" 
+            onclick="switchProfileTab('security')" 
+            class="profile-nav-tab px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 transition shrink-0 cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">
+            <i data-lucide="shield-check" class="w-4 h-4"></i> Security & Password
+          </button>
+
+          <button 
+            type="button" 
+            id="tab-btn-directory" 
+            onclick="switchProfileTab('directory')" 
+            class="profile-nav-tab px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 transition shrink-0 cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">
+            <i data-lucide="users" class="w-4 h-4"></i> Members Directory (<span id="dash-roster-count">0</span>)
+          </button>
+
+          <button 
+            type="button" 
+            id="tab-btn-invites" 
+            onclick="switchProfileTab('invites')" 
+            class="profile-nav-tab px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 transition shrink-0 cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">
+            <i data-lucide="share-2" class="w-4 h-4"></i> Invites & Growth
+          </button>
+
+          <button 
+            type="button" 
+            id="tab-btn-faculty" 
+            onclick="switchProfileTab('faculty')" 
+            class="hidden profile-nav-tab px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 transition shrink-0 cursor-pointer bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800">
+            <i data-lucide="graduation-cap" class="w-4 h-4"></i> Faculty Suite
+          </button>
+
+          <button 
+            type="button" 
+            id="tab-btn-roles" 
+            onclick="switchProfileTab('roles')" 
+            class="profile-nav-tab px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 transition shrink-0 cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">
+            <i data-lucide="git-merge" class="w-4 h-4"></i> Roles & Governance
           </button>
         </div>
       </div>
 
-      <!-- MEMBER ACTIONS: 4. EDIT PASSWORD (SECURITY SETTINGS) -->
-      <div class="academic-card p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
-        <div class="mb-4">
-          <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-blue-600 dark:text-blue-400">
-            <i data-lucide="key-round" class="w-3.5 h-3.5"></i> Security Settings
-          </div>
-          <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">
-            Edit / Update Member Password
-          </h3>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            You can update your account password at any time. It will be securely salted and hashed.
-          </p>
-        </div>
-
-        <form onsubmit="handlePasswordChange(event)" class="space-y-3 max-w-lg">
-          <div>
-            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Current Password</label>
-            <input 
-              type="password" 
-              id="pwd-current" 
-              required 
-              placeholder="Enter existing password" 
-              class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <!-- TAB 1: OVERVIEW PANE (Digital ID Card, Merit Score, Advancement, Admin Operations) -->
+      <div id="tab-pane-overview" class="profile-tab-pane space-y-6">
+        
+        <!-- LEAD ADMINISTRATOR COMMAND SUITE (ONLY SHOWN FOR LEAD ADMIN) -->
+        <div id="admin-suite-card" class="hidden academic-card p-6 rounded-2xl shadow-sm border-2 border-amber-500/60 bg-gradient-to-br from-amber-50/50 via-white to-amber-50/20 dark:from-amber-950/20 dark:via-slate-900 dark:to-amber-950/10">
+          <div class="flex items-start justify-between gap-3 mb-4">
             <div>
-              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">New Password</label>
-              <input 
-                type="password" 
-                id="pwd-new" 
-                required 
-                minlength="8" 
-                placeholder="At least 8 chars" 
-                class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-amber-600 dark:text-amber-400">
+                <i data-lucide="terminal" class="w-4 h-4 text-amber-500"></i> Lead Administrator Operations [UID 0]
+              </div>
+              <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">
+                Lead Administration & Member Governance
+              </h3>
+              <p class="text-xs text-slate-600 dark:text-slate-300 mt-0.5 leading-relaxed">
+                Root / UID 0. Head of platform infrastructure and club governance. Multi-admin enabled (≥1 active Lead Admin required). Holds exclusive authority to promote members to Core Maintainer or Lead Admin, and manage member demotions across all tiers. Exempt from contribution points and auto-demotion.
+              </p>
             </div>
-
-            <div>
-              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Confirm New Password</label>
-              <input 
-                type="password" 
-                id="pwd-confirm-new" 
-                required 
-                placeholder="Re-enter new password" 
-                class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
-            </div>
+            <span class="px-2.5 py-1 rounded-lg bg-amber-500 text-slate-950 text-xs font-mono font-extrabold uppercase shadow-sm flex items-center gap-1">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> LEAD ADMIN [UID 0]
+            </span>
           </div>
 
-          <div class="pt-2">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
             <button 
-              type="submit" 
-              class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider shadow-sm transition flex items-center gap-1.5">
-              <i data-lucide="check" class="w-3.5 h-3.5"></i> Update Password
+              type="button" 
+              onclick="switchProfileTab('directory')" 
+              class="p-3.5 rounded-xl border border-amber-200 dark:border-amber-900/60 bg-white dark:bg-slate-900 hover:border-amber-500 text-left transition shadow-sm group cursor-pointer">
+              <div class="flex items-center justify-between mb-1">
+                <i data-lucide="users" class="w-4 h-4 text-amber-500 group-hover:scale-110 transition"></i>
+                <span id="admin-member-count-stat" class="font-mono text-xs font-bold text-slate-700 dark:text-slate-300">0 Members</span>
+              </div>
+              <div class="text-xs font-bold text-slate-900 dark:text-white">Member Roster & Governance</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">Filter roles, promote & manage demotions</div>
+            </button>
+
+            <a 
+              href="index.html#events" 
+              class="p-3.5 rounded-xl border border-amber-200 dark:border-amber-900/60 bg-white dark:bg-slate-900 hover:border-amber-500 text-left transition shadow-sm group">
+              <div class="flex items-center justify-between mb-1">
+                <i data-lucide="calendar-plus" class="w-4 h-4 text-blue-500 group-hover:scale-110 transition"></i>
+                <span class="font-mono text-xs font-bold text-blue-600">LIVE</span>
+              </div>
+              <div class="text-xs font-bold text-slate-900 dark:text-white">Workshops & Hackathons</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">Schedule events, RSVP tracks & sessions</div>
+            </a>
+
+            <a 
+              href="index.html#projects" 
+              class="p-3.5 rounded-xl border border-amber-200 dark:border-amber-900/60 bg-white dark:bg-slate-900 hover:border-amber-500 text-left transition shadow-sm group">
+              <div class="flex items-center justify-between mb-1">
+                <i data-lucide="folder-git-2" class="w-4 h-4 text-emerald-500 group-hover:scale-110 transition"></i>
+                <span class="font-mono text-xs font-bold text-emerald-600">GALLERY</span>
+              </div>
+              <div class="text-xs font-bold text-slate-900 dark:text-white">Student Project Showcases</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">Review domain builds & student repositories</div>
+            </a>
+          </div>
+        </div>
+
+        <!-- RESPONSIVE 2-COLUMN GRID (Expansive layout on laptops/desktops, clean single-column on mobile) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          <!-- LEFT COLUMN: DIGITAL TECH CLUB ID CARD (lg:col-span-7 xl:col-span-7 space-y-6) -->
+          <div class="lg:col-span-7 xl:col-span-7 space-y-6">
+
+            <!-- DIGITAL TECH CLUB ID CARD (Modern Academic Minimalist) -->
+            <div id="digital-id-card" class="ticket-pass p-6 sm:p-7 rounded-2xl bg-gradient-to-br from-white via-slate-50 to-blue-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/20 border-2 border-blue-500 shadow-xl">
+              
+              <!-- ID Header -->
+              <div class="flex items-start justify-between border-b border-slate-200 dark:border-slate-800 pb-4 mb-4">
+                <div class="flex items-center gap-3">
+                  <div id="card-avatar-badge" class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-mono font-extrabold text-base shadow-sm overflow-hidden">
+                    BST
+                  </div>
+                  <div>
+                    <div id="card-type-label" class="text-xs font-mono font-extrabold tracking-wider uppercase text-blue-600 dark:text-blue-400">BST TECH CLUB ID</div>
+                    <div class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Department of CSE (AI & ML)</div>
+                  </div>
+                </div>
+
+                <div class="text-right">
+                  <span id="card-pass-label" class="text-[10px] text-slate-400 uppercase font-mono font-semibold">MEMBER PASS ID</span>
+                  <div id="card-club-id" class="font-mono text-sm sm:text-base font-extrabold text-blue-600 dark:text-blue-400">
+                    BST-2026-XXXX
+                  </div>
+                </div>
+              </div>
+
+              <!-- ID Card Body -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 items-center">
+                
+                <div class="sm:col-span-2 space-y-3">
+                  <div>
+                    <span class="text-[10px] uppercase font-mono text-slate-400">MEMBER NAME</span>
+                    <div id="card-name" class="text-base font-extrabold text-slate-900 dark:text-white leading-tight">Student Name</div>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-3 text-xs">
+                    <div>
+                      <span class="text-[10px] uppercase font-mono text-slate-400">USN NUMBER</span>
+                      <div id="card-usn" class="font-mono font-semibold text-slate-800 dark:text-slate-200">2392608001</div>
+                    </div>
+                    <div>
+                      <span class="text-[10px] uppercase font-mono text-slate-400">SECTION</span>
+                      <div id="card-section" class="font-mono font-semibold text-slate-800 dark:text-slate-200">AIML-A</div>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-3 text-xs">
+                    <div>
+                      <span class="text-[10px] uppercase font-mono text-slate-400">ACADEMIC BRANCH</span>
+                      <div id="card-dept" class="font-medium text-slate-700 dark:text-slate-300 truncate">CSE (AI & ML)</div>
+                    </div>
+                    <div>
+                      <span class="text-[10px] uppercase font-mono text-slate-400">COLLEGE EMAIL</span>
+                      <div id="card-email" class="font-mono text-slate-700 dark:text-slate-300 truncate">1234567890@svyasa-sas.edu.in</div>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-3 text-xs">
+                    <div>
+                      <span class="text-[10px] uppercase font-mono text-slate-400">ACADEMIC COHORT</span>
+                      <div class="font-mono font-semibold text-blue-600 dark:text-blue-400">Cohort 2026</div>
+                    </div>
+                    <div>
+                      <span class="text-[10px] uppercase font-mono text-slate-400">STATUS / ROLE</span>
+                      <div id="card-status-badge" class="font-mono font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                        <span id="card-status-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> <span id="card-status-text">ACTIVE MEMBER</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Dynamic Member Referral & Verification QR Code -->
+                <div class="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm relative group">
+                  <div id="card-qr-container" class="w-28 h-28 flex items-center justify-center p-1 bg-white rounded-lg border border-slate-100">
+                    <!-- Rendered by JS in 0ms -->
+                  </div>
+                  <div class="mt-2 flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-[10px] font-mono font-semibold text-slate-500 dark:text-slate-400">Scan via Mobile Camera</span>
+                  </div>
+                  <button type="button" onclick="downloadReferralQr()" title="Save QR Image" class="mt-1 text-[10px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer">
+                    <i data-lucide="download" class="w-3 h-3"></i> Save QR Badge
+                  </button>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- RIGHT COLUMN: CONTRIBUTION & ADVANCEMENT ENGINE (lg:col-span-5 xl:col-span-5 space-y-6) -->
+          <div class="lg:col-span-5 xl:col-span-5 space-y-6">
+
+            <!-- CONTRIBUTION & ADVANCEMENT ENGINE -->
+            <div id="dash-contribution-card" class="academic-card p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+                <div>
+                  <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-blue-600 dark:text-blue-400">
+                    <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> Contribution & Advancement
+                  </div>
+                  <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">
+                    Merit Score & Rank Progression
+                  </h3>
+                  <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    Live score calculated from verified referrals (+20 pts), workshop RSVPs (+15 pts), and project showcases (+25 pts).
+                  </p>
+                </div>
+                <div class="text-left sm:text-right shrink-0 bg-blue-50/70 dark:bg-blue-950/40 px-4 py-2.5 rounded-xl border border-blue-100 dark:border-blue-900/50">
+                  <span class="text-[10px] uppercase font-mono text-slate-500 dark:text-slate-400 block font-semibold">TOTAL MERIT POINTS</span>
+                  <div id="dash-contrib-total-pts" class="text-2xl font-mono font-extrabold text-blue-600 dark:text-blue-400">0 pts</div>
+                </div>
+              </div>
+
+              <!-- 3 Metric Pillars -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 my-4">
+                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                  <div class="flex items-center justify-between text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                    <span class="flex items-center gap-1"><i data-lucide="users" class="w-3.5 h-3.5 text-purple-500"></i> Peer Invites</span>
+                    <span class="font-mono text-purple-600 dark:text-purple-400 font-bold" id="dash-contrib-ref-pts">+0 pts</span>
+                  </div>
+                  <div class="text-sm font-mono font-bold text-slate-800 dark:text-slate-200" id="dash-contrib-ref-count">0 peers</div>
+                  <div class="text-[10px] text-slate-400 font-mono mt-0.5">20 pts per join</div>
+                </div>
+
+                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                  <div class="flex items-center justify-between text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                    <span class="flex items-center gap-1"><i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-500"></i> Events & RSVPs</span>
+                    <span class="font-mono text-emerald-600 dark:text-emerald-400 font-bold" id="dash-contrib-rsvp-pts">+0 pts</span>
+                  </div>
+                  <div class="text-sm font-mono font-bold text-slate-800 dark:text-slate-200" id="dash-contrib-rsvp-count">0 events</div>
+                  <div class="text-[10px] text-slate-400 font-mono mt-0.5">15 pts per workshop</div>
+                </div>
+
+                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                  <div class="flex items-center justify-between text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                    <span class="flex items-center gap-1"><i data-lucide="git-pull-request" class="w-3.5 h-3.5 text-blue-500"></i> Projects</span>
+                    <span class="font-mono text-blue-600 dark:text-blue-400 font-bold" id="dash-contrib-proj-pts">+0 pts</span>
+                  </div>
+                  <div class="text-sm font-mono font-bold text-slate-800 dark:text-slate-200" id="dash-contrib-proj-count">0 projects</div>
+                  <div class="text-[10px] text-slate-400 font-mono mt-0.5">25 pts per showcase</div>
+                </div>
+              </div>
+
+              <!-- Dynamic Advancement Status Box -->
+              <div id="dash-contrib-advancement-box" class="mt-2"></div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- TAB 2: EDIT PROFILE & BIO PANE -->
+      <div id="tab-pane-profile" class="profile-tab-pane hidden space-y-6">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          <!-- Left: Avatar Photo Manager -->
+          <div class="lg:col-span-4 academic-card p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-4">
+            <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-blue-600 dark:text-blue-400">
+              <i data-lucide="camera" class="w-3.5 h-3.5"></i> Profile Picture
+            </div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white">Custom Avatar</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+              Upload your own picture or select from curated tech presets. Appears on your ID card and directory.
+            </p>
+
+            <div class="flex flex-col items-center justify-center p-6 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 gap-3">
+              <div id="profile-edit-avatar-preview" class="w-24 h-24 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-mono font-extrabold text-3xl shadow-lg ring-4 ring-white dark:ring-slate-800 overflow-hidden">
+                BST
+              </div>
+              <div class="flex items-center gap-2">
+                <button 
+                  type="button" 
+                  onclick="openAvatarModal()" 
+                  class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-sm">
+                  <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Change Photo
+                </button>
+                <button 
+                  type="button" 
+                  onclick="removeProfileAvatar()" 
+                  class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-rose-50 hover:text-rose-600 text-slate-600 dark:text-slate-400 text-xs font-semibold transition cursor-pointer">
+                  Remove
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Bio & Social Profile Form -->
+          <div class="lg:col-span-8 academic-card p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+            <div class="mb-4">
+              <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-blue-600 dark:text-blue-400">
+                <i data-lucide="user" class="w-3.5 h-3.5"></i> Member Information
+              </div>
+              <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">
+                Edit Bio, Technical Skills & Social Links
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Keep your technical credentials up to date. Visible on your member card and portfolio showcase.
+              </p>
+            </div>
+
+            <form onsubmit="handleProfileDetailsSubmit(event)" class="space-y-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Headline & Bio</label>
+                <textarea 
+                  id="profile-bio-input" 
+                  rows="3" 
+                  placeholder="e.g. 2nd Year CSE (AI & ML) | Passionate about LLMs, Computer Vision and distributed systems..."
+                  class="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Technical Skills & Stacks (Comma separated)</label>
+                <input 
+                  type="text" 
+                  id="profile-skills-input" 
+                  placeholder="e.g. Python, PyTorch, React, Node.js, Docker, Next.js" 
+                  class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
+                    <i data-lucide="github" class="w-3.5 h-3.5 text-slate-700 dark:text-slate-300"></i> GitHub URL
+                  </label>
+                  <input 
+                    type="url" 
+                    id="profile-github-input" 
+                    placeholder="https://github.com/..." 
+                    class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
+                    <i data-lucide="linkedin" class="w-3.5 h-3.5 text-blue-600"></i> LinkedIn URL
+                  </label>
+                  <input 
+                    type="url" 
+                    id="profile-linkedin-input" 
+                    placeholder="https://linkedin.com/in/..." 
+                    class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
+                    <i data-lucide="globe" class="w-3.5 h-3.5 text-emerald-600"></i> Portfolio / Web
+                  </label>
+                  <input 
+                    type="url" 
+                    id="profile-website-input" 
+                    placeholder="https://portfolio.dev" 
+                    class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+              </div>
+
+              <div class="pt-2 flex justify-end">
+                <button 
+                  type="submit" 
+                  class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider shadow-sm transition flex items-center gap-1.5 cursor-pointer">
+                  <i data-lucide="check" class="w-3.5 h-3.5"></i> Save Profile Details
+                </button>
+              </div>
+            </form>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- TAB 3: SECURITY & PASSWORD PANE -->
+      <div id="tab-pane-security" class="profile-tab-pane hidden space-y-6">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          <!-- Password Update Form -->
+          <div class="lg:col-span-7 academic-card p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+            <div class="mb-4">
+              <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-blue-600 dark:text-blue-400">
+                <i data-lucide="key-round" class="w-3.5 h-3.5"></i> Security Settings
+              </div>
+              <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">
+                Edit / Update Member Password
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Update your account password. It will be securely salted and hashed using browser Web Crypto SHA-256.
+              </p>
+            </div>
+
+            <form onsubmit="handlePasswordChange(event)" class="space-y-3 max-w-lg">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Current Password</label>
+                <input 
+                  type="password" 
+                  id="pwd-current" 
+                  required 
+                  placeholder="Enter existing password" 
+                  class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">New Password</label>
+                  <input 
+                    type="password" 
+                    id="pwd-new" 
+                    required 
+                    minlength="8" 
+                    placeholder="At least 8 chars" 
+                    class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Confirm New Password</label>
+                  <input 
+                    type="password" 
+                    id="pwd-confirm-new" 
+                    required 
+                    placeholder="Re-enter new password" 
+                    class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+              </div>
+
+              <div class="pt-2">
+                <button 
+                  type="submit" 
+                  class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider shadow-sm transition flex items-center gap-1.5 cursor-pointer">
+                  <i data-lucide="check" class="w-3.5 h-3.5"></i> Update Password
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Cryptographic Vault Status & Active Session -->
+          <div class="lg:col-span-5 space-y-6">
+            
+            <!-- Cryptographic Vault Architecture Card -->
+            <div class="academic-card p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-3">
+              <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-emerald-600 dark:text-emerald-400">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Cryptographic Vault Badge
+              </div>
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white">Web Crypto API SHA-256 + Salt</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                Your credentials never leave your browser in plaintext. Passwords are bound with a 16-byte cryptographically secure random salt and hashed with SHA-256 before storing into client vaults.
+              </p>
+              <div class="p-3 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/60 text-[11px] font-mono text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Active Vault Protection: VERIFIED</span>
+              </div>
+            </div>
+
+            <!-- Prominent Session Log Out Card -->
+            <div class="academic-card p-6 rounded-2xl shadow-sm border border-rose-200 dark:border-rose-900/60 bg-rose-50/30 dark:bg-rose-950/20 space-y-3">
+              <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-rose-600 dark:text-rose-400">
+                <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Session Termination
+              </div>
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white">Sign Out of Member Portal</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                Clears active authentication tokens and returns to public guest view.
+              </p>
+              <button 
+                type="button" 
+                onclick="handleLogout()" 
+                class="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs uppercase tracking-wider shadow-sm transition flex items-center justify-center gap-2 cursor-pointer">
+                <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out of Session
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- TAB 4: MEMBERS DIRECTORY PANE (EMBEDDED UNCLUTTERED DIRECTORY) -->
+      <div id="tab-pane-directory" class="profile-tab-pane hidden space-y-4">
+        
+        <div class="academic-card p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+          
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
+            <div>
+              <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-blue-600 dark:text-blue-400">
+                <i data-lucide="users" class="w-3.5 h-3.5"></i> Department Community
+              </div>
+              <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-1">
+                Registered Members Directory
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Official roster with assigned governance ranks and live merit points.
+              </p>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button 
+                type="button" 
+                onclick="syncAndRefreshDirectory()" 
+                class="px-3.5 py-2 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition cursor-pointer">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Sync Cloud
+              </button>
+            </div>
+          </div>
+
+          <!-- Search Input -->
+          <div class="py-3 flex items-center gap-2">
+            <div class="relative flex-1">
+              <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+              <input 
+                type="text" 
+                id="embedded-directory-search-input" 
+                oninput="renderDirectoryList()" 
+                placeholder="Search by name, USN, section, or ID..." 
+                class="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+          </div>
+
+          <!-- Role Filter Bar -->
+          <div class="pb-3 border-b border-slate-100 dark:border-slate-800/80 flex items-center gap-1.5 overflow-x-auto text-[10px] font-mono">
+            <button 
+              type="button" 
+              id="embedded-role-filter-ALL" 
+              onclick="setDirectoryRoleFilter('ALL')" 
+              class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0 bg-blue-600 text-white">
+              <i data-lucide="users" class="w-3 h-3"></i>
+              <span>All</span>
+              <span id="embedded-role-count-ALL" class="px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-black/20 text-inherit">0</span>
+            </button>
+
+            <button 
+              type="button" 
+              id="embedded-role-filter-Root Architect" 
+              onclick="setDirectoryRoleFilter('Root Architect')" 
+              class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+              <i data-lucide="terminal" class="w-3 h-3"></i>
+              <span>Lead Admin</span>
+              <span id="embedded-role-count-Root Architect" class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-slate-200/80 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300">0</span>
+            </button>
+
+            <button 
+              type="button" 
+              id="embedded-role-filter-Core Maintainer" 
+              onclick="setDirectoryRoleFilter('Core Maintainer')" 
+              class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+              <i data-lucide="git-branch" class="w-3 h-3"></i>
+              <span>Maintainer</span>
+              <span id="embedded-role-count-Core Maintainer" class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-slate-200/80 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300">0</span>
+            </button>
+
+            <button 
+              type="button" 
+              id="embedded-role-filter-Staff Contributor" 
+              onclick="setDirectoryRoleFilter('Staff Contributor')" 
+              class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+              <i data-lucide="code-2" class="w-3 h-3"></i>
+              <span>Staff</span>
+              <span id="embedded-role-count-Staff Contributor" class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-slate-200/80 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300">0</span>
+            </button>
+
+            <button 
+              type="button" 
+              id="embedded-role-filter-Active Developer" 
+              onclick="setDirectoryRoleFilter('Active Developer')" 
+              class="px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+              <i data-lucide="cpu" class="w-3 h-3"></i>
+              <span>Active Dev</span>
+              <span id="embedded-role-count-Active Developer" class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-slate-200/80 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300">0</span>
             </button>
           </div>
-        </form>
+
+          <!-- Roster Members List Container -->
+          <div id="embedded-members-list" class="space-y-2.5 pt-3 max-h-[70vh] overflow-y-auto">
+            <!-- Rendered by JS -->
+          </div>
+
+        </div>
+
       </div>
 
-      <!-- MEMBER ACTIONS: 5. SHARE REFERRAL LINK & QR -->
-      <div id="referral-share-card" class="academic-card p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
-        <div class="flex items-start justify-between gap-3 mb-4">
-          <div>
-            <div id="referral-tag-badge" class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-blue-600 dark:text-blue-400">
-              <i data-lucide="share-2" class="w-3.5 h-3.5"></i> Peer Referral & Sign-Up Share
+      <!-- TAB 5: INVITES & GROWTH PANE (PEER REFERRAL & ADMINISTRATIVE ONBOARDING) -->
+      <div id="tab-pane-invites" class="profile-tab-pane hidden space-y-6">
+        
+        <!-- MEMBER ACTIONS: 5. SHARE REFERRAL LINK & QR -->
+        <div id="referral-share-card" class="academic-card p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+          <div class="flex items-start justify-between gap-3 mb-4">
+            <div>
+              <div id="referral-tag-badge" class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-blue-600 dark:text-blue-400">
+                <i data-lucide="share-2" class="w-3.5 h-3.5"></i> Peer Referral & Sign-Up Share
+              </div>
+              <h3 id="referral-box-title" class="text-lg font-bold text-slate-900 dark:text-white mt-1">
+                Invite Peers to Join BST Tech Club
+              </h3>
+              <p id="referral-box-desc" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                Share your personal invite link or show your QR code. Earn <b>+20 points</b> for every peer who joins. <b>Reaching 100 points unlocks Staff Contributor rank!</b>
+              </p>
             </div>
-            <h3 id="referral-box-title" class="text-base font-bold text-slate-900 dark:text-white mt-1">
-              Invite Peers to Join BST Tech Club
-            </h3>
-            <p id="referral-box-desc" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
-              Share your personal invite link or show your QR code. Earn <b>+20 points</b> for every peer who joins. <b>Reaching 100 points unlocks Staff Contributor rank!</b>
-            </p>
+            
+            <div class="text-right shrink-0 bg-emerald-50 dark:bg-emerald-950/60 px-4 py-2 rounded-xl border border-emerald-200 dark:border-emerald-900/60">
+              <span id="referral-stat-label" class="text-[10px] uppercase font-mono text-slate-400 block font-semibold">PEERS REFERRED</span>
+              <div id="card-referral-count" class="text-xl font-mono font-extrabold text-emerald-600 dark:text-emerald-400">0</div>
+            </div>
           </div>
-          
-          <div class="text-right shrink-0">
-            <span id="referral-stat-label" class="text-[10px] uppercase font-mono text-slate-400 block font-semibold">PEERS REFERRED</span>
-            <div id="card-referral-count" class="text-lg font-mono font-extrabold text-emerald-600 dark:text-emerald-400">0</div>
+
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <div class="relative flex-1">
+              <i data-lucide="link" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+              <input 
+                type="text" 
+                id="referral-link-input" 
+                readonly 
+                class="w-full pl-10 pr-4 py-2 text-xs font-mono rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-300 focus:outline-none">
+            </div>
+            <button 
+              onclick="copyReferralLink()" 
+              class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Link
+            </button>
+            <button 
+              onclick="shareViaWhatsApp()" 
+              class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-sm cursor-pointer">
+              <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WhatsApp Invite
+            </button>
+            <button 
+              onclick="shareViaNative()" 
+              class="px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-center gap-1.5 transition cursor-pointer">
+              <i data-lucide="share-2" class="w-3.5 h-3.5"></i> Share
+            </button>
+          </div>
+
+          <!-- Live Domain Verification Badge -->
+          <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+            <span class="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-medium">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Canonical Domain: https://bst-tech-club-2gvj.vercel.app
+            </span>
+            <span class="text-[10px] text-slate-400 font-sans">Official Public URL</span>
           </div>
         </div>
 
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-          <div class="relative flex-1">
-            <i data-lucide="link" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-            <input 
-              type="text" 
-              id="referral-link-input" 
-              readonly 
-              class="w-full pl-10 pr-4 py-2 text-xs font-mono rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-300 focus:outline-none">
-          </div>
-          <button 
-            onclick="copyReferralLink()" 
-            class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-xs font-bold flex items-center justify-center gap-1.5 transition">
-            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Link
-          </button>
-          <button 
-            onclick="shareViaWhatsApp()" 
-            class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-sm">
-            <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WhatsApp Invite
-          </button>
-          <button 
-            onclick="shareViaNative()" 
-            class="px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-center gap-1.5 transition">
-            <i data-lucide="share-2" class="w-3.5 h-3.5"></i> Share
-          </button>
-        </div>
-
-        <!-- Live Domain Verification Badge -->
-        <div class="mt-3 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-mono">
-          <span class="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-medium">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Live Link: https://bst-tech-club-2gvj.vercel.app
-          </span>
-          <span class="text-[10px] text-slate-400 font-sans">Official Public URL</span>
-        </div>
       </div>
 
-    </div> <!-- End Right Column -->
+      <!-- TAB 6: FACULTY SUITE PANE -->
+      <div id="tab-pane-faculty" class="profile-tab-pane hidden space-y-6">
+        
+        <!-- TEACHER / FACULTY EVALUATOR OPERATIONS SUITE -->
+        <div id="teacher-section-card" class="academic-card p-6 sm:p-8 rounded-2xl shadow-sm border-2 border-indigo-500/60 bg-gradient-to-br from-indigo-50/50 via-white to-indigo-50/20 dark:from-indigo-950/20 dark:via-slate-900 dark:to-indigo-950/10">
+          <div class="flex items-start justify-between gap-3 mb-4">
+            <div>
+              <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-indigo-600 dark:text-indigo-400">
+                <i data-lucide="graduation-cap" class="w-4 h-4 text-indigo-500"></i> Faculty Evaluator Operations Suite
+              </div>
+              <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">
+                Teacher Oversight & Academic Assessment Console
+              </h3>
+              <p class="text-xs text-slate-600 dark:text-slate-300 mt-0.5 leading-relaxed">
+                Academic Faculty Portal. Review student repositories, evaluate project submissions with rubric marks & feedback, and inspect hackathon team logs across all domains. Exempt from point-based demotions.
+              </p>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg bg-indigo-600 text-white text-xs font-mono font-extrabold uppercase shadow-sm flex items-center gap-1">
+              <i data-lucide="award" class="w-3.5 h-3.5"></i> FACULTY EVALUATOR
+            </span>
+          </div>
 
-    </div> <!-- End 12-column Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+            <a 
+              href="index.html#projects" 
+              class="p-3.5 rounded-xl border border-indigo-200 dark:border-indigo-900/60 bg-white dark:bg-slate-900 hover:border-indigo-500 text-left transition shadow-sm group">
+              <div class="flex items-center justify-between mb-1">
+                <i data-lucide="check-square" class="w-4 h-4 text-indigo-500 group-hover:scale-110 transition"></i>
+                <span class="font-mono text-xs font-bold text-indigo-600">GRADE</span>
+              </div>
+              <div class="text-xs font-bold text-slate-900 dark:text-white">Student Projects & Marks</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">Evaluate builds and record official feedback</div>
+            </a>
 
-  </div> <!-- End member-dashboard-container -->
+            <a 
+              href="index.html#events" 
+              class="p-3.5 rounded-xl border border-indigo-200 dark:border-indigo-900/60 bg-white dark:bg-slate-900 hover:border-indigo-500 text-left transition shadow-sm group">
+              <div class="flex items-center justify-between mb-1">
+                <i data-lucide="table" class="w-4 h-4 text-indigo-500 group-hover:scale-110 transition"></i>
+                <span class="font-mono text-xs font-bold text-indigo-600">SUBMISSIONS</span>
+              </div>
+              <div class="text-xs font-bold text-slate-900 dark:text-white">Hackathon Teams & PPTs</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">View logged teams, PPT slides & status</div>
+            </a>
+
+            <button 
+              type="button" 
+              onclick="switchProfileTab('directory')" 
+              class="p-3.5 rounded-xl border border-indigo-200 dark:border-indigo-900/60 bg-white dark:bg-slate-900 hover:border-indigo-500 text-left transition shadow-sm group cursor-pointer">
+              <div class="flex items-center justify-between mb-1">
+                <i data-lucide="users" class="w-4 h-4 text-indigo-500 group-hover:scale-110 transition"></i>
+                <span class="font-mono text-xs font-bold text-indigo-600">ROSTER</span>
+              </div>
+              <div class="text-xs font-bold text-slate-900 dark:text-white">Department Roster</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">Review registered students and mentors</div>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TAB 7: ROLES & GOVERNANCE PANE -->
+      <div id="tab-pane-roles" class="profile-tab-pane hidden space-y-6">
+        
+        <!-- TECHNICAL CONTRIBUTION TRACKS & COMMUNITY ROLES -->
+        <div class="academic-card p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+          <div class="flex items-start justify-between gap-3 mb-4">
+            <div>
+              <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-purple-600 dark:text-purple-400">
+                <i data-lucide="git-merge" class="w-3.5 h-3.5"></i> Community Architecture
+              </div>
+              <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">
+                Technical Roles & Contribution Tracks
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Club governance model for the Department of CSE (AI & ML). Earn 100 points to auto-promote from Active Developer to Staff Contributor (maintain ≥60 pts). Leadership ranks (Core Maintainer & Lead Admin) are appointed manually and exempt from points.
+              </p>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 text-xs font-mono font-bold border border-purple-200 dark:border-purple-800">
+              4 COMMUNITY ROLES
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <!-- Role 4: Lead Administrator -->
+            <div class="p-4 rounded-xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/40 dark:bg-amber-950/20 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-amber-800 dark:text-amber-300">
+                    <i data-lucide="terminal" class="w-3.5 h-3.5"></i> Lead Administrator (Club Admin)
+                  </span>
+                  <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200 font-extrabold border border-amber-300/60">
+                    LEAD ADMIN PASS
+                  </span>
+                </div>
+                <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-2.5">
+                  <b>Root / UID 0.</b> Highest tier in club administration and platform infrastructure. Operates under multi-admin governance (there can be multiple Lead Admins, but never less than one).
+                </p>
+                <div class="space-y-1 text-[11px] text-slate-600 dark:text-slate-400 font-mono">
+                  <div class="flex items-start gap-1.5">
+                    <span class="text-amber-600 dark:text-amber-400 font-bold shrink-0">▸ Authority:</span>
+                    <span>Exclusive authority to manually promote members to Core Maintainer or Lead Admin, and demote any lower rank.</span>
+                  </div>
+                  <div class="flex items-start gap-1.5">
+                    <span class="text-amber-600 dark:text-amber-400 font-bold shrink-0">▸ Auto-System:</span>
+                    <span class="text-amber-700 dark:text-amber-300 font-semibold">Exempt from contribution points, auto-promotion, and auto-demotion.</span>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-t border-amber-200/60 dark:border-amber-900/40 text-[10px] font-mono font-bold text-amber-700 dark:text-amber-400 flex items-center justify-between">
+                <span>Tier 4 • Platform Governance</span>
+                <span class="px-1.5 py-0.5 rounded bg-amber-200/60 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 text-[9px]">EXEMPT FROM DECAY</span>
+              </div>
+            </div>
+
+            <!-- Role 3: Core Maintainer -->
+            <div class="p-4 rounded-xl border border-purple-200 dark:border-purple-900/60 bg-purple-50/40 dark:bg-purple-950/20 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-purple-800 dark:text-purple-300">
+                    <i data-lucide="git-branch" class="w-3.5 h-3.5"></i> Core Maintainer
+                  </span>
+                  <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-900/60 text-purple-900 dark:text-purple-200 font-extrabold border border-purple-300/60">
+                    CORE MAINTAINER PASS
+                  </span>
+                </div>
+                <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-2.5">
+                  <b>Main Branch Authority.</b> Oversees domain tracks (Competitive Programming, Robotics, AI & ML), coordinates technical project architecture, and reviews code submissions.
+                </p>
+                <div class="space-y-1 text-[11px] text-slate-600 dark:text-slate-400 font-mono">
+                  <div class="flex items-start gap-1.5">
+                    <span class="text-purple-600 dark:text-purple-400 font-bold shrink-0">▸ Promotion:</span>
+                    <span>Appointed exclusively by Lead Administrators. Cannot be unlocked through automated contribution points.</span>
+                  </div>
+                  <div class="flex items-start gap-1.5">
+                    <span class="text-purple-600 dark:text-purple-400 font-bold shrink-0">▸ Auto-System:</span>
+                    <span class="text-purple-700 dark:text-purple-300 font-semibold">Exempt from contribution points, auto-promotion, and auto-demotion.</span>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-t border-purple-200/60 dark:border-purple-900/40 text-[10px] font-mono font-bold text-purple-700 dark:text-purple-400 flex items-center justify-between">
+                <span>Tier 3 • Technical Leadership</span>
+                <span class="px-1.5 py-0.5 rounded bg-purple-200/60 dark:bg-purple-900/40 text-purple-900 dark:text-purple-200 text-[9px]">EXEMPT FROM DECAY</span>
+              </div>
+            </div>
+
+            <!-- Role 2: Staff Contributor -->
+            <div class="p-4 rounded-xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/40 dark:bg-emerald-950/20 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-emerald-800 dark:text-emerald-300">
+                    <i data-lucide="code-2" class="w-3.5 h-3.5"></i> Staff Contributor
+                  </span>
+                  <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-200 font-extrabold border border-emerald-300/60">
+                    STAFF CONTRIBUTOR PASS
+                  </span>
+                </div>
+                <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-2.5">
+                  <b>Senior Peer Mentor.</b> Guides junior developers, assists in workshops, and conducts initial code reviews across active repositories.
+                </p>
+                <div class="space-y-1 text-[11px] text-slate-600 dark:text-slate-400 font-mono">
+                  <div class="flex items-start gap-1.5">
+                    <span class="text-emerald-600 dark:text-emerald-400 font-bold shrink-0">▸ Auto-Promote:</span>
+                    <span>Unlocked automatically when an Active Developer reaches <b>100+ merit points</b>.</span>
+                  </div>
+                  <div class="flex items-start gap-1.5">
+                    <span class="text-emerald-600 dark:text-emerald-400 font-bold shrink-0">▸ Maintenance:</span>
+                    <span>Must maintain <b>≥60 points</b>. Falling below 60 points triggers <b>auto-demotion</b> to Active Dev.</span>
+                  </div>
+                  <div class="flex items-start gap-1.5">
+                    <span class="text-emerald-600 dark:text-emerald-400 font-bold shrink-0">▸ System Ceiling:</span>
+                    <span class="text-slate-700 dark:text-slate-300 font-semibold">Auto-promotion strictly caps here. Advancement to higher tiers is by Lead Admin only.</span>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-t border-emerald-200/60 dark:border-emerald-900/40 text-[10px] font-mono font-bold text-emerald-700 dark:text-emerald-400 flex items-center justify-between">
+                <span>Tier 2 • Senior Contributor</span>
+                <span class="px-1.5 py-0.5 rounded bg-emerald-200/60 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-200 text-[9px]">MAINTAIN ≥60 PTS</span>
+              </div>
+            </div>
+
+            <!-- Role 1: Active Developer -->
+            <div class="p-4 rounded-xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/40 dark:bg-blue-950/20 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-blue-800 dark:text-blue-300">
+                    <i data-lucide="cpu" class="w-3.5 h-3.5"></i> Active Developer
+                  </span>
+                  <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/60 text-blue-900 dark:text-blue-200 font-extrabold border border-blue-300/60">
+                    ACTIVE DEVELOPER PASS
+                  </span>
+                </div>
+                <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-2.5">
+                  <b>Verified Student Member.</b> Entry tier for CSE (AI & ML) undergraduates who claim their official Tech Club ID. Participates in hackathons, workshops, and team builds.
+                </p>
+                <div class="space-y-1 text-[11px] text-slate-600 dark:text-slate-400 font-mono">
+                  <div class="flex items-start gap-1.5">
+                    <span class="text-blue-600 dark:text-blue-400 font-bold shrink-0">▸ Merit Points:</span>
+                    <span>+20 pts per verified peer referral • +15 pts per workshop RSVP • +25 pts per project showcase.</span>
+                  </div>
+                  <div class="flex items-start gap-1.5">
+                    <span class="text-blue-600 dark:text-blue-400 font-bold shrink-0">▸ Auto-Promote:</span>
+                    <span class="text-blue-700 dark:text-blue-300 font-semibold">Reaching 100 points automatically promotes you to Staff Contributor rank!</span>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-t border-blue-200/60 dark:border-blue-900/40 text-[10px] font-mono font-bold text-blue-700 dark:text-blue-400 flex items-center justify-between">
+                <span>Tier 1 • Member Registry</span>
+                <span class="px-1.5 py-0.5 rounded bg-blue-200/60 dark:bg-blue-900/40 text-blue-900 dark:text-blue-200 text-[9px]">TARGET: 100 PTS</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div> <!-- End member-dashboard-container -->
 
 </main>
 
@@ -1107,11 +1528,66 @@
   </div>
 
   <!-- Scripts -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase-config.js"></script>
-  <script src="js/supabase-client.js"></script>
-  <script src="js/auth.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
+    window.switchProfileTab = switchProfileTab;
+    window.openAvatarModal = openAvatarModal;
+    window.closeAvatarModal = closeAvatarModal;
+    window.selectPresetAvatar = selectPresetAvatar;
+    window.handleAvatarFileUpload = handleAvatarFileUpload;
+    window.applyAvatarUrl = applyAvatarUrl;
+    window.removeProfileAvatar = removeProfileAvatar;
+    window.saveAvatarSelection = saveAvatarSelection;
+    window.handleProfileDetailsSubmit = handleProfileDetailsSubmit;
+
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    window.switchProfileTab = switchProfileTab;
+    window.openAvatarModal = openAvatarModal;
+    window.closeAvatarModal = closeAvatarModal;
+    window.selectPresetAvatar = selectPresetAvatar;
+    window.handleAvatarFileUpload = handleAvatarFileUpload;
+    window.applyAvatarUrl = applyAvatarUrl;
+    window.removeProfileAvatar = removeProfileAvatar;
+    window.saveAvatarSelection = saveAvatarSelection;
+    window.handleProfileDetailsSubmit = handleProfileDetailsSubmit;
+
+  </script>
+  <script src="js/supabase-config.js">
+    window.switchProfileTab = switchProfileTab;
+    window.openAvatarModal = openAvatarModal;
+    window.closeAvatarModal = closeAvatarModal;
+    window.selectPresetAvatar = selectPresetAvatar;
+    window.handleAvatarFileUpload = handleAvatarFileUpload;
+    window.applyAvatarUrl = applyAvatarUrl;
+    window.removeProfileAvatar = removeProfileAvatar;
+    window.saveAvatarSelection = saveAvatarSelection;
+    window.handleProfileDetailsSubmit = handleProfileDetailsSubmit;
+
+  </script>
+  <script src="js/supabase-client.js">
+    window.switchProfileTab = switchProfileTab;
+    window.openAvatarModal = openAvatarModal;
+    window.closeAvatarModal = closeAvatarModal;
+    window.selectPresetAvatar = selectPresetAvatar;
+    window.handleAvatarFileUpload = handleAvatarFileUpload;
+    window.applyAvatarUrl = applyAvatarUrl;
+    window.removeProfileAvatar = removeProfileAvatar;
+    window.saveAvatarSelection = saveAvatarSelection;
+    window.handleProfileDetailsSubmit = handleProfileDetailsSubmit;
+
+  </script>
+  <script src="js/auth.js">
+    window.switchProfileTab = switchProfileTab;
+    window.openAvatarModal = openAvatarModal;
+    window.closeAvatarModal = closeAvatarModal;
+    window.selectPresetAvatar = selectPresetAvatar;
+    window.handleAvatarFileUpload = handleAvatarFileUpload;
+    window.applyAvatarUrl = applyAvatarUrl;
+    window.removeProfileAvatar = removeProfileAvatar;
+    window.saveAvatarSelection = saveAvatarSelection;
+    window.handleProfileDetailsSubmit = handleProfileDetailsSubmit;
+
+  </script>
   <script>
     /* ============================================================
        LOGIN & REGISTRATION CONTROLLER
@@ -1448,6 +1924,188 @@
     }
 
     // Check if an existing session is already stored
+    
+    // --- PROFILE TAB MANAGEMENT ---
+    let activeProfileTab = 'overview';
+
+    function switchProfileTab(tabName) {
+      activeProfileTab = tabName;
+      
+      const tabButtons = document.querySelectorAll('.profile-nav-tab');
+      tabButtons.forEach(btn => {
+        btn.className = 'profile-nav-tab px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 transition shrink-0 cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700';
+      });
+
+      const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+      if (activeBtn) {
+        if (tabName === 'faculty') {
+          activeBtn.className = 'profile-nav-tab px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-2 transition shrink-0 cursor-pointer bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-400/30';
+        } else {
+          activeBtn.className = 'profile-nav-tab px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-2 transition shrink-0 cursor-pointer bg-blue-600 text-white shadow-sm ring-2 ring-blue-400/30';
+        }
+      }
+
+      const tabPanes = document.querySelectorAll('.profile-tab-pane');
+      tabPanes.forEach(pane => {
+        pane.classList.add('hidden');
+      });
+
+      const activePane = document.getElementById(`tab-pane-${tabName}`);
+      if (activePane) {
+        activePane.classList.remove('hidden');
+      }
+
+      if (tabName === 'directory') {
+        renderDirectoryList();
+      }
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    // --- AVATAR MANAGEMENT ---
+    const PRESET_AVATARS = [
+      { name: 'Ada', url: 'https://api.dicebear.com/7.x/bottts/svg?seed=Ada' },
+      { name: 'Turing', url: 'https://api.dicebear.com/7.x/bottts/svg?seed=Turing' },
+      { name: 'Felix', url: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Felix' },
+      { name: 'Luna', url: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Luna' },
+      { name: 'Gizmo', url: 'https://api.dicebear.com/7.x/fun-emoji/svg?seed=Gizmo' },
+      { name: 'Spark', url: 'https://api.dicebear.com/7.x/pixel-art/svg?seed=Spark' },
+      { name: 'Leo', url: 'https://api.dicebear.com/7.x/personas/svg?seed=Leo' },
+      { name: 'Nova', url: 'https://api.dicebear.com/7.x/lorelei/svg?seed=Nova' }
+    ];
+
+    let pendingAvatarUrl = '';
+
+    function openAvatarModal() {
+      const session = window.AuthEngine.getActiveSession();
+      if (!session) return;
+
+      pendingAvatarUrl = session.avatar || '';
+      updateAvatarModalPreview(pendingAvatarUrl, session.name);
+
+      const nameEl = document.getElementById('avatar-preview-name');
+      if (nameEl) nameEl.textContent = session.name;
+
+      renderPresetAvatars();
+
+      const modal = document.getElementById('avatar-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function closeAvatarModal() {
+      const modal = document.getElementById('avatar-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function renderPresetAvatars() {
+      const grid = document.getElementById('preset-avatars-grid');
+      if (!grid) return;
+      grid.innerHTML = PRESET_AVATARS.map(p => `
+        <button 
+          type="button" 
+          onclick="selectPresetAvatar('${p.url}')" 
+          class="p-1.5 rounded-xl border-2 ${pendingAvatarUrl === p.url ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/50' : 'border-slate-200 dark:border-slate-800 hover:border-blue-400'} flex flex-col items-center gap-1 transition cursor-pointer group">
+          <img src="${p.url}" alt="${p.name}" class="w-10 h-10 rounded-lg object-contain group-hover:scale-105 transition">
+          <span class="text-[10px] font-mono font-semibold text-slate-600 dark:text-slate-300">${p.name}</span>
+        </button>
+      `).join('');
+    }
+
+    function selectPresetAvatar(url) {
+      pendingAvatarUrl = url;
+      updateAvatarModalPreview(url);
+      renderPresetAvatars();
+    }
+
+    function handleAvatarFileUpload(e) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      if (file.size > 2 * 1024 * 1024) {
+        showToast('Image file size must be under 2MB.', 'alert-circle');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        pendingAvatarUrl = event.target.result;
+        updateAvatarModalPreview(pendingAvatarUrl);
+        renderPresetAvatars();
+        showToast('Local image ready. Click "Save Avatar" to apply.', 'image');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function applyAvatarUrl() {
+      const input = document.getElementById('avatar-url-input');
+      const val = (input?.value || '').trim();
+      if (!val) {
+        showToast('Please enter a valid image URL.', 'alert-circle');
+        return;
+      }
+      pendingAvatarUrl = val;
+      updateAvatarModalPreview(pendingAvatarUrl);
+      renderPresetAvatars();
+      showToast('Image URL applied to preview.', 'image');
+    }
+
+    function removeProfileAvatar() {
+      pendingAvatarUrl = '';
+      updateAvatarModalPreview('');
+      renderPresetAvatars();
+      showToast('Avatar cleared (will use initials).', 'info');
+    }
+
+    function updateAvatarModalPreview(url, name) {
+      const preview = document.getElementById('avatar-modal-preview');
+      if (!preview) return;
+      const session = window.AuthEngine.getActiveSession();
+      const displayName = name || session?.name || 'BST';
+      const initials = displayName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'BST';
+
+      if (url) {
+        preview.innerHTML = `<img src="${url}" alt="${displayName}" class="w-full h-full object-cover">`;
+      } else {
+        preview.innerHTML = initials;
+      }
+    }
+
+    function saveAvatarSelection() {
+      try {
+        const updated = window.AuthEngine.updateMemberProfile({ avatar: pendingAvatarUrl });
+        showToast('Profile picture updated successfully!', 'check-circle-2');
+        renderMemberDashboard(updated);
+        closeAvatarModal();
+      } catch (err) {
+        showToast(err.message, 'alert-circle');
+      }
+    }
+
+    // --- PROFILE DETAILS & BIO SUBMIT ---
+    function handleProfileDetailsSubmit(e) {
+      e.preventDefault();
+      const bio = (document.getElementById('profile-bio-input')?.value || '').trim();
+      const skills = (document.getElementById('profile-skills-input')?.value || '').trim();
+      const github = (document.getElementById('profile-github-input')?.value || '').trim();
+      const linkedin = (document.getElementById('profile-linkedin-input')?.value || '').trim();
+      const website = (document.getElementById('profile-website-input')?.value || '').trim();
+
+      try {
+        const updated = window.AuthEngine.updateMemberProfile({ bio, skills, github, linkedin, website });
+        showToast('Profile details saved!', 'check-circle-2');
+        renderMemberDashboard(updated);
+      } catch (err) {
+        showToast(err.message, 'alert-circle');
+      }
+    }
+
     function checkActiveSessionState() {
       const session = window.AuthEngine.getActiveSession();
       if (session) {
@@ -1468,6 +2126,51 @@
       const userRank = window.AuthEngine.normalizeMemberRank ? window.AuthEngine.normalizeMemberRank(currentMemberRecord.role || session.role) : 'Active Developer';
 
       document.getElementById('dash-user-name').textContent = session.name;
+
+      // Populate Avatar Displays
+      const initials = session.name ? session.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'BST';
+      const dashAvatar = document.getElementById('dash-avatar-container');
+      const editAvatarPreview = document.getElementById('profile-edit-avatar-preview');
+
+      if (session.avatar) {
+        if (dashAvatar) dashAvatar.innerHTML = `<img src="${session.avatar}" alt="${session.name}" class="w-full h-full object-cover">`;
+        if (editAvatarPreview) editAvatarPreview.innerHTML = `<img src="${session.avatar}" alt="${session.name}" class="w-full h-full object-cover">`;
+      } else {
+        if (dashAvatar) dashAvatar.innerHTML = initials;
+        if (editAvatarPreview) editAvatarPreview.innerHTML = initials;
+      }
+
+      // Populate Profile Details Form & Header Badges
+      const bioInput = document.getElementById('profile-bio-input');
+      if (bioInput) bioInput.value = currentMemberRecord.bio || session.bio || '';
+      const skillsInput = document.getElementById('profile-skills-input');
+      if (skillsInput) skillsInput.value = currentMemberRecord.skills || session.skills || '';
+      const githubInput = document.getElementById('profile-github-input');
+      if (githubInput) githubInput.value = currentMemberRecord.github || session.github || '';
+      const linkedinInput = document.getElementById('profile-linkedin-input');
+      if (linkedinInput) linkedinInput.value = currentMemberRecord.linkedin || session.linkedin || '';
+      const websiteInput = document.getElementById('profile-website-input');
+      if (websiteInput) websiteInput.value = currentMemberRecord.website || session.website || '';
+      const bioPreview = document.getElementById('dash-bio-preview');
+      if (bioPreview) {
+        bioPreview.textContent = (currentMemberRecord.bio || session.bio) || `${session.department} • Cohort 2026`;
+      }
+      const clubIdBadge = document.getElementById('dash-club-id-badge');
+      if (clubIdBadge) clubIdBadge.textContent = session.techClubId;
+      const usnBadge = document.getElementById('dash-usn-badge');
+      if (usnBadge) usnBadge.textContent = session.usn === 'FACULTY' ? 'FACULTY OBSERVER' : `USN: ${session.usn}`;
+      const deptBadge = document.getElementById('dash-dept-badge');
+      if (deptBadge) deptBadge.textContent = session.department;
+
+      // Show/Hide Faculty Tab Button
+      const facultyTabBtn = document.getElementById('tab-btn-faculty');
+      if (facultyTabBtn) {
+        if (userRank === 'Faculty Evaluator' || userRank === 'Root Architect' || userRank === 'Core Maintainer' || currentMemberRecord.isTeacher) {
+          facultyTabBtn.classList.remove('hidden');
+        } else {
+          facultyTabBtn.classList.add('hidden');
+        }
+      }
       document.getElementById('card-club-id').textContent = session.techClubId;
       document.getElementById('card-name').textContent = session.name;
       document.getElementById('card-usn').textContent = session.usn === 'FACULTY' ? 'FACULTY OBSERVER' : session.usn;
@@ -1592,6 +2295,11 @@
         if (cardStatusDot) cardStatusDot.className = 'w-1.5 h-1.5 rounded-full bg-blue-500';
         if (cardStatusText) cardStatusText.textContent = 'ACTIVE DEVELOPER [USERLAND]';
         if (adminSuite) adminSuite.classList.add('hidden');
+      }
+
+      
+      if (session.avatar && cardAvatar) {
+        cardAvatar.innerHTML = `<img src="${session.avatar}" alt="${session.name}" class="w-full h-full object-cover">`;
       }
 
       // Real-time Contribution & Advancement Metrics
@@ -2156,9 +2864,10 @@
 
     function renderDirectoryList() {
       const container = document.getElementById('modal-members-list');
-      if (!container) return;
+      const embeddedContainer = document.getElementById('embedded-members-list');
+      if (!container && !embeddedContainer) return;
 
-      const query = (document.getElementById('directory-search-input')?.value || '').toLowerCase().trim();
+      const query = (document.getElementById('embedded-directory-search-input')?.value || document.getElementById('directory-search-input')?.value || '').toLowerCase().trim();
       const vault = window.AuthEngine ? window.AuthEngine.getMembersVault() : {};
       const members = Object.values(vault || {});
 
@@ -2195,6 +2904,50 @@
       if (elCountStaff) elCountStaff.textContent = countStaff;
       const elCountActive = document.getElementById('role-count-Active Developer');
       if (elCountActive) elCountActive.textContent = countActive;
+
+      // Update embedded tab counts
+      const elEmbAll = document.getElementById('embedded-role-count-ALL');
+      if (elEmbAll) elEmbAll.textContent = countAll;
+      const elEmbLead = document.getElementById('embedded-role-count-Root Architect');
+      if (elEmbLead) elEmbLead.textContent = countLead;
+      const elEmbMaintainer = document.getElementById('embedded-role-count-Core Maintainer');
+      if (elEmbMaintainer) elEmbMaintainer.textContent = countMaintainer;
+      const elEmbStaff = document.getElementById('embedded-role-count-Staff Contributor');
+      if (elEmbStaff) elEmbStaff.textContent = countStaff;
+      const elEmbActive = document.getElementById('embedded-role-count-Active Developer');
+      if (elEmbActive) elEmbActive.textContent = countActive;
+
+      const btnEmbAll = document.getElementById('embedded-role-filter-ALL');
+      const btnEmbLead = document.getElementById('embedded-role-filter-Root Architect');
+      const btnEmbMaintainer = document.getElementById('embedded-role-filter-Core Maintainer');
+      const btnEmbStaff = document.getElementById('embedded-role-filter-Staff Contributor');
+      const btnEmbActive = document.getElementById('embedded-role-filter-Active Developer');
+
+      if (btnEmbAll) {
+        btnEmbAll.className = currentDirectoryRoleFilter === 'ALL'
+          ? 'px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-blue-600 text-white shadow-sm ring-1 ring-blue-400/50 scale-[1.02] transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0'
+          : 'px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700/80 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700/60 hover:scale-[1.02] active:scale-95 transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0';
+      }
+      if (btnEmbLead) {
+        btnEmbLead.className = currentDirectoryRoleFilter === 'Root Architect'
+          ? 'px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-amber-500 text-slate-950 border border-amber-300 ring-2 ring-amber-400/50 shadow-sm shadow-amber-500/20 scale-[1.02] transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0'
+          : 'px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-slate-100 hover:bg-amber-50 dark:bg-slate-800 dark:hover:bg-amber-950/40 text-slate-600 dark:text-slate-300 hover:text-amber-800 dark:hover:text-amber-300 border border-slate-200 dark:border-slate-700/60 hover:border-amber-300 dark:hover:border-amber-700 hover:scale-[1.02] active:scale-95 transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0';
+      }
+      if (btnEmbMaintainer) {
+        btnEmbMaintainer.className = currentDirectoryRoleFilter === 'Core Maintainer'
+          ? 'px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-purple-600 text-white border border-purple-400 ring-2 ring-purple-400/50 shadow-sm shadow-purple-500/20 scale-[1.02] transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0'
+          : 'px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-slate-100 hover:bg-purple-50 dark:bg-slate-800 dark:hover:bg-purple-950/40 text-slate-600 dark:text-slate-300 hover:text-purple-800 dark:hover:text-purple-300 border border-slate-200 dark:border-slate-700/60 hover:border-purple-300 dark:hover:border-purple-700 hover:scale-[1.02] active:scale-95 transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0';
+      }
+      if (btnEmbStaff) {
+        btnEmbStaff.className = currentDirectoryRoleFilter === 'Staff Contributor'
+          ? 'px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-emerald-600 text-white border border-emerald-400 ring-2 ring-emerald-400/50 shadow-sm shadow-emerald-500/20 scale-[1.02] transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0'
+          : 'px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-slate-100 hover:bg-emerald-50 dark:bg-slate-800 dark:hover:bg-emerald-950/40 text-slate-600 dark:text-slate-300 hover:text-emerald-800 dark:hover:text-emerald-300 border border-slate-200 dark:border-slate-700/60 hover:border-emerald-300 dark:hover:border-emerald-700 hover:scale-[1.02] active:scale-95 transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0';
+      }
+      if (btnEmbActive) {
+        btnEmbActive.className = currentDirectoryRoleFilter === 'Active Developer'
+          ? 'px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-blue-600 text-white border border-blue-400 ring-2 ring-blue-400/50 shadow-sm shadow-blue-500/20 scale-[1.02] transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0'
+          : 'px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-slate-100 hover:bg-blue-50 dark:bg-slate-800 dark:hover:bg-blue-950/40 text-slate-600 dark:text-slate-300 hover:text-blue-700 dark:hover:text-blue-300 border border-slate-200 dark:border-slate-700/60 hover:border-blue-300 dark:hover:border-blue-700 hover:scale-[1.02] active:scale-95 transition-all duration-150 cursor-pointer flex items-center gap-1.5 shrink-0';
+      }
 
       // Dynamic Interactive Button States
       const btnAll = document.getElementById('role-filter-ALL');
@@ -2273,7 +3026,7 @@
         };
         const currentCategoryLabel = roleLabelMap[currentDirectoryRoleFilter] || 'members';
 
-        container.innerHTML = `
+        const emptyHtml = `
           <div class="text-center py-12 px-4">
             <div class="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto mb-3 shadow-inner">
               <i data-lucide="users" class="w-6 h-6"></i>
@@ -2291,11 +3044,13 @@
             ` : ''}
           </div>
         `;
+        if (container) container.innerHTML = emptyHtml;
+        if (embeddedContainer) embeddedContainer.innerHTML = emptyHtml;
         if (window.lucide) window.lucide.createIcons();
         return;
       }
 
-      container.innerHTML = filtered.map((m, index) => {
+      const generatedDirectoryHtml = filtered.map((m, index) => {
         const mRank = window.AuthEngine.normalizeMemberRank ? window.AuthEngine.normalizeMemberRank(m.role) : (m.role || 'Active Developer');
         const ranksOrder = { 'Active Developer': 1, 'Staff Contributor': 2, 'Core Maintainer': 3, 'Root Architect': 4, 'Faculty Evaluator': 5 };
         const mRankLevel = ranksOrder[mRank] || 1;
@@ -2520,8 +3275,130 @@
         `;
       }).join('');
 
+      if (container) container.innerHTML = generatedDirectoryHtml;
+      if (embeddedContainer) embeddedContainer.innerHTML = generatedDirectoryHtml;
+
       if (window.lucide) window.lucide.createIcons();
     }
+  
+    window.switchProfileTab = switchProfileTab;
+    window.openAvatarModal = openAvatarModal;
+    window.closeAvatarModal = closeAvatarModal;
+    window.selectPresetAvatar = selectPresetAvatar;
+    window.handleAvatarFileUpload = handleAvatarFileUpload;
+    window.applyAvatarUrl = applyAvatarUrl;
+    window.removeProfileAvatar = removeProfileAvatar;
+    window.saveAvatarSelection = saveAvatarSelection;
+    window.handleProfileDetailsSubmit = handleProfileDetailsSubmit;
+
   </script>
+  <!-- ============================================================
+       AVATAR CUSTOMIZATION MODAL (FILE UPLOAD, 8 TECH PRESETS, URL)
+       ============================================================ -->
+  <div id="avatar-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <!-- Modal Header -->
+      <div class="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+            <i data-lucide="camera" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white">Customize Profile Picture</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Upload your own photo or pick from curated tech avatars</p>
+          </div>
+        </div>
+        <button onclick="closeAvatarModal()" class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-5 overflow-y-auto space-y-5 flex-1">
+        
+        <!-- Live Avatar Preview -->
+        <div class="flex items-center gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+          <div id="avatar-modal-preview" class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-mono font-bold text-xl shadow-md overflow-hidden shrink-0">
+            BST
+          </div>
+          <div class="min-w-0">
+            <span class="text-[10px] uppercase font-mono text-slate-400 font-bold block">CURRENT PREVIEW</span>
+            <div id="avatar-preview-name" class="text-sm font-bold text-slate-900 dark:text-white truncate">Member Name</div>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Will be updated across your Tech Club ID card, dashboard, and roster.</p>
+          </div>
+        </div>
+
+        <!-- Option 1: File Upload (Local File) -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
+            <i data-lucide="upload" class="w-3.5 h-3.5 text-blue-500"></i> Upload Image File (PNG, JPG, WebP)
+          </label>
+          <input 
+            type="file" 
+            id="avatar-file-input" 
+            accept="image/*" 
+            onchange="handleAvatarFileUpload(event)" 
+            class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 dark:file:bg-blue-950 file:text-blue-700 dark:file:text-blue-300 hover:file:bg-blue-100 cursor-pointer">
+          <p class="text-[10px] text-slate-400 mt-1">Image is converted client-side and saved securely in your browser vault.</p>
+        </div>
+
+        <!-- Option 2: Curated 8 Tech Presets -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-1.5">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-purple-500"></i> Curated Tech Avatars
+          </label>
+          <div class="grid grid-cols-4 gap-2.5" id="preset-avatars-grid">
+            <!-- 8 Tech Presets rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Option 3: External Image URL -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+            <i data-lucide="link" class="w-3.5 h-3.5 text-indigo-500"></i> Or Enter Image URL (e.g. GitHub Avatar)
+          </label>
+          <div class="flex gap-2">
+            <input 
+              type="url" 
+              id="avatar-url-input" 
+              placeholder="https://github.com/your-username.png" 
+              class="flex-1 px-3 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button 
+              type="button" 
+              onclick="applyAvatarUrl()" 
+              class="px-3 py-2 text-xs font-bold rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition cursor-pointer">
+              Apply
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 flex items-center justify-between gap-2">
+        <button 
+          type="button" 
+          onclick="removeProfileAvatar()" 
+          class="text-xs font-semibold text-rose-600 dark:text-rose-400 hover:underline flex items-center gap-1 cursor-pointer">
+          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Remove Photo
+        </button>
+        <div class="flex items-center gap-2">
+          <button 
+            type="button" 
+            onclick="closeAvatarModal()" 
+            class="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer">
+            Cancel
+          </button>
+          <button 
+            type="button" 
+            onclick="saveAvatarSelection()" 
+            class="px-5 py-2 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition flex items-center gap-1.5 cursor-pointer">
+            <i data-lucide="check" class="w-3.5 h-3.5"></i> Save Avatar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

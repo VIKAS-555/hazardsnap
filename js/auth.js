@@ -358,6 +358,44 @@ function logoutMember() {
   window.location.reload();
 }
 
+/**
+ * Update member profile details (avatar, bio, github, linkedin, skills)
+ */
+function updateMemberProfile(updates) {
+  const session = getActiveSession();
+  if (!session) throw new Error('No active session found.');
+
+  const vault = getMembersVault();
+  let updatedMember = null;
+
+  if (Array.isArray(vault)) {
+    const idx = vault.findIndex(m => m.techClubId === session.techClubId || m.email.toLowerCase() === session.email.toLowerCase());
+    if (idx !== -1) {
+      vault[idx] = { ...vault[idx], ...updates };
+      updatedMember = vault[idx];
+      saveMembersVault(vault);
+    }
+  } else if (vault && typeof vault === 'object') {
+    if (vault[session.techClubId]) {
+      vault[session.techClubId] = { ...vault[session.techClubId], ...updates };
+      updatedMember = vault[session.techClubId];
+      saveMembersVault(vault);
+    }
+  }
+
+  // Update session
+  const updatedSession = { ...session, ...updates };
+  localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(updatedSession));
+  sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(updatedSession));
+
+  // Sync with cloud if configured
+  if (window.SupabaseEngine && window.SupabaseEngine.isConfigured() && updatedMember) {
+    window.SupabaseEngine.upsertMember(updatedMember).catch(err => console.warn('[Supabase] Profile sync err:', err));
+  }
+
+  return updatedSession;
+}
+
 // --- Core Auth APIs ---
 
 /**
@@ -827,5 +865,6 @@ window.AuthEngine = {
   isFaculty,
   updateMemberRank,
   demoteMember,
-  promoteMember
+  promoteMember,
+  updateMemberProfile
 };

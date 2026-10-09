@@ -1395,6 +1395,22 @@ function openRsvpModal(eventId) {
           ? `Team Event (${maxTeamSize} Members)`
           : `Team: ${minTeamSize}–${maxTeamSize} Members`;
       }
+      // Populate Team Capacity Range Dropdown
+      const targetSizeSelect = document.getElementById('rsvp-target-team-size');
+      if (targetSizeSelect) {
+        targetSizeSelect.innerHTML = '';
+        for (let sz = minTeamSize; sz <= maxTeamSize; sz++) {
+          const opt = document.createElement('option');
+          opt.value = sz;
+          opt.textContent = `${sz} Members${sz === maxTeamSize ? ' (Max)' : ''}`;
+          targetSizeSelect.appendChild(opt);
+        }
+        if (existingTeam && existingTeam.targetTeamSize) {
+          targetSizeSelect.value = existingTeam.targetTeamSize;
+        } else {
+          targetSizeSelect.value = maxTeamSize;
+        }
+      }
       if (teammatesList) teammatesList.innerHTML = '';
 
       // Check if user is already registered in a team for this event
@@ -1563,8 +1579,9 @@ function handleRsvpSubmit(e) {
       return;
     }
 
-    if (totalMembers > maxTeamSize) {
-      showToast(`This event allows a maximum of ${maxTeamSize} team members. Currently: ${totalMembers}.`, 'alert-circle');
+    const targetTeamSize = parseInt(document.getElementById('rsvp-target-team-size')?.value || maxTeamSize, 10);
+    if (totalMembers > targetTeamSize) {
+      showToast(`Selected team size is ${targetTeamSize} members. You have currently added ${totalMembers}. Adjust roster or team size.`, 'alert-circle');
       return;
     }
 
@@ -1607,6 +1624,7 @@ function handleRsvpSubmit(e) {
     let currentTeams = getStoredEventTeams();
     const existingTeamIdx = currentTeams.findIndex(t => t.eventId === activeRsvpEvent.id && t.leaderUsn === studentId);
 
+    const generatedCode = 'BST-' + teamName.replace(/[^A-Za-z0-9]/g, '').slice(0, 5).toUpperCase() + '-' + Math.floor(100 + Math.random() * 900);
     if (existingTeamIdx !== -1) {
       currentTeams[existingTeamIdx] = {
         ...currentTeams[existingTeamIdx],
@@ -1614,6 +1632,8 @@ function handleRsvpSubmit(e) {
         leaderName: name,
         leaderUsn: studentId,
         leaderEmail: email,
+        targetTeamSize,
+        inviteCode: currentTeams[existingTeamIdx].inviteCode || generatedCode,
         members: teammates,
         projectLink,
         pptLink,
@@ -1630,6 +1650,8 @@ function handleRsvpSubmit(e) {
         leaderName: name,
         leaderUsn: studentId,
         leaderEmail: email,
+        targetTeamSize,
+        inviteCode: generatedCode,
         members: teammates,
         projectLink,
         pptLink,
@@ -1736,6 +1758,30 @@ function openPassModal(eventId) {
           ...(userTeam.members || []).map(m => m.name)
         ];
         teamMembersEl.textContent = `Roster: ${roster.join(', ')}`;
+      }
+
+      // Team Capacity Pill & Invite Link Box
+      const filledSlots = 1 + (userTeam.members || []).length;
+      const targetSize = userTeam.targetTeamSize || userTeam.maxTeamSize || 4;
+      const capacityPill = document.getElementById('pass-team-capacity-pill');
+      if (capacityPill) {
+        capacityPill.textContent = `${filledSlots} / ${targetSize} Slots Filled`;
+      }
+
+      const inviteInput = document.getElementById('pass-team-invite-link');
+      const inviteBox = document.getElementById('pass-team-invite-box');
+      if (inviteInput) {
+        const inviteUrl = `${window.location.origin}${window.location.pathname}?join_team=${encodeURIComponent(userTeam.id)}`;
+        inviteInput.value = inviteUrl;
+        if (inviteBox) {
+          if (filledSlots >= targetSize) {
+            inviteBox.classList.add('opacity-75');
+            inviteInput.title = 'Team capacity filled';
+          } else {
+            inviteBox.classList.remove('opacity-75');
+            inviteInput.title = 'Send this invite link to your teammates';
+          }
+        }
       }
 
       if (teamStatusEl) {
@@ -2037,7 +2083,307 @@ function showToast(message, iconName = 'info') {
 window.toggleTheme = toggleTheme;
 window.filterEvents = filterEvents;
 window.resetEventFilters = resetEventFilters;
+/* ============================================================
+   HACKATHON TEAMMATE JOIN & INVITE ENGINE
+   ============================================================ */
+
+function openJoinTeamModal(teamIdOrCode = '') {
+  const modal = document.getElementById('join-team-modal');
+  if (!modal) return;
+
+  // Pre-fill user profile if logged in
+  const session = window.AuthEngine && window.AuthEngine.getActiveSession ? window.AuthEngine.getActiveSession() : null;
+  const cached = JSON.parse(localStorage.getItem('devsphere-student-profile') || '{}');
+
+  const nameInput = document.getElementById('join-member-name');
+  if (nameInput) nameInput.value = session?.name || cached?.name || '';
+
+  const usnInput = document.getElementById('join-member-usn');
+  if (usnInput) usnInput.value = session?.usn || cached?.studentId || '';
+
+  const emailInput = document.getElementById('join-member-email');
+  if (emailInput) emailInput.value = session?.email || cached?.email || '';
+
+  const yearInput = document.getElementById('join-member-year');
+  if (yearInput && cached?.year) yearInput.value = cached.year;
+
+  // Populate open teams dropdown
+  const selectDropdown = document.getElementById('join-team-select-dropdown');
+  const allTeams = getStoredEventTeams();
+
+  if (selectDropdown) {
+    selectDropdown.innerHTML = '<option value="">— Or pick from open registered teams —</option>';
+    allTeams.forEach(t => {
+      const filled = 1 + (t.members || []).length;
+      const target = t.targetTeamSize || t.maxTeamSize || 4;
+      if (filled < target) {
+        const opt = document.createElement('option');
+        opt.value = t.id;
+        opt.textContent = `${t.teamName} (${t.eventTitle || 'Event'}) — ${filled}/${target} filled`;
+        selectDropdown.appendChild(opt);
+      }
+    });
+  }
+
+  // Hide details card initially
+  const detailsCard = document.getElementById('join-team-details-card');
+  if (detailsCard) detailsCard.classList.add('hidden');
+  const teamHidden = document.getElementById('join-team-id-hidden');
+  if (teamHidden) teamHidden.value = '';
+
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  document.body.style.overflow = 'hidden';
+
+  if (teamIdOrCode) {
+    const codeInput = document.getElementById('join-team-code-input');
+    if (codeInput) codeInput.value = teamIdOrCode;
+    lookupTeamByCode(teamIdOrCode);
+  }
+
+  if (window.lucide) window.lucide.createIcons();
+}
+
+function closeJoinTeamModal() {
+  const modal = document.getElementById('join-team-modal');
+  if (!modal) return;
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+  document.body.style.overflow = 'auto';
+}
+
+function lookupTeamByCode(explicitCode = '') {
+  const input = document.getElementById('join-team-code-input');
+  const code = (explicitCode || input?.value || '').trim();
+  if (!code) {
+    showToast('Please enter a team code or team ID.', 'alert-circle');
+    return;
+  }
+
+  const allTeams = getStoredEventTeams();
+  const normalized = code.toLowerCase();
+  const team = allTeams.find(t => 
+    t.id.toLowerCase() === normalized || 
+    (t.inviteCode && t.inviteCode.toLowerCase() === normalized) ||
+    t.teamName.toLowerCase() === normalized
+  );
+
+  if (!team) {
+    showToast(`Team with code "${code}" not found. Please verify.`, 'alert-circle');
+    return;
+  }
+
+  displaySelectedTeamInJoinModal(team);
+}
+
+function selectTeamFromDropdown(teamId) {
+  if (!teamId) {
+    const detailsCard = document.getElementById('join-team-details-card');
+    if (detailsCard) detailsCard.classList.add('hidden');
+    const teamHidden = document.getElementById('join-team-id-hidden');
+    if (teamHidden) teamHidden.value = '';
+    return;
+  }
+  const allTeams = getStoredEventTeams();
+  const team = allTeams.find(t => t.id === teamId);
+  if (team) {
+    displaySelectedTeamInJoinModal(team);
+  }
+}
+
+function displaySelectedTeamInJoinModal(team) {
+  const detailsCard = document.getElementById('join-team-details-card');
+  const nameDisplay = document.getElementById('join-team-name-display');
+  const eventDisplay = document.getElementById('join-team-event-display');
+  const slotsBadge = document.getElementById('join-team-slots-badge');
+  const leaderDisplay = document.getElementById('join-team-leader-display');
+  const rosterDisplay = document.getElementById('join-team-roster-display');
+  const teamHidden = document.getElementById('join-team-id-hidden');
+
+  const filled = 1 + (team.members || []).length;
+  const target = team.targetTeamSize || team.maxTeamSize || 4;
+  const isFull = filled >= target;
+
+  if (nameDisplay) nameDisplay.textContent = team.teamName;
+  if (eventDisplay) eventDisplay.textContent = team.eventTitle || 'Hackathon / Event';
+  if (slotsBadge) {
+    slotsBadge.textContent = isFull ? `${filled}/${target} Filled (FULL)` : `${filled}/${target} Slots Filled (${target - filled} Open)`;
+    slotsBadge.className = isFull 
+      ? 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-400 border border-rose-200'
+      : 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800';
+  }
+  if (leaderDisplay) leaderDisplay.textContent = `${team.leaderName} (${team.leaderUsn})`;
+  if (rosterDisplay) {
+    const list = [team.leaderName, ...(team.members || []).map(m => m.name)];
+    rosterDisplay.textContent = list.join(', ');
+  }
+  if (teamHidden) teamHidden.value = team.id;
+
+  if (detailsCard) detailsCard.classList.remove('hidden');
+
+  const submitBtn = document.getElementById('btn-submit-join-team');
+  if (submitBtn) {
+    submitBtn.disabled = isFull;
+    if (isFull) {
+      submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      submitBtn.innerHTML = '<i data-lucide="lock" class="w-4 h-4"></i> Team Full';
+    } else {
+      submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      submitBtn.innerHTML = '<i data-lucide="user-check" class="w-4 h-4"></i> Confirm & Join Team';
+    }
+  }
+
+  if (window.lucide) window.lucide.createIcons();
+}
+
+function handleJoinTeamSubmit(e) {
+  e.preventDefault();
+  const teamId = document.getElementById('join-team-id-hidden')?.value;
+  if (!teamId) {
+    showToast('Please select or look up a valid team first.', 'alert-circle');
+    return;
+  }
+
+  const allTeams = getStoredEventTeams();
+  const teamIdx = allTeams.findIndex(t => t.id === teamId);
+  if (teamIdx === -1) {
+    showToast('Team not found.', 'alert-circle');
+    return;
+  }
+
+  const team = allTeams[teamIdx];
+  const name = (document.getElementById('join-member-name')?.value || '').trim();
+  const usn = (document.getElementById('join-member-usn')?.value || '').trim();
+  const email = (document.getElementById('join-member-email')?.value || '').trim();
+  const year = document.getElementById('join-member-year')?.value || '2nd Year';
+
+  // USN validation
+  const usnNum = parseInt(usn, 10);
+  if (isNaN(usnNum) || usnNum < 2392608001 || usnNum > 2392608302) {
+    showToast('USN must be between 2392608001 and 2392608302.', 'alert-circle');
+    return;
+  }
+
+  const targetSize = team.targetTeamSize || team.maxTeamSize || 4;
+  const currentSlots = 1 + (team.members || []).length;
+  if (currentSlots >= targetSize) {
+    showToast(`Team "${team.teamName}" is already at full capacity (${targetSize} members).`, 'alert-circle');
+    return;
+  }
+
+  // Mutual exclusivity check across all teams for this event
+  for (const existingTeam of allTeams) {
+    if (existingTeam.eventId === team.eventId) {
+      const inThisTeam = (existingTeam.leaderUsn === usn) || (existingTeam.members || []).some(m => m.usn === usn);
+      if (inThisTeam) {
+        alert(
+          `[Mutual Exclusivity Enforced]
+
+` +
+          `USN: ${usn}
+` +
+          `Status: Already registered in team "${existingTeam.teamName}" for this event.
+
+` +
+          `Rule: A student in one group cannot register in another team. To join "${team.teamName}", you must first leave or disband team "${existingTeam.teamName}".`
+        );
+        return;
+      }
+    }
+  }
+
+  // Add teammate to team roster
+  team.members = team.members || [];
+  team.members.push({ usn, name, email, year });
+  team.updatedAt = new Date().toISOString();
+  saveStoredEventTeams(allTeams);
+
+  // Mint RSVP Pass for this teammate
+  const ticketId = `BST-${usn.slice(-4)}-${Math.floor(100 + Math.random() * 900)}`;
+  const rsvpRecord = {
+    ticketId,
+    eventId: team.eventId,
+    eventTitle: team.eventTitle,
+    eventDate: activeRsvpEvent?.date || 'Hackathon Track',
+    eventTime: activeRsvpEvent?.time || 'Scheduled',
+    eventVenue: activeRsvpEvent?.venue || 'Lab Complex',
+    registeredAt: new Date().toISOString(),
+    studentName: name,
+    studentEmail: email,
+    studentId: usn,
+    department: 'CSE (AI & ML)',
+    year: year,
+    teamId: team.id,
+    teamName: team.teamName,
+    role: 'Team Member'
+  };
+
+  // Find event details for pass
+  const events = getStoredEvents();
+  const evt = events.find(e => e.id === team.eventId);
+  if (evt) {
+    rsvpRecord.eventDate = evt.date;
+    rsvpRecord.eventTime = evt.time;
+    rsvpRecord.eventVenue = evt.venue;
+  }
+
+  saveUserRsvp(team.eventId, rsvpRecord);
+
+  // Save student profile
+  localStorage.setItem('devsphere-student-profile', JSON.stringify({ name, email, studentId: usn, dept: 'CSE (AI & ML)', year }));
+
+  closeJoinTeamModal();
+  updateRsvpBadges();
+  renderEvents();
+  openPassModal(team.eventId);
+  showToast(`Successfully joined "${team.teamName}"! Admission pass ready.`, 'check-circle-2');
+}
+
+function copyTeamInviteLinkFromPass() {
+  const input = document.getElementById('pass-team-invite-link');
+  if (!input) return;
+  input.select();
+  navigator.clipboard.writeText(input.value).then(() => {
+    showToast('Team invite link copied to clipboard!', 'copy');
+  }).catch(() => {
+    document.execCommand('copy');
+    showToast('Team invite link copied!', 'copy');
+  });
+}
+
+function shareTeamInviteWhatsAppFromPass() {
+  const input = document.getElementById('pass-team-invite-link');
+  const teamNameEl = document.getElementById('pass-team-name');
+  const teamName = teamNameEl?.textContent || 'our hackathon team';
+  const link = input?.value || window.location.href;
+
+  const text = `Hey! Join our hackathon team "${teamName}" for the upcoming BST Tech Club event:
+
+Click this invite link to join directly:
+${link}`;
+  const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+  window.open(whatsappUrl, '_blank');
+}
+
+function handleJoinTeamUrlParam() {
+  const params = new URLSearchParams(window.location.search);
+  const joinTeamId = params.get('join_team') || params.get('team_code') || params.get('team');
+  if (joinTeamId) {
+    setTimeout(() => {
+      openJoinTeamModal(joinTeamId);
+    }, 250);
+  }
+}
+
 window.openRsvpModal = openRsvpModal;
+window.openJoinTeamModal = openJoinTeamModal;
+window.closeJoinTeamModal = closeJoinTeamModal;
+window.lookupTeamByCode = lookupTeamByCode;
+window.selectTeamFromDropdown = selectTeamFromDropdown;
+window.handleJoinTeamSubmit = handleJoinTeamSubmit;
+window.copyTeamInviteLinkFromPass = copyTeamInviteLinkFromPass;
+window.shareTeamInviteWhatsAppFromPass = shareTeamInviteWhatsAppFromPass;
+
 window.closeRsvpModal = closeRsvpModal;
 window.handleRsvpSubmit = handleRsvpSubmit;
 window.openPassModal = openPassModal;
