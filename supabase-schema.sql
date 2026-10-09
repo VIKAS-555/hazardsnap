@@ -105,6 +105,11 @@ CREATE POLICY "Allow members update own record"
     ON public.members FOR UPDATE 
     USING (true);
 
+-- Members: Allow deleting member records (Lead Administrator kick-out)
+CREATE POLICY "Allow delete members" 
+    ON public.members FOR DELETE 
+    USING (true);
+
 -- Events: Everyone can view events
 CREATE POLICY "Allow public read events" 
     ON public.events FOR SELECT 
@@ -124,6 +129,11 @@ CREATE POLICY "Allow public read rsvps"
 CREATE POLICY "Allow submit rsvps" 
     ON public.event_rsvps FOR INSERT 
     WITH CHECK (true);
+
+-- RSVPs: Allow deleting RSVPs (Lead Administrator kick-out / RSVP cancellation)
+CREATE POLICY "Allow delete rsvps" 
+    ON public.event_rsvps FOR DELETE 
+    USING (true);
 
 -- Projects: Everyone can view projects
 CREATE POLICY "Allow public read projects" 

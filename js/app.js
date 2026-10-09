@@ -160,7 +160,11 @@ async function initCloudEngineSync() {
     // Sync members
     const members = await window.SupabaseEngine.fetchMembers();
     if (members && Object.keys(members).length > 0) {
-      localStorage.setItem('devsphere_members_vault_v1', JSON.stringify(members));
+      if (window.AuthEngine && typeof window.AuthEngine.saveMembersVault === 'function') {
+        window.AuthEngine.saveMembersVault(members);
+      } else {
+        localStorage.setItem('devsphere_members_vault_v1', JSON.stringify(members));
+      }
       renderClubOverview();
     }
 
@@ -197,7 +201,11 @@ async function initCloudEngineSync() {
     onMembersUpdate: async () => {
       const members = await window.SupabaseEngine.fetchMembers();
       if (members) {
-        localStorage.setItem('devsphere_members_vault_v1', JSON.stringify(members));
+        if (window.AuthEngine && typeof window.AuthEngine.saveMembersVault === 'function') {
+          window.AuthEngine.saveMembersVault(members);
+        } else {
+          localStorage.setItem('devsphere_members_vault_v1', JSON.stringify(members));
+        }
         renderClubOverview();
       }
     },

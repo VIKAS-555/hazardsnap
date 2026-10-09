@@ -1660,6 +1660,9 @@
         try {
           await window.AuthEngine.syncWithCloud();
           updateMemberCountBadges();
+          if (typeof renderDirectoryList === 'function') {
+            renderDirectoryList();
+          }
         } catch (e) {
           console.warn('[Login Portal] Background sync:', e);
         }

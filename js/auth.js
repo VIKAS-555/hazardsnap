@@ -253,6 +253,41 @@ function generateTechClubId(usn, year = '2026') {
 }
 
 // --- Members Database / Vault ---
+const EXPELLED_STORAGE_KEY = 'devsphere_expelled_members';
+
+function getExpelledMembers() {
+  try {
+    const raw = localStorage.getItem(EXPELLED_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function addExpelledMember(identifier) {
+  if (!identifier) return;
+  const list = getExpelledMembers();
+  const idStr = String(identifier).trim();
+  if (!list.includes(idStr)) {
+    list.push(idStr);
+    localStorage.setItem(EXPELLED_STORAGE_KEY, JSON.stringify(list));
+  }
+}
+
+function isMemberExpelled(memberOrId) {
+  if (!memberOrId) return false;
+  const list = getExpelledMembers();
+  if (typeof memberOrId === 'string') {
+    const s = memberOrId.trim();
+    return list.includes(s) || list.includes(s.toLowerCase());
+  }
+  return (
+    list.includes(memberOrId.techClubId) ||
+    (memberOrId.email && list.includes(memberOrId.email.toLowerCase())) ||
+    (memberOrId.usn && list.includes(memberOrId.usn))
+  );
+}
+
 function getMembersVault() {
   try {
     const raw = localStorage.getItem(AUTH_STORAGE_KEY);
@@ -262,13 +297,15 @@ function getMembersVault() {
     const vault = JSON.parse(raw);
     let modified = false;
 
-    // Purge any pre-seeded demo accounts (e.g. Aditya Sharma)
+    // Purge any pre-seeded demo accounts (e.g. Aditya Sharma) & any expelled accounts
     for (const key of Object.keys(vault)) {
+      const record = vault[key];
       if (
         key === 'BST-2026-8001' || 
-        vault[key].name === 'Aditya Sharma' || 
-        vault[key].name === 'Alex Sharma' || 
-        vault[key].email === '2392608001@svyasa-sas.edu.in'
+        (record && (record.name === 'Aditya Sharma' || record.name === 'Alex Sharma' || record.email === '2392608001@svyasa-sas.edu.in')) ||
+        isMemberExpelled(key) ||
+        isMemberExpelled(record) ||
+        (record && (record.role === 'EXPELLED' || record.name === '[EXPELLED]'))
       ) {
         delete vault[key];
         modified = true;
@@ -285,6 +322,18 @@ function getMembersVault() {
 }
 
 function saveMembersVault(vault) {
+  if (vault && typeof vault === 'object') {
+    for (const key of Object.keys(vault)) {
+      const record = vault[key];
+      if (
+        isMemberExpelled(key) ||
+        isMemberExpelled(record) ||
+        (record && (record.role === 'EXPELLED' || record.name === '[EXPELLED]'))
+      ) {
+        delete vault[key];
+      }
+    }
+  }
   localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(vault));
 }
 
@@ -327,7 +376,12 @@ function getActiveSession() {
     const raw = sessionStorage.getItem(SESSION_STORAGE_KEY) || localStorage.getItem(SESSION_STORAGE_KEY);
     if (!raw) return null;
     const session = JSON.parse(raw);
-    if (session && (session.techClubId === 'BST-2026-8001' || session.name === 'Aditya Sharma' || session.name === 'Alex Sharma')) {
+    if (session && (
+      session.techClubId === 'BST-2026-8001' || 
+      session.name === 'Aditya Sharma' || 
+      session.name === 'Alex Sharma' ||
+      isMemberExpelled(session)
+    )) {
       localStorage.removeItem(SESSION_STORAGE_KEY);
       sessionStorage.removeItem(SESSION_STORAGE_KEY);
       return null;
@@ -615,6 +669,10 @@ async function authenticateMember(identifier, password, rememberMe = true) {
 
   const cleanIdentifier = identifier.trim().toLowerCase();
 
+  if (isMemberExpelled(cleanIdentifier)) {
+    throw new Error('Account Expelled: This member ID has been permanently revoked by the Lead Administrator.');
+  }
+
   // Find by Tech Club ID (case-insensitive) OR College Email OR USN
   const member = Object.values(vault).find(m => 
     m.techClubId.toLowerCase() === cleanIdentifier || 
@@ -622,7 +680,7 @@ async function authenticateMember(identifier, password, rememberMe = true) {
     m.usn.toLowerCase() === cleanIdentifier
   );
 
-  if (!member) {
+  if (!member || isMemberExpelled(member)) {
     recordFailedAttempt();
     throw new Error('Invalid Tech Club ID, Email, or Password.');
   }
@@ -713,6 +771,16 @@ async function syncWithCloud() {
     try {
       const cloudVault = await window.SupabaseEngine.fetchMembers();
       if (cloudVault) {
+        for (const key of Object.keys(cloudVault)) {
+          const rec = cloudVault[key];
+          if (
+            isMemberExpelled(key) ||
+            isMemberExpelled(rec) ||
+            (rec && (rec.role === 'EXPELLED' || rec.name === '[EXPELLED]'))
+          ) {
+            delete cloudVault[key];
+          }
+        }
         saveMembersVault(cloudVault);
         return cloudVault;
       }
@@ -866,18 +934,23 @@ async function kickOutMember(targetClubId) {
     }
   }
 
-  // Delete from local vault
+  // 1. Permanently register this member in the local expelled tombstone registry
+  addExpelledMember(targetClubId);
+  if (target.email) addExpelledMember(target.email);
+  if (target.usn) addExpelledMember(target.usn);
+
+  // 2. Delete from local vault and persist
   delete vault[targetClubId];
   saveMembersVault(vault);
 
-  // Clean up any RSVPs stored for this member
+  // 3. Clean up any local RSVPs stored for this member
   try {
     const rsvps = JSON.parse(localStorage.getItem('devsphere_event_rsvps') || '[]');
     const cleanedRsvps = rsvps.filter(r => r.clubId !== targetClubId && r.techClubId !== targetClubId && r.email !== target.email);
     localStorage.setItem('devsphere_event_rsvps', JSON.stringify(cleanedRsvps));
   } catch (e) {}
 
-  // Clean up team memberships from hackathon teams
+  // 4. Clean up team memberships from hackathon teams
   try {
     const teams = JSON.parse(localStorage.getItem('bst_hackathon_teams') || '[]');
     let teamsModified = false;
@@ -904,12 +977,18 @@ async function kickOutMember(targetClubId) {
     }
   } catch (e) {}
 
-  // Clean up from Supabase Cloud if configured
+  // 5. Cloud Database Purge (Supabase): Delete row, delete RSVPs, and tombstone
   if (window.SupabaseEngine && window.SupabaseEngine.isConfigured()) {
     try {
-      const client = window.SupabaseEngine.getClient();
-      if (client) {
-        await client.from('members').delete().eq('tech_club_id', targetClubId);
+      if (typeof window.SupabaseEngine.deleteMember === 'function') {
+        await window.SupabaseEngine.deleteMember(targetClubId);
+      } else {
+        const client = window.SupabaseEngine.getClient();
+        if (client) {
+          await client.from('event_rsvps').delete().eq('tech_club_id', targetClubId);
+          await client.from('members').delete().eq('tech_club_id', targetClubId);
+          await client.from('members').update({ role: 'EXPELLED', name: '[EXPELLED]' }).eq('tech_club_id', targetClubId);
+        }
       }
     } catch (e) {
       console.warn('[AuthEngine] Cloud kick-out notice:', e.message);
@@ -954,5 +1033,9 @@ window.AuthEngine = {
   demoteMember,
   promoteMember,
   kickOutMember,
+  getExpelledMembers,
+  addExpelledMember,
+  isMemberExpelled,
+  saveMembersVault,
   updateMemberProfile
 };

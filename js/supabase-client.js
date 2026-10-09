@@ -86,7 +86,28 @@
 
       // Format as vault dictionary keyed by techClubId
       const vault = {};
+      const expelled = (function () {
+        try {
+          return JSON.parse(localStorage.getItem('devsphere_expelled_members') || '[]');
+        } catch (e) {
+          return [];
+        }
+      })();
+
       (data || []).forEach(row => {
+        if (!row.tech_club_id) return;
+
+        // Never restore expelled members from cloud snapshot
+        if (
+          row.role === 'EXPELLED' ||
+          row.name === '[EXPELLED]' ||
+          expelled.includes(row.tech_club_id) ||
+          (row.usn && expelled.includes(row.usn)) ||
+          (row.email && expelled.includes(row.email.toLowerCase()))
+        ) {
+          return;
+        }
+
         vault[row.tech_club_id] = {
           techClubId: row.tech_club_id,
           name: row.name,
@@ -169,6 +190,62 @@
 
       if (error) throw new Error(error.message);
       return true;
+    },
+
+    async deleteMember(techClubId) {
+      const client = getClient();
+      if (!client) return false;
+
+      let deleteOk = false;
+
+      // 1. Delete associated event RSVPs
+      try {
+        await client
+          .from('event_rsvps')
+          .delete()
+          .eq('tech_club_id', techClubId);
+      } catch (e) {
+        console.warn('[Supabase] Could not delete event RSVPs for member:', e);
+      }
+
+      // 2. Direct hard delete from members table
+      try {
+        const { error: delErr } = await client
+          .from('members')
+          .delete()
+          .eq('tech_club_id', techClubId);
+        if (!delErr) {
+          deleteOk = true;
+        } else {
+          console.warn('[Supabase] Delete query notice:', delErr.message);
+        }
+      } catch (delErr) {
+        console.warn('[Supabase] Direct delete exception:', delErr);
+      }
+
+      // 3. Fallback tombstone update (in case RLS blocks DELETE for anon role)
+      // Supabase policy "Allow members update own record" guarantees UPDATE works!
+      try {
+        const dummyEmail = `expelled_${Date.now()}_${techClubId.replace(/[^a-zA-Z0-9]/g, '')}@removed.invalid`;
+        const { error: updErr } = await client
+          .from('members')
+          .update({
+            role: 'EXPELLED',
+            name: '[EXPELLED]',
+            email: dummyEmail
+          })
+          .eq('tech_club_id', techClubId);
+
+        if (!updErr) {
+          deleteOk = true;
+        } else {
+          console.warn('[Supabase] Tombstone update notice:', updErr.message);
+        }
+      } catch (updErr) {
+        console.warn('[Supabase] Tombstone update exception:', updErr);
+      }
+
+      return deleteOk;
     },
 
     // 2. Events Cloud Operations
