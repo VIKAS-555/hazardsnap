@@ -9,7 +9,6 @@ import {
   LocateFixed,
   Maximize2,
   Minimize2,
-  Box,
   Layers,
   Sparkles,
 } from 'lucide-react';
@@ -51,7 +50,6 @@ export default function SafetyMap({
   const [filterFixed, setFilterFixed] = useState<boolean>(false);
   const [selectedHazardModal, setSelectedHazardModal] = useState<HazardReport | null>(null);
   const [mapTheme, setMapTheme] = useState<MapTheme>('dark');
-  const [is3DView, setIs3DView] = useState<boolean>(false);
 
   // User location for navigation & centering
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number }>({
@@ -74,7 +72,7 @@ export default function SafetyMap({
     }
   }, [focusedHazard]);
 
-  // Adjust size smoothly when expanded or 3D view changes
+  // Adjust size smoothly when expanded
   useEffect(() => {
     if (mapInstanceRef.current) {
       const timer = setTimeout(() => {
@@ -82,7 +80,7 @@ export default function SafetyMap({
       }, 250);
       return () => clearTimeout(timer);
     }
-  }, [isExpanded, is3DView]);
+  }, [isExpanded]);
 
   // Fetch initial user GPS
   useEffect(() => {
@@ -437,13 +435,11 @@ export default function SafetyMap({
   };
 
   return (
-    <div className="relative w-full h-full bg-slate-100 dark:bg-slate-950 overflow-hidden map-3d-wrapper rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
-      {/* 3D / 2D MAP CANVAS */}
+    <div className="relative w-full h-full bg-slate-100 dark:bg-slate-950 overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+      {/* MAP CANVAS */}
       <div
         ref={mapContainerRef}
-        className={`w-full h-full z-0 transition-transform duration-500 ${
-          is3DView ? 'map-3d-tilt' : 'map-2d-flat'
-        }`}
+        className="w-full h-full z-0"
       />
 
       {/* TOP UNIFIED CONTROL BAR */}
@@ -484,20 +480,6 @@ export default function SafetyMap({
             🛰️ Satellite
           </button>
         </div>
-
-        {/* 3D Perspective Toggle */}
-        <button
-          onClick={() => setIs3DView(!is3DView)}
-          className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-            is3DView
-              ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm'
-              : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
-          }`}
-          title="Toggle 3D Drone Perspective"
-        >
-          <Box className="w-3.5 h-3.5" />
-          <span>3D View</span>
-        </button>
 
         {/* Expand / Minimize */}
         {onToggleExpand && (

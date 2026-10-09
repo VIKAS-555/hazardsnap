@@ -96,38 +96,6 @@ body {
   pointer-events: none;
 }
 
-/* 3D Isometric View Mode */
-.map-3d-wrapper {
-  perspective: 1000px;
-  position: relative;
-  overflow: hidden;
-}
-
-.map-3d-tilt {
-  transform: rotateX(25deg) scale(1.04);
-  transform-origin: 50% 80%;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: transform;
-}
-
-.map-2d-flat {
-  transform: rotateX(0deg) scale(1);
-  transform-origin: 50% 50%;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* Counter-tilt only the INNER child so Leaflet's marker translate3d coordinates are never overridden */
-.map-3d-tilt .custom-hazard-marker > div {
-  transform: rotateX(-25deg) translateY(-6px);
-  filter: drop-shadow(0 10px 8px rgba(0, 0, 0, 0.4));
-  transition: transform 0.3s ease;
-}
-
-.map-3d-tilt .user-gps-pulse > div {
-  transform: rotateX(-25deg);
-  transition: transform 0.3s ease;
-}
-
 /* Subtle clean scrollbars */
 ::-webkit-scrollbar {
   width: 5px;
