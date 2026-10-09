@@ -23,13 +23,40 @@ body {
   font-family: inherit;
 }
 
-/* Zero-API-Key Dark Mode styling for standard OpenStreetMap tiles */
-.dark-tiles img.leaflet-tile {
-  filter: brightness(0.6) invert(1) contrast(2.5) hue-rotate(200deg) saturate(0.25) brightness(0.75) !important;
+/* Faster tile rendering with hardware acceleration */
+.leaflet-tile {
+  will-change: transform, opacity;
+  image-rendering: auto;
 }
 
-.street-tiles img.leaflet-tile {
-  filter: contrast(1.05) brightness(0.95) !important;
+/* 3D Perspective Isometric Map Transform */
+.map-3d-wrapper {
+  perspective: 1100px;
+  overflow: hidden;
+  position: relative;
+}
+
+.map-3d-container {
+  transform: perspective(1000px) rotateX(38deg) scale(1.08) !important;
+  transform-origin: 50% 80% !important;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.map-2d-container {
+  transform: perspective(1000px) rotateX(0deg) scale(1) !important;
+  transform-origin: 50% 50% !important;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 3D Elevated Holographic Markers */
+.map-3d-container .custom-hazard-marker {
+  transform: rotateX(-38deg) translateY(-14px) scale(1.15) !important;
+  filter: drop-shadow(0 16px 8px rgba(0, 0, 0, 0.85)) !important;
+  transition: transform 0.4s ease;
+}
+
+.map-3d-container .user-gps-pulse {
+  transform: rotateX(-38deg) translateY(-10px) !important;
 }
 
 .leaflet-popup-content-wrapper {

@@ -7,6 +7,9 @@ import {
   CheckCircle2,
   AlertTriangle,
   LocateFixed,
+  Maximize2,
+  Minimize2,
+  Box,
   Layers,
   Sparkles,
 } from 'lucide-react';
@@ -19,6 +22,9 @@ interface SafetyMapProps {
   onSelectHazard?: (hazard: HazardReport) => void;
   onUpvote?: (hazardId: string) => void;
   onRequestReport?: () => void;
+  isExpanded?: boolean;
+  onToggleExpand?: () => void;
+  focusedHazard?: HazardReport | null;
 }
 
 type MapTheme = 'dark' | 'street' | 'satellite';
@@ -28,6 +34,9 @@ export default function SafetyMap({
   onSelectHazard,
   onUpvote,
   onRequestReport,
+  isExpanded = false,
+  onToggleExpand,
+  focusedHazard,
 }: SafetyMapProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<any>(null);
@@ -42,6 +51,7 @@ export default function SafetyMap({
   const [filterFixed, setFilterFixed] = useState<boolean>(false);
   const [selectedHazardModal, setSelectedHazardModal] = useState<HazardReport | null>(null);
   const [mapTheme, setMapTheme] = useState<MapTheme>('dark');
+  const [is3DView, setIs3DView] = useState<boolean>(false);
 
   // User location for navigation & centering
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number }>({
@@ -51,6 +61,27 @@ export default function SafetyMap({
 
   const [activeRoutePlan, setActiveRoutePlan] = useState<SafeNavigationPlan | null>(null);
   const [isSimulating, setIsSimulating] = useState(false);
+
+  // Handle focused hazard from external list
+  useEffect(() => {
+    if (focusedHazard && mapInstanceRef.current) {
+      setSelectedHazardModal(focusedHazard);
+      mapInstanceRef.current.flyTo(
+        [focusedHazard.latitude, focusedHazard.longitude],
+        16,
+        { animate: true, duration: 1 }
+      );
+    }
+  }, [focusedHazard]);
+
+  // Invalidate map size when expanded state or 3D view changes
+  useEffect(() => {
+    if (mapInstanceRef.current) {
+      setTimeout(() => {
+        mapInstanceRef.current.invalidateSize();
+      }, 300);
+    }
+  }, [isExpanded, is3DView]);
 
   // Fetch initial user geolocation
   useEffect(() => {
@@ -62,13 +93,11 @@ export default function SafetyMap({
             lng: pos.coords.longitude,
           };
           setUserLocation(loc);
-
-          // If map is already initialized, pan to user
           if (mapInstanceRef.current) {
             updateUserMarker(loc.lat, loc.lng);
           }
         },
-        (err) => console.warn('Location query fallback:', err),
+        () => {},
         { enableHighAccuracy: true }
       );
     }
@@ -133,15 +162,21 @@ export default function SafetyMap({
     }
   };
 
-  // Switch Map Theme Tiles (100% Free, NO API Key needed)
+  // High-Speed Multi-CDN Tile Loader
   const applyTileLayer = (L: any, map: any, theme: MapTheme) => {
     if (tileLayerRef.current) {
       map.removeLayer(tileLayerRef.current);
     }
 
-    let url = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+    // High performance tile configuration with parallel subdomains & cache buffer
+    let url = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
     let options: any = {
       maxZoom: 19,
+      subdomains: ['a', 'b', 'c'],
+      keepBuffer: 6, // Keeps 6 rows of adjacent tiles cached for instant panning
+      updateWhenIdle: false, // Smooth continuous tile loading
+      updateWhenZooming: true,
+      crossOrigin: true,
       attribution: '&copy; OpenStreetMap contributors',
     };
 
@@ -153,6 +188,7 @@ export default function SafetyMap({
       url = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
       options.attribution = '&copy; Esri World Imagery';
       options.maxZoom = 18;
+      delete options.subdomains;
     }
 
     tileLayerRef.current = L.tileLayer(url, options).addTo(map);
@@ -189,11 +225,10 @@ export default function SafetyMap({
         map = L.map(mapContainerRef.current, {
           zoomControl: false,
           attributionControl: false,
+          preferCanvas: true, // Canvas hardware acceleration for high FPS
         }).setView([defaultLat, defaultLng], 14);
 
-        // Apply free reliable OpenStreetMap tile layer
         applyTileLayer(L, map, mapTheme);
-
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
         mapInstanceRef.current = map;
@@ -233,7 +268,7 @@ export default function SafetyMap({
           fillOpacity: 0.16,
           weight: 1.5,
           dashArray: '4, 4',
-          radius: 65, // 65-meter safety buffer
+          radius: 65,
         }).addTo(map);
         markersRef.current.push(circle);
       }
@@ -292,7 +327,6 @@ export default function SafetyMap({
 
       if (!activeRoutePlan) return;
 
-      // 1. Direct Unsafe Path (Dashed Red Line)
       if (activeRoutePlan.isDetourRequired) {
         const directPolyline = L.polyline(activeRoutePlan.directRoute.coordinates, {
           color: '#ef4444',
@@ -304,7 +338,6 @@ export default function SafetyMap({
         routeLayersRef.current.push(directPolyline);
       }
 
-      // 2. Safe Avoidance Path (Solid Emerald)
       const safePolyline = L.polyline(activeRoutePlan.safeRoute.coordinates, {
         color: '#10b981',
         weight: 5.5,
@@ -312,7 +345,6 @@ export default function SafetyMap({
       }).addTo(map);
 
       routeLayersRef.current.push(safePolyline);
-
       map.fitBounds(safePolyline.getBounds(), { padding: [60, 60] });
     });
   }, [activeRoutePlan]);
@@ -391,9 +423,52 @@ export default function SafetyMap({
   };
 
   return (
-    <div className="relative w-full h-[calc(100vh-4rem)] bg-zinc-950 overflow-hidden">
-      {/* MAP CANVAS */}
-      <div ref={mapContainerRef} className="w-full h-full z-0" />
+    <div className="relative w-full h-full bg-zinc-950 overflow-hidden map-3d-wrapper rounded-3xl border border-zinc-800 shadow-2xl">
+      {/* 3D / 2D MAP CANVAS CONTAINER */}
+      <div
+        ref={mapContainerRef}
+        className={`w-full h-full z-0 transition-transform duration-500 ${
+          is3DView ? 'map-3d-container' : 'map-2d-container'
+        }`}
+      />
+
+      {/* TOP CONTROLS: EXPAND / COLLAPSE & 3D VIEW BUTTON */}
+      <div className="absolute top-4 right-4 z-20 pointer-events-auto flex items-center gap-2">
+        {/* 3D Isometric View Toggle */}
+        <button
+          onClick={() => setIs3DView(!is3DView)}
+          className={`px-3 py-2 rounded-2xl text-xs font-bold transition flex items-center gap-1.5 backdrop-blur-md shadow-xl border ${
+            is3DView
+              ? 'bg-blue-600 text-white border-blue-400 shadow-blue-900/50 ring-2 ring-blue-500/50'
+              : 'bg-zinc-900/90 text-zinc-300 border-zinc-700 hover:text-white hover:bg-zinc-850'
+          }`}
+          title="Toggle 3D Drone Perspective"
+        >
+          <Box className={`w-3.5 h-3.5 ${is3DView ? 'animate-spin' : ''}`} />
+          <span>{is3DView ? '3D View ON' : '3D View'}</span>
+        </button>
+
+        {/* Expand / Minimize Fullscreen Map */}
+        {onToggleExpand && (
+          <button
+            onClick={onToggleExpand}
+            className="p-2 sm:px-3 sm:py-2 rounded-2xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-700 text-white text-xs font-bold shadow-xl backdrop-blur-md flex items-center gap-1.5 transition active:scale-95"
+            title={isExpanded ? 'Collapse into Side Panel' : 'Expand Full Map'}
+          >
+            {isExpanded ? (
+              <>
+                <Minimize2 className="w-4 h-4 text-amber-400" />
+                <span className="hidden sm:inline">Split View</span>
+              </>
+            ) : (
+              <>
+                <Maximize2 className="w-4 h-4 text-emerald-400" />
+                <span className="hidden sm:inline">Expand Map</span>
+              </>
+            )}
+          </button>
+        )}
+      </div>
 
       {/* SAFE ROUTE PLANNER FLOATING PANEL */}
       <SafeRoutePlanner
@@ -406,8 +481,7 @@ export default function SafetyMap({
       />
 
       {/* TOP FLOATING CONTROLS: CATEGORY CHIPS */}
-      <div className="absolute top-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
-        {/* Category Filter Pills */}
+      <div className="absolute top-4 left-4 right-32 sm:right-56 z-10 flex flex-wrap items-center gap-2 pointer-events-none">
         <div className="pointer-events-auto flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 scrollbar-none bg-zinc-900/90 backdrop-blur-md p-1.5 rounded-2xl border border-zinc-800 shadow-xl">
           <button
             onClick={() => setSelectedCategoryFilter('all')}
@@ -417,7 +491,7 @@ export default function SafetyMap({
                 : 'text-zinc-400 hover:text-white'
             }`}
           >
-            All Hazards ({hazards.length})
+            All ({hazards.length})
           </button>
           {(Object.keys(CATEGORY_METADATA) as HazardCategory[]).map((cat) => {
             const meta = CATEGORY_METADATA[cat];
@@ -426,36 +500,22 @@ export default function SafetyMap({
               <button
                 key={cat}
                 onClick={() => setSelectedCategoryFilter(cat)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition shrink-0 flex items-center gap-1.5 ${
+                className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold transition shrink-0 flex items-center gap-1.5 ${
                   isSel
                     ? 'bg-zinc-800 text-white border border-red-500 shadow'
                     : 'text-zinc-400 hover:text-zinc-200'
                 }`}
               >
                 <span>{meta.icon}</span>
-                <span>{meta.label.split(' ')[0]}</span>
+                <span className="hidden md:inline">{meta.label.split(' ')[0]}</span>
               </button>
             );
           })}
-        </div>
-
-        {/* Toggle Show Fixed */}
-        <div className="pointer-events-auto flex items-center gap-2 bg-zinc-900/90 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-zinc-800 shadow-xl text-xs">
-          <label className="flex items-center gap-2 cursor-pointer text-zinc-300">
-            <input
-              type="checkbox"
-              checked={filterFixed}
-              onChange={(e) => setFilterFixed(e.target.checked)}
-              className="rounded accent-emerald-500 w-3.5 h-3.5"
-            />
-            <span>Show Fixed ({hazards.filter((h) => h.status === 'verified_fixed').length})</span>
-          </label>
         </div>
       </div>
 
       {/* MAP LAYER SWITCHER & RE-CENTER BUTTON (BOTTOM RIGHT) */}
       <div className="absolute bottom-6 right-4 z-20 pointer-events-auto flex flex-col items-end gap-2">
-        {/* Layer Theme Selector */}
         <div className="bg-zinc-900/90 backdrop-blur-md border border-zinc-800 rounded-2xl p-1 shadow-2xl flex items-center gap-1">
           <button
             onClick={() => setMapTheme('dark')}
@@ -491,11 +551,10 @@ export default function SafetyMap({
             title="Satellite Aerial"
           >
             <span>🛰️</span>
-            <span className="hidden sm:inline">Satellite</span>
+            <span className="hidden sm:inline">Sat</span>
           </button>
         </div>
 
-        {/* Re-center to GPS */}
         <button
           onClick={handleRecenterToUser}
           className="p-3 rounded-2xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 text-blue-400 hover:text-blue-300 shadow-2xl backdrop-blur-md transition group"
@@ -509,10 +568,10 @@ export default function SafetyMap({
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 pointer-events-auto">
         <button
           onClick={onRequestReport}
-          className="px-6 py-3.5 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-bold text-sm shadow-2xl shadow-red-950/80 flex items-center gap-2.5 transition active:scale-95 border border-red-400/30"
+          className="px-5 py-3 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-bold text-xs sm:text-sm shadow-2xl shadow-red-950/80 flex items-center gap-2 transition active:scale-95 border border-red-400/30"
         >
-          <AlertTriangle className="w-5 h-5 text-yellow-300" />
-          <span>Report Hazard (5 Seconds)</span>
+          <AlertTriangle className="w-4 h-4 text-yellow-300" />
+          <span>Report Hazard (5s)</span>
         </button>
       </div>
 
@@ -545,7 +604,6 @@ export default function SafetyMap({
             </button>
           </div>
 
-          {/* Photo */}
           {selectedHazardModal.photo_url && (
             <div className="mt-3 rounded-2xl overflow-hidden aspect-video bg-zinc-900 border border-zinc-800">
               <img
@@ -556,7 +614,6 @@ export default function SafetyMap({
             </div>
           )}
 
-          {/* Fixed Verification Badge */}
           {selectedHazardModal.status === 'verified_fixed' && (
             <div className="mt-3 p-3 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 space-y-2">
               <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold">
