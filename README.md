@@ -1,4 +1,3 @@
-<img width="1465" height="840" alt="Screenshot 2026-10-10 at 3 21 13 AM" src="https://github.com/user-attachments/assets/75eeb139-1f77-4d19-ab29-96eb6fbddfcf" /># 🚨 HazardSnap — Hyper-Local Civic Hazard Intelligence & Rapid Response Grid
 
 TEAM: 2392608146-Obsidian
 NAME: Vikas N
