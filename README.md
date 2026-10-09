@@ -2,24 +2,29 @@
 
 > **Hackathon Submission**: Civic Tech & Urban Infrastructure Safety  
 > *Transforming how citizens report street dangers and how municipal teams prioritize life-saving repairs.*
+>
+> 🌐 **Repository**: [https://github.com/VIKAS-555/hazardsnap](https://github.com/VIKAS-555/hazardsnap)  
+> 🛡️ **Branch**: `main`
 
 ---
 
 ## 📌 Executive Summary
 
-Every year, thousands of commuters suffer avoidable injuries and fatalities from preventable street hazards: **uncovered stormwater manholes, dangling 11kV live power wires, caved-in footpaths, and submerged roads**. 
+Every year, thousands of pedestrians, cyclists, and motorists suffer severe injuries and fatalities due to neglected street hazards: **uncovered stormwater manholes, dangling 11kV live power wires, road sinkholes, and flash-flooded underpasses**.
 
-### The Problem
-- **Extreme Citizen Friction**: Existing civic reporting portals (grievance apps, municipal helplines) require 15+ mandatory form fields, account creation, and cumbersome dropdowns. Frustrated commuters give up.
-- **Data Blindspots**: Municipal engineers have zero real-time spatial visibility into where hazards are concentrated or which ones pose an imminent danger to life.
-- **The Accountability Void**: Complaints are routinely marked as "Resolved" in municipal backends without any physical proof, leaving citizens skeptical and dangers unaddressed.
+### The Real-World Problems
+1. **Extreme Citizen Friction**: Existing civic reporting portals (grievance apps, municipal helplines) require 15+ mandatory form fields, bureaucratic department categorization, and cumbersome dropdowns. Frustrated commuters give up in seconds.
+2. **Spatial Blindspots**: Municipal engineers and disaster response squads lack real-time spatial visibility into where hazards are clustered and which ones pose immediate lethal risk.
+3. **The Accountability Void**: Citizen complaints are routinely marked "Resolved" in municipal backends without physical verification, leaving commuters skeptical and lethal hazards active.
 
 ### The HazardSnap Solution
-HazardSnap removes 100% of the friction with a **5-second, photo-first reporting workflow** paired with an **AI-powered public safety grid**:
-1. **📸 Photo-First & 5-Second Log**: Snap a photo or record a voice note on the move. High-accuracy GPS auto-pins the location with automated reverse-geocoding.
-2. **🗺️ Public Safety Navigation Map**: Commuters see real-time color-coded hazard alerts with **pulsing radar warnings** around critical hazards (live wires & open drains) to navigate safely.
-3. **🏛️ Municipal Severity-Ranked Triage Queue**: Incoming reports are automatically scored (0–100) and ranked by lethal danger so response units deploy to life-threatening risks first.
-4. **✅ Photographic Fix Verification**: A hazard ticket **cannot be closed without an 'After-Fix' photograph and field log**, providing an immutable Before/After audit trail for the public.
+HazardSnap delivers a **zero-friction, photo-first emergency response grid** built on high-performance web standards:
+- **📸 5-Second Photo Logger**: Instant camera snap (`capture="environment"`), auto-GPS lock with reverse-geocoding, and in-browser voice memos.
+- **🛡️ Secure Civic Gatekeeper**: Personal detail registration, 6-digit OTP verification, rate-limiting bot shields, and malware-safe payload sanitization.
+- **🗺️ Live Civic Threat Grid**: Pure dark-mode geospatial map with **pulsing radar rings**, 65m danger perimeters, and multi-layer basemaps (Dark Grid, Street, Satellite).
+- **🧭 Safe Route Navigator**: Automated detour engine that calculates safe pedestrian/driving paths around active hazards, featuring an interactive walking simulation.
+- **🏛️ Municipal Severity-Ranked Queue**: Auto-scored triage board (0–100 danger rating) directing crews to life-threatening risks first.
+- **✅ Photographic Fix Verification**: Tickets cannot be closed without an **"After-Fix" photo** and timestamped field log, providing an immutable Before/After audit trail.
 
 ---
 
@@ -27,53 +32,67 @@ HazardSnap removes 100% of the friction with a **5-second, photo-first reporting
 
 ```mermaid
 flowchart TD
-    subgraph Citizen["📱 Commuter / Citizen (On the Street)"]
-        A["📸 One-Tap Camera Snap"]
-        B["📍 Auto-GPS Lock & Address"]
-        C["🎙️ In-Browser Voice Memo"]
-        D["⚡ Quick Hazard Pills"]
+    subgraph Gatekeeper["🔐 Citizen Gatekeeper & Security Shield"]
+        A["👤 Personal Details Registration"]
+        B["📲 6-Digit OTP Verification"]
+        C["🛡️ Malware & Brute-Force Rate Limiter"]
     end
 
-    subgraph Engine["⚙️ HazardSnap Processing Engine"]
-        E["Hybrid Severity Engine (0-100 Score)"]
-        F["Google Gemini AI Vision Classification"]
-        G["Community Confirmations ('I See This Too')"]
+    subgraph FieldLogger["📱 Rapid Citizen Reporting"]
+        D["📸 One-Tap Camera Capture"]
+        E["📍 Sub-Meter GPS Auto-Pin"]
+        F["🎙️ HTML5 Voice Memo Visualizer"]
+        G["⚡ Single-Tap Hazard Category Pills"]
     end
 
-    subgraph Data["🗄️ Supabase Cloud & Resilient Cache"]
-        H[("PostgreSQL Spatial Database")]
-        I[("Encrypted Local Demo Cache")]
+    subgraph CoreEngine["⚙️ Hazard Intelligence Engine"]
+        H["Dynamic Danger Scorer (0–100 Scale)"]
+        I["Google Gemini AI Multimodal Vision Analysis"]
+        J["Community 'I See This Too' Upvote Engine"]
     end
 
-    subgraph Outputs["🚀 Real-Time Response Channels"]
-        J["🗺️ Interactive Public Safety Map<br/>(Pulsing Radar Rings & Live Popups)"]
-        K["🏛️ Municipal Emergency Triage Queue<br/>(Severity-Ranked Action Board)"]
-        L["📸 Photographic Proof Verification<br/>(Before & After Audit Trail)"]
+    subgraph DataTier["🗄️ Resilient Cloud & Edge Storage"]
+        K[("Supabase Spatial PostgreSQL")]
+        L[("Encrypted Local Offline Fallback Cache")]
     end
 
-    A --> E
-    B --> E
-    C --> E
-    D --> E
-    E --> F
-    F --> H
-    H <--> I
-    H --> J
-    H --> K
-    G --> E
-    K --> L
-    L --> J
+    subgraph ResponseHub["🚀 Public Safety & Municipal Response"]
+        M["🗺️ Live Threat Grid (Dark / Street / Satellite)"]
+        N["🧭 Safe Route Navigator & Walking Simulation"]
+        O["🏛️ Municipal Priority Queue (Severity-Sorted)"]
+        P["✅ Photographic Before/After Fix Verification"]
+    end
+
+    A --> B --> C --> FieldLogger
+    D & E & F & G --> CoreEngine
+    H & I & J --> K
+    K <--> L
+    K --> M
+    K --> N
+    K --> O
+    O --> P
+    P --> M
 ```
 
 ---
 
-## ⚡ Core Features Built for Hackathon Judges
+## ⚡ Flagship Capabilities
 
-### 1. 5-Second Citizen Logger
-- **Camera First**: Direct phone camera shutter launch (`capture="environment"`). Zero redundant clicks.
-- **Sub-meter GPS Pin**: Captures device coordinates with accuracy radius and reverse-geocodes into street names via OpenStreetMap.
-- **Web Audio Voice Note**: Records voice explanations using HTML5 `MediaRecorder` with dynamic audio wave visualizer and playback controls.
-- **Single-Tap Preset Pills**:
+### 1. 🔐 Secure Gatekeeper & Citizen Onboarding
+- **Clean Separation**: First-time visitors are welcomed by a dedicated, focused authentication portal before accessing the live command center.
+- **Personal Detail Verification**: Captures verified citizen identity (Full Name, Phone Number, Email, Ward / Locality, Citizen ID) to deter malicious submissions.
+- **OTP Verification Flow**: 6-digit security code verification with countdown resend timer and automated retry limits.
+- **Anti-Malware & Abuse Protections**:
+  - Client and edge input sanitization preventing XSS / SQL injection.
+  - Strict MIME-type checking on media uploads.
+  - Exponential backoff rate limiting against bot spamming.
+- **Persistent Authenticated State**: Once signed in, citizens seamlessly enter the Command Center with zero session dropouts.
+
+### 2. 📸 5-Second Rapid Citizen Logger
+- **Camera First**: Direct shutter trigger with zero secondary clicks.
+- **Sub-meter GPS Pin**: Captures device coordinates with accuracy radius and reverse-geocodes into street names via OpenStreetMap Nominatim.
+- **Web Audio Voice Note**: In-browser recording via HTML5 `MediaRecorder` API with live waveform animation.
+- **Standardized Hazard Danger Catalog**:
   | Category | Threat Level | Base Danger Score | Immediate Danger Profile |
   | :--- | :---: | :---: | :--- |
   | ⚡ **Dangling Live Wire** | **Critical** | `98 / 100` | High electrocution risk, sparking near puddles |
@@ -83,30 +102,26 @@ flowchart TD
   | 🌳 **Fallen Tree / Branch** | **High** | `72 / 100` | Road blockage, snapped overhead utility lines |
   | 🚧 **Broken Footpath** | **Medium** | `62 / 100` | Tripping hazard, forces pedestrians into vehicular traffic |
 
-### 2. Commuter Public Safety Map & Live Threat Grid
-- **Pulsing Radar Wave**: Critical dangers emit animated red radar pulses directly on the map so users spot them at a glance.
+### 3. 🗺️ Pure Dark-Mode Threat Map & Spatial Controls
+- **Unified Controls**: One-click toggle between **🌙 Dark Grid (CartoDB Dark Matter)**, **🗺️ Street (OSM)**, and **🛰️ Satellite (Esri)**.
+- **Pulsing Radar Rings**: High-voltage wires and open manholes emit animated red radar pulses for instant peripheral awareness.
+- **Safety Buffer Perimeters**: 65-meter danger zones rendered on the map around critical active hazards.
 - **One-Tap Community Validation**: Commuters can tap *"Confirm Hazard"* to upvote, boosting priority and verifying the hazard in real time.
-- **Danger Buffer Radii**: Red translucent 65-meter safety buffer perimeters around active high-voltage lines and open manholes.
-- **Filter Controls**: Filter by hazard categories or toggle resolved items.
+- **Fullscreen & Recenter**: Quick toggle between split feed layout and immersive fullscreen map view.
 
-### 3. 🧭 Safe Route Navigator (Automated Hazard Avoidance)
-- **Real-Time Danger Interception**: Evaluates user path coordinates against active hazards using spatial distance algorithms.
-- **Dynamic Detour Generation**: Automatically calculates an alternate pedestrian/driving path routing commuters safely 100m+ away from red-flagged hazard zones.
+### 4. 🧭 Safe Route Navigator (Automated Hazard Avoidance)
+- **Real-Time Hazard Interception**: Analyzes coordinate paths against active threat radii.
+- **Dynamic Detour Generation**: Calculates safe walking/driving detours routing commuters safely away from red-flagged hazard zones.
 - **Route Comparison Matrix**:
-  - 🚫 *Direct Unsafe Path*: Displayed as a dashed red line highlighting intercepted critical hazards.
-  - 🛡️ *Protected Safe Path*: Rendered as a glowing emerald corridor with extra time/distance estimates.
-- **Interactive Walking Simulation**: Step-by-step animated pedestrian simulation (`🚶`) walking along the safe path for live hackathon judge demos!
+  - 🚫 *Direct Unsafe Path*: Displayed as a red dashed line intercepting active critical hazards.
+  - 🛡️ *Protected Safe Path*: Rendered as a glowing emerald corridor with real-time distance and time delta calculations.
+- **Interactive Walking Simulation**: Step-by-step animated pedestrian simulation (`🚶`) following the safe path in real-time.
 
-### 4. Municipal Priority Queue & Photographic Fix Proof
-- **Severity-Ranked Triage**: Automatically orders tasks by danger score so emergency crews tackle high-voltage wires and open pits before cosmetic repairs.
-- **Crew Dispatch Workflow**: Transition items seamlessly from `Reported` ➔ `Crew Dispatched` ➔ `Verified Fixed`.
-- **Mandatory Photo-Proof**: Municipal workers must upload an **"After-Fix" photo** showing the repaired manhole or insulated cable.
-- **Before & After Visuals**: Commuters and municipal supervisors can inspect side-by-side Before/After photos for total accountability.
-
-### 5. Smart Hybrid AI Engine
-- **Pre-calibrated Risk Weights**: Physical danger algorithms calibrated for urban traffic scenarios.
-- **Google Gemini 1.5 Flash Vision**: Evaluates uploaded images and contextual notes to auto-detect hazard classes, calculate confidence, and generate commuter safety advisories.
-- **Zero-Downtime Architecture**: Backed by a seamless local storage caching layer that ensures **100% demo uptime** even during network dropouts during live judging.
+### 5. 🏛️ Municipal Priority Queue & Photographic Fix Proof
+- **Severity-Ranked Triage**: Emergency crews automatically view tickets sorted by danger score (highest risk first).
+- **Status Lifecycles**: `Reported` ➔ `Crew Dispatched` ➔ `Verified Fixed`.
+- **Mandatory Photo-Proof**: Technicians must upload an **"After-Fix" photo** before a ticket can be closed.
+- **Side-by-Side Audit Trail**: Citizens and municipal supervisors inspect side-by-side Before & After photos with timestamped work notes for complete transparency.
 
 ---
 
@@ -114,14 +129,14 @@ flowchart TD
 
 | Layer | Technology | Rationale |
 | :--- | :--- | :--- |
-| **Framework** | **Next.js 15 (App Router)** | Server-side optimization, fast routing, enterprise production readiness |
-| **Frontend** | **React 19 & Tailwind CSS** | Ultra-responsive, mobile-first design with dark civic theme |
-| **Mapping Engine** | **Leaflet + CartoDB Dark Matter** | Ultra-lightweight, high-performance spatial map rendering |
-| **Audio Processing** | **HTML5 MediaRecorder API** | In-browser audio capture without third-party app dependencies |
-| **Database** | **Supabase (PostgreSQL)** | Spatial indexing, row-level security (RLS), real-time sync |
-| **AI Integration** | **Google Gemini 1.5 Flash Vision** | Fast image classification and multimodal hazard severity analysis |
-| **Icons & UI** | **Lucide React** | High-clarity civic danger iconography |
-| **Deployment** | **Vercel** | Edge network deployment with automated CI/CD pipeline |
+| **Framework** | **Next.js 15 (App Router)** | High-speed server components, optimized asset bundling, production reliability |
+| **Frontend UI** | **React 19 & Tailwind CSS** | Ultra-responsive, mobile-first design with high-contrast civic dark aesthetic |
+| **Spatial Mapping** | **Leaflet & CartoDB / Esri** | Fast vector markers, radar animations, custom buffer geometry |
+| **Audio Processing** | **HTML5 MediaRecorder API** | Native in-browser voice recording with zero third-party SDK dependencies |
+| **Database & Auth** | **Supabase (PostgreSQL + RLS)** | Real-time spatial queries, row-level security, verified user sessions |
+| **AI Classification** | **Google Gemini 1.5 Flash Vision** | Fast multimodal image understanding and hazard advisory synthesis |
+| **Icons & Design** | **Lucide React** | High-clarity civic danger iconography |
+| **Deployment** | **Vercel / Edge Network** | Instant edge delivery with automated CI/CD pipeline |
 
 ---
 
@@ -129,23 +144,23 @@ flowchart TD
 
 | Criterion | How HazardSnap Solves It |
 | :--- | :--- |
-| **Innovation & Creativity** | Replaces cumbersome 15-field bureaucratic forms with a 5-second camera snap, voice note, and automatic reverse-geocoding. |
-| **Real-World Impact** | Directly targets life-threatening urban dangers (electrocution, open sewer falls, sinkholes) with automated severity ranking. |
-| **Technical Execution** | Full-stack Next.js 15 + React 19 app with Leaflet interactive mapping, browser audio capture, Supabase database, and Gemini AI vision. |
-| **Accountability & Trust** | Solves the "fake resolution" problem by requiring photographic proof of fixes before a ticket can be closed. |
-| **Feasibility & Scalability** | Low deployment cost, zero app installation required (runs in mobile browser/PWA), instant municipal utility. |
+| **Innovation & Creativity** | Replaces bureaucratic 15-field portals with a 5-second camera snap, voice note, and automatic reverse-geocoding. |
+| **Real-World Impact** | Prioritizes life-threatening risks (electrocution, open manhole falls) with algorithmic severity ranking and detour routing. |
+| **Technical Execution** | Full-stack Next.js 15 + React 19 app with Leaflet spatial mapping, browser audio capture, Supabase database, and Gemini AI vision. |
+| **Accountability & Trust** | Solves fake ticket closures by requiring photographic proof of fixes before tickets can be closed. |
+| **Feasibility & Scalability** | PWA-ready, zero app installation required (runs directly in mobile browser), instant municipal utility. |
 
 ---
 
 ## 🚀 Quick Start Guide (Run Locally)
 
 ### 1. Prerequisites
-- **Node.js**: v18.0.0 or later (v22 LTS recommended)
-- **npm** or **yarn** / **pnpm**
+- **Node.js**: v18.0.0 or later (v20+ recommended)
+- **npm**, **yarn**, or **pnpm**
 
 ### 2. Clone and Install
 ```bash
-# Clone the repository
+# Clone the official repository
 git clone https://github.com/VIKAS-555/hazardsnap.git
 cd hazardsnap
 
@@ -156,14 +171,14 @@ npm install
 ### 3. Configure Environment Variables
 Create a `.env.local` file in the root directory:
 ```env
-# Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL=https://vltpqzsonqqxxzysaxdv.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+# Supabase Cloud Configuration
+NEXT_PUBLIC_SUPABASE_URL=https://scewuadxgpnggpypzubu.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_26zYJPkGrZA5OzhDLyjO3Q_dQ7OExG6
 
-# Optional: Google Gemini API Key for automated hazard photo classification
+# Optional: Google Gemini API Key for AI Hazard Photo Classification
 NEXT_PUBLIC_GEMINI_API_KEY=your_gemini_api_key
 ```
-*(Note: If no Supabase or Gemini keys are provided, the app automatically switches to its built-in smart heuristic engine and resilient demo cache).*
+*(Note: If API keys are omitted, HazardSnap automatically uses its smart heuristic engine and resilient demo cache).*
 
 ### 4. Run the Development Server
 ```bash
@@ -179,14 +194,6 @@ npm start
 
 ---
 
-## 🗺️ Product Roadmap & Next Iterations
-
-- [ ] **Predictive Flooding Alerts**: Integrate IoT water level sensor feeds from storm drains to warn motorists before underpasses flood.
-- [ ] **Turn-by-Turn Safe Routing**: Integration with Mapbox Navigation SDK to calculate pedestrian and two-wheeler paths that route around active critical hazard zones.
-- [ ] **WhatsApp & Telegram Bot Gateway**: Allow citizens to forward a photo with location pin via WhatsApp to log hazards without opening a browser.
-- [ ] **Automated Civic Karma Rewards**: Micro-incentives and civic badges for verified citizen reporters and spot-checkers.
-
----
-
 ## 📄 License & Attribution
-Developed with ❤️ for civic safety and urban mobility. Released under the [MIT License](LICENSE).
+Developed with ❤️ for civic safety, pedestrian lives, and transparent urban governance.  
+Released under the [MIT License](LICENSE).
