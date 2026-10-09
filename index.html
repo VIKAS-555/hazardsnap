@@ -243,8 +243,8 @@
 
       <!-- Action & Filter toolbar -->
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-        <!-- Add Event Button -->
-        <button onclick="openEventEditorModal()" class="px-3.5 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-1.5 shadow-sm transition">
+        <!-- Add Event Button (Lead Admin & Core Maintainer only) -->
+        <button id="btn-add-event-toolbar" onclick="openEventEditorModal()" class="hidden px-3.5 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-1.5 shadow-sm transition cursor-pointer">
           <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Event
         </button>
 
@@ -290,7 +290,8 @@
         </div>
 
         <div>
-          <button onclick="openProjectEditorModal()" class="px-4 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1.5 shadow-sm transition">
+          <!-- Add Project Button (Lead Admin & Core Maintainer only) -->
+          <button id="btn-add-project-toolbar" onclick="openProjectEditorModal()" class="hidden px-4 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1.5 shadow-sm transition cursor-pointer">
             <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Project
           </button>
         </div>
@@ -865,6 +866,6 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/config.js"></script>
   <script src="js/auth.js"></script>
-  <script src="js/app.js?v=3.5"></script>
+  <script src="js/app.js?v=3.6"></script>
 </body>
 </html>

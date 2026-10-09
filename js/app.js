@@ -64,8 +64,33 @@ function updateThemeIcons() {
 }
 
 /* ============================================================
-   ACTIVE MEMBER SESSION SYNC
+   ACTIVE MEMBER SESSION SYNC & GOVERNANCE PERMISSIONS
    ============================================================ */
+function hasContentAdminAccess() {
+  if (!window.AuthEngine || typeof window.AuthEngine.getActiveSession !== 'function') {
+    return false;
+  }
+  const session = window.AuthEngine.getActiveSession();
+  if (!session) return false;
+  const role = window.AuthEngine.normalizeMemberRank ? window.AuthEngine.normalizeMemberRank(session.role) : session.role;
+  return role === 'Root Architect' || role === 'Core Maintainer';
+}
+
+function syncContentAdminControls() {
+  const canEdit = hasContentAdminAccess();
+  const btnAddEvent = document.getElementById('btn-add-event-toolbar');
+  if (btnAddEvent) {
+    if (canEdit) btnAddEvent.classList.remove('hidden');
+    else btnAddEvent.classList.add('hidden');
+  }
+
+  const btnAddProj = document.getElementById('btn-add-project-toolbar');
+  if (btnAddProj) {
+    if (canEdit) btnAddProj.classList.remove('hidden');
+    else btnAddProj.classList.add('hidden');
+  }
+}
+
 function checkAuthNavbarState() {
   const session = window.AuthEngine && window.AuthEngine.getActiveSession ? window.AuthEngine.getActiveSession() : null;
   const navText = document.getElementById('nav-auth-text');
@@ -95,6 +120,8 @@ function checkAuthNavbarState() {
     navLink.className = 'holographic-id-badge inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition shadow-sm border border-blue-500/40';
     if (verifiedDot) verifiedDot.classList.add('hidden');
   }
+
+  syncContentAdminControls();
 }
 
 /* ============================================================
@@ -460,6 +487,7 @@ function renderEvents() {
 
   const events = getStoredEvents();
   const userRsvps = getUserRsvps();
+  const canManage = hasContentAdminAccess();
 
   // If no events exist in the club
   if (events.length === 0) {
@@ -469,12 +497,16 @@ function renderEvents() {
           <i data-lucide="calendar" class="w-6 h-6"></i>
         </div>
         <h3 class="text-base font-bold text-slate-900 dark:text-white">No Events Scheduled Yet</h3>
-        <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-1 mb-5 leading-relaxed">
-          The schedule is currently clear. Club leads and coordinators can add workshops, labs, and hackathons below.
+        <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-1 ${canManage ? 'mb-5' : 'mb-2'} leading-relaxed">
+          ${canManage 
+            ? 'The schedule is currently clear. You have governance permissions to schedule workshops, labs, and hackathons.' 
+            : 'The schedule is currently clear. Upcoming technical sessions, workshops, and hackathons will appear here once announced.'}
         </p>
-        <button onclick="openEventEditorModal()" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition">
-          <i data-lucide="plus" class="w-4 h-4"></i> Add New Event
-        </button>
+        ${canManage ? `
+          <button onclick="openEventEditorModal()" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition cursor-pointer">
+            <i data-lucide="plus" class="w-4 h-4"></i> Add New Event
+          </button>
+        ` : ''}
       </div>
     `;
     if (window.lucide) window.lucide.createIcons();
@@ -543,15 +575,17 @@ function renderEvents() {
             </span>
             <div class="flex items-center gap-2">
               ${statusBadge}
-              <!-- Edit & Delete Controls -->
-              <div class="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition">
-                <button onclick="openEventEditorModal('${evt.id}')" title="Edit Event" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-blue-600 transition">
-                  <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
-                </button>
-                <button onclick="deleteEvent('${evt.id}')" title="Delete Event" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-rose-600 transition">
-                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                </button>
-              </div>
+              ${canManage ? `
+                <!-- Edit & Delete Controls (Lead Admin & Core Maintainer only) -->
+                <div class="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition">
+                  <button onclick="openEventEditorModal('${evt.id}')" title="Edit Event" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-blue-600 transition cursor-pointer">
+                    <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                  </button>
+                  <button onclick="deleteEvent('${evt.id}')" title="Delete Event" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-rose-600 transition cursor-pointer">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                  </button>
+                </div>
+              ` : ''}
             </div>
           </div>
 
@@ -637,6 +671,10 @@ function resetEventFilters() {
 
 // --- EVENT EDITOR MODAL LOGIC (ADD / EDIT) ---
 function openEventEditorModal(eventId = null) {
+  if (!hasContentAdminAccess()) {
+    showToast('Access Restricted: Only Lead Administrators and Core Maintainers can manage workshops.', 'shield-alert');
+    return;
+  }
   const modal = document.getElementById('event-editor-modal');
   if (!modal) return;
 
@@ -686,6 +724,11 @@ function closeEventEditorModal() {
 
 function handleEventEditorSubmit(e) {
   e.preventDefault();
+  if (!hasContentAdminAccess()) {
+    showToast('Access Restricted: Only Lead Administrators and Core Maintainers can manage workshops.', 'shield-alert');
+    closeEventEditorModal();
+    return;
+  }
   const id = document.getElementById('edit-event-id').value;
   const title = document.getElementById('edit-event-title').value.trim();
   const type = document.getElementById('edit-event-type').value;
@@ -768,6 +811,10 @@ function handleEventEditorSubmit(e) {
 }
 
 function deleteEvent(eventId) {
+  if (!hasContentAdminAccess()) {
+    showToast('Access Restricted: Only Lead Administrators and Core Maintainers can delete workshops.', 'shield-alert');
+    return;
+  }
   if (!confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
     return;
   }
@@ -810,6 +857,7 @@ function renderProjects() {
   if (!container) return;
 
   const projects = getStoredProjects();
+  const canManage = hasContentAdminAccess();
 
   // If empty state
   if (projects.length === 0) {
@@ -819,12 +867,16 @@ function renderProjects() {
           <i data-lucide="folder-code" class="w-6 h-6"></i>
         </div>
         <h3 class="text-base font-bold text-slate-900 dark:text-white">No Projects Published Yet</h3>
-        <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-1 mb-5 leading-relaxed">
-          Members can publish their projects built in Competitive Programming, Robotics, Open Source, or Hackathons.
+        <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-1 ${canManage ? 'mb-5' : 'mb-2'} leading-relaxed">
+          ${canManage 
+            ? 'No projects published yet. You have maintainer access to publish student projects built in AI, Robotics, CP, and Open Source.' 
+            : 'No projects published yet. Curated member projects reviewed and published by Core Maintainers will appear here.'}
         </p>
-        <button onclick="openProjectEditorModal()" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition">
-          <i data-lucide="plus" class="w-4 h-4"></i> Add First Project
-        </button>
+        ${canManage ? `
+          <button onclick="openProjectEditorModal()" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition cursor-pointer">
+            <i data-lucide="plus" class="w-4 h-4"></i> Add First Project
+          </button>
+        ` : ''}
       </div>
     `;
     if (window.lucide) window.lucide.createIcons();
@@ -842,14 +894,17 @@ function renderProjects() {
             <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-900/40">
               ${proj.badge || 'Project'}
             </span>
-            <div class="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition">
-              <button onclick="openProjectEditorModal('${proj.id}')" title="Edit Project" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-blue-600 transition">
-                <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
-              </button>
-              <button onclick="deleteProject('${proj.id}')" title="Delete Project" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-rose-600 transition">
-                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-              </button>
-            </div>
+            ${canManage ? `
+              <!-- Edit & Delete Controls (Lead Admin & Core Maintainer only) -->
+              <div class="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition">
+                <button onclick="openProjectEditorModal('${proj.id}')" title="Edit Project" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-blue-600 transition cursor-pointer">
+                  <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="deleteProject('${proj.id}')" title="Delete Project" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-rose-600 transition cursor-pointer">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            ` : ''}
           </div>
         </div>
 
@@ -890,6 +945,10 @@ function renderProjects() {
 }
 
 function openProjectEditorModal(projectId = null) {
+  if (!hasContentAdminAccess()) {
+    showToast('Access Restricted: Only Lead Administrators and Core Maintainers can manage projects.', 'shield-alert');
+    return;
+  }
   const modal = document.getElementById('project-editor-modal');
   if (!modal) return;
 
@@ -936,6 +995,11 @@ function closeProjectEditorModal() {
 
 function handleProjectEditorSubmit(e) {
   e.preventDefault();
+  if (!hasContentAdminAccess()) {
+    showToast('Access Restricted: Only Lead Administrators and Core Maintainers can manage projects.', 'shield-alert');
+    closeProjectEditorModal();
+    return;
+  }
   const id = document.getElementById('edit-project-id').value;
   const title = document.getElementById('edit-project-title').value.trim();
   const tagline = document.getElementById('edit-project-tagline').value.trim();
@@ -998,6 +1062,10 @@ function handleProjectEditorSubmit(e) {
 }
 
 function deleteProject(projectId) {
+  if (!hasContentAdminAccess()) {
+    showToast('Access Restricted: Only Lead Administrators and Core Maintainers can delete projects.', 'shield-alert');
+    return;
+  }
   if (!confirm('Are you sure you want to remove this project?')) return;
   let projects = getStoredProjects();
   projects = projects.filter(p => p.id !== projectId);
@@ -1354,6 +1422,7 @@ function setupEventListeners() {
     if (!e.key || e.key.includes('devsphere') || e.key.includes('bst')) {
       renderClubOverview();
       renderEvents();
+      renderProjects();
       updateRsvpBadges();
       checkAuthNavbarState();
     }
@@ -1362,6 +1431,7 @@ function setupEventListeners() {
   window.addEventListener('pageshow', () => {
     renderClubOverview();
     renderEvents();
+    renderProjects();
     updateRsvpBadges();
     checkAuthNavbarState();
   });
@@ -1370,6 +1440,7 @@ function setupEventListeners() {
     if (!document.hidden) {
       renderClubOverview();
       renderEvents();
+      renderProjects();
       updateRsvpBadges();
       checkAuthNavbarState();
     }
@@ -1443,6 +1514,8 @@ window.openProjectEditorModal = openProjectEditorModal;
 window.closeProjectEditorModal = closeProjectEditorModal;
 window.handleProjectEditorSubmit = handleProjectEditorSubmit;
 window.deleteProject = deleteProject;
+window.hasContentAdminAccess = hasContentAdminAccess;
+window.syncContentAdminControls = syncContentAdminControls;
 
 /* ============================================================
    DEEPSEEK-STYLE DETECTIVE CODE LENS
