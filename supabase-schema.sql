@@ -1,164 +1,93 @@
--- ============================================================
--- BST TECH CLUB - PRODUCTION SUPABASE DATABASE SCHEMA
--- Department: Computer Science & Engineering (AI & ML)
--- Cohort: 2026
--- USN Range Restriction: 2392608001 to 2392608302
--- ============================================================
+-- =========================================================================
+-- HAZARDSNAP (CIVIC ALERT) - SUPABASE PRODUCTION DATABASE SCHEMA
+-- Hyper-local, photo-first civic hazard logging, real-time safety map &
+-- municipal severity triage queue with photographic fix verification.
+-- =========================================================================
 
--- 1. MEMBERS TABLE (Registered Undergraduates)
-CREATE TABLE IF NOT EXISTS public.members (
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- 1. HAZARDS TABLE
+CREATE TABLE IF NOT EXISTS public.hazards (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    tech_club_id TEXT UNIQUE NOT NULL,
-    name TEXT NOT NULL,
-    usn TEXT UNIQUE NOT NULL,
-    section TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL,
-    department TEXT NOT NULL DEFAULT 'CSE (AI & ML)',
-    role TEXT NOT NULL DEFAULT 'Member',
-    password_hash TEXT NOT NULL,
-    salt TEXT NOT NULL,
-    referral_count INTEGER NOT NULL DEFAULT 0,
-    referred_by TEXT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    
-    -- Strict USN Range Constraint for Department of CSE (AI & ML)
-    CONSTRAINT valid_usn_format CHECK (usn ~ '^[0-9]{10}$'),
-    CONSTRAINT valid_usn_range CHECK (usn::bigint >= 2392608001 AND usn::bigint <= 2392608302)
-);
-
--- 2. EVENTS TABLE (Workshops, Hands-on Labs & Hackathons)
-CREATE TABLE IF NOT EXISTS public.events (
-    id TEXT PRIMARY KEY,
     title TEXT NOT NULL,
-    type TEXT NOT NULL,
-    category TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'Upcoming',
-    seats INTEGER NOT NULL DEFAULT 90,
-    date TEXT NOT NULL,
-    time TEXT NOT NULL,
-    venue TEXT NOT NULL,
-    speaker_name TEXT,
-    speaker_role TEXT,
-    description TEXT NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    category TEXT NOT NULL CHECK (category IN ('live_wire', 'open_manhole', 'waterlogging', 'broken_footpath', 'sinkhole', 'fallen_tree', 'other')),
+    description TEXT,
+    severity TEXT NOT NULL DEFAULT 'high' CHECK (severity IN ('critical', 'high', 'medium', 'low')),
+    severity_score INTEGER NOT NULL DEFAULT 70 CHECK (severity_score >= 0 AND severity_score <= 100),
+    status TEXT NOT NULL DEFAULT 'reported' CHECK (status IN ('reported', 'in_progress', 'verified_fixed', 'rejected')),
+    latitude DOUBLE PRECISION NOT NULL,
+    longitude DOUBLE PRECISION NOT NULL,
+    address TEXT,
+    photo_url TEXT,
+    voice_note_url TEXT,
+    voice_transcript TEXT,
+    fix_photo_url TEXT,
+    fix_notes TEXT,
+    fixed_at TIMESTAMPTZ,
+    upvotes_count INTEGER NOT NULL DEFAULT 1,
+    reported_by TEXT DEFAULT 'Anonymous Commuter',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- 3. EVENT RSVPS TABLE (Digital Ticket Passes & QR Verification)
-CREATE TABLE IF NOT EXISTS public.event_rsvps (
+-- Indexes for ultra-fast spatial search & priority queue sorting
+CREATE INDEX IF NOT EXISTS idx_hazards_status ON public.hazards(status);
+CREATE INDEX IF NOT EXISTS idx_hazards_severity_score ON public.hazards(severity_score DESC);
+CREATE INDEX IF NOT EXISTS idx_hazards_created_at ON public.hazards(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_hazards_coords ON public.hazards(latitude, longitude);
+
+-- 2. HAZARD CONFIRMATIONS / UPVOTES TABLE (Community validation)
+CREATE TABLE IF NOT EXISTS public.hazard_upvotes (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    event_id TEXT NOT NULL REFERENCES public.events(id) ON DELETE CASCADE,
-    tech_club_id TEXT NOT NULL,
-    student_name TEXT NOT NULL,
-    student_usn TEXT NOT NULL,
-    student_email TEXT,
-    student_section TEXT,
-    verification_code TEXT NOT NULL,
+    hazard_id UUID NOT NULL REFERENCES public.hazards(id) ON DELETE CASCADE,
+    device_id TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    
-    -- Prevent duplicate RSVPs for the same student on the same event
-    CONSTRAINT unique_event_usn UNIQUE(event_id, student_usn)
+    CONSTRAINT unique_hazard_device_vote UNIQUE (hazard_id, device_id)
 );
 
--- 4. STUDENT PROJECTS TABLE (Student Showcase Gallery)
-CREATE TABLE IF NOT EXISTS public.projects (
-    id TEXT PRIMARY KEY,
-    title TEXT NOT NULL,
-    tagline TEXT,
-    category TEXT NOT NULL,
-    badge TEXT,
-    tech TEXT,
-    description TEXT NOT NULL,
-    github TEXT,
-    demo TEXT,
-    author_id TEXT,
-    author_name TEXT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
+-- Auto-update updated_at timestamp trigger
+CREATE OR REPLACE FUNCTION public.handle_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = now();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
--- Grant API access permissions to anon and authenticated roles
+DROP TRIGGER IF EXISTS set_hazards_updated_at ON public.hazards;
+CREATE TRIGGER set_hazards_updated_at
+    BEFORE UPDATE ON public.hazards
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_updated_at();
+
+-- Enable Row Level Security
+ALTER TABLE public.hazards ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.hazard_upvotes ENABLE ROW LEVEL SECURITY;
+
+-- Permissions: Public access for citizen reporting & viewing
+CREATE POLICY "Allow public read hazards"
+    ON public.hazards FOR SELECT
+    USING (true);
+
+CREATE POLICY "Allow public insert hazards"
+    ON public.hazards FOR INSERT
+    WITH CHECK (true);
+
+CREATE POLICY "Allow public update hazards"
+    ON public.hazards FOR UPDATE
+    USING (true);
+
+CREATE POLICY "Allow public read upvotes"
+    ON public.hazard_upvotes FOR SELECT
+    USING (true);
+
+CREATE POLICY "Allow public insert upvotes"
+    ON public.hazard_upvotes FOR INSERT
+    WITH CHECK (true);
+
+-- Grant privileges to anon and authenticated
 GRANT USAGE ON SCHEMA public TO anon, authenticated;
 GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;
 GRANT ALL ON ALL ROUTINES IN SCHEMA public TO anon, authenticated;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO anon, authenticated;
-
--- ============================================================
--- ROW LEVEL SECURITY (RLS) POLICIES
--- ============================================================
-ALTER TABLE public.members ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.event_rsvps ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.projects ENABLE ROW LEVEL SECURITY;
-
--- Members: Allow public reading of non-sensitive member stats & profiles
-CREATE POLICY "Allow public read members" 
-    ON public.members FOR SELECT 
-    USING (true);
-
--- Members: Allow registration of new eligible students
-CREATE POLICY "Allow public insert members" 
-    ON public.members FOR INSERT 
-    WITH CHECK (true);
-
--- Members: Allow members to update their own profile / password / referrals
-CREATE POLICY "Allow members update own record" 
-    ON public.members FOR UPDATE 
-    USING (true);
-
--- Members: Allow deleting member records (Lead Administrator kick-out)
-CREATE POLICY "Allow delete members" 
-    ON public.members FOR DELETE 
-    USING (true);
-
--- Events: Everyone can view events
-CREATE POLICY "Allow public read events" 
-    ON public.events FOR SELECT 
-    USING (true);
-
--- Events: Allow adding and editing events
-CREATE POLICY "Allow manage events" 
-    ON public.events FOR ALL 
-    USING (true);
-
--- RSVPs: Everyone can view RSVPs (to calculate seat count)
-CREATE POLICY "Allow public read rsvps" 
-    ON public.event_rsvps FOR SELECT 
-    USING (true);
-
--- RSVPs: Allow submitting RSVPs
-CREATE POLICY "Allow submit rsvps" 
-    ON public.event_rsvps FOR INSERT 
-    WITH CHECK (true);
-
--- RSVPs: Allow deleting RSVPs (Lead Administrator kick-out / RSVP cancellation)
-CREATE POLICY "Allow delete rsvps" 
-    ON public.event_rsvps FOR DELETE 
-    USING (true);
-
--- Projects: Everyone can view projects
-CREATE POLICY "Allow public read projects" 
-    ON public.projects FOR SELECT 
-    USING (true);
-
--- Projects: Allow publishing and managing projects
-CREATE POLICY "Allow manage projects" 
-    ON public.projects FOR ALL 
-    USING (true);
-
--- ============================================================
--- REALTIME WEB-SOCKET SUBSCRIPTIONS
--- Allows real-time live sync across devices without refreshing
--- ============================================================
-BEGIN;
-  -- Enable replication on all tables
-  ALTER TABLE public.members REPLICA IDENTITY FULL;
-  ALTER TABLE public.events REPLICA IDENTITY FULL;
-  ALTER TABLE public.event_rsvps REPLICA IDENTITY FULL;
-  ALTER TABLE public.projects REPLICA IDENTITY FULL;
-  
-  -- Add tables to realtime publication
-  ALTER PUBLICATION supabase_realtime ADD TABLE public.members;
-  ALTER PUBLICATION supabase_realtime ADD TABLE public.events;
-  ALTER PUBLICATION supabase_realtime ADD TABLE public.event_rsvps;
-  ALTER PUBLICATION supabase_realtime ADD TABLE public.projects;
-COMMIT;
